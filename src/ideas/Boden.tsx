@@ -160,11 +160,12 @@ function Markierung({
       m.rotation.z = daempf(istGross ? 0 : b.brot * richten, m.rotation.z, 9, dt)
       m.scale.setScalar(daempf(zielScale, m.scale.x, 9, dt))
     })
-    // … und wandert geöffnet hinter Titel und Beschreibung.
+    // … und weicht geöffnet an den freien linken Rand aus — die Farbe
+    // trägt dann allein die Titelfläche, die Beschreibung steht auf Weiß.
     const f = farbe.current
     if (f) {
       const ziel = offen
-        ? { x: 6.2, y: -5.2, rot: 0, sx: 14.5 / fBreite, sy: 11.5 / fHoehe }
+        ? { x: -8.5, y: -3.5, rot: fRot * 0.4, sx: 1.5, sy: 1.5 }
         : { x: fX, y: fY, rot: fRot, sx: 1, sy: 1 }
       f.position.x = daempf(ziel.x, f.position.x, 8, dt)
       f.position.y = daempf(ziel.y, f.position.y, 8, dt)

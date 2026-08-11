@@ -295,6 +295,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-size: 13px;
   line-height: 1.5;
   padding: 20px 26px 24px;
+  background: #ffffff;
 }
 .bo-beschreibung .bo-meta { color: var(--grau); margin-bottom: 14px; }
 .bo-beschreibung .bo-blurb { margin-bottom: 14px; }
