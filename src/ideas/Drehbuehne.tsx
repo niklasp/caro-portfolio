@@ -51,8 +51,9 @@ vec2 abdecken(vec2 uv, float imgA) {
 }
 
 void main() {
-  vec3 alt = texture2D(uAlt, abdecken(vUv, uAltA)).rgb;
-  vec3 neu = texture2D(uBild, abdecken(vUv, uBildA)).rgb;
+  vec2 uv = vec2(1.0 - vUv.x, vUv.y); // Innenseite des Zylinders
+  vec3 alt = texture2D(uAlt, abdecken(uv, uAltA)).rgb;
+  vec3 neu = texture2D(uBild, abdecken(uv, uBildA)).rgb;
   vec3 farbe = mix(alt, neu, smoothstep(0.0, 1.0, uMix));
   // stark abgedunkelt, zur Mitte hin etwas offener
   float vig = smoothstep(1.1, 0.3, distance(vUv, vec2(0.5, 0.42)));
@@ -92,8 +93,9 @@ function Hintergrund({ src }: { src: string }) {
         uZeit: { value: 0 },
         uBildA: { value: 1.5 },
         uAltA: { value: 1.5 },
-        uPlaneA: { value: 54 / 27 },
+        uPlaneA: { value: 2.85 },
       },
+      side: THREE.BackSide,
     })
   }, [])
 
@@ -118,9 +120,10 @@ function Hintergrund({ src }: { src: string }) {
     material.uniforms.uMix.value = Math.min(1, (material.uniforms.uMix.value as number) + dt * 1.3)
   })
 
+  const BOGEN = 2.4 // ~140° Rückwand-Segment
   return (
-    <mesh material={material} position={[0, 6.5, -16]}>
-      <planeGeometry args={[54, 27]} />
+    <mesh material={material} position={[0, 6, 0]}>
+      <cylinderGeometry args={[19, 19, 16, 96, 1, true, Math.PI - BOGEN / 2, BOGEN]} />
     </mesh>
   )
 }
