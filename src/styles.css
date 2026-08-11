@@ -248,12 +248,16 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-weight: 700;
   letter-spacing: -0.015em;
   white-space: nowrap;
-  text-align: center;
+  text-align: left;
   padding: 3px 8px;
 }
+/* Die Fläche ist kürzer als der Text, dafür höher — Text darf überstehen. */
 .marke-titel .marke-flaeche {
   position: absolute;
-  inset: 0;
+  top: -9px;
+  bottom: -11px;
+  left: -7px;
+  right: 30%;
   transform: translate(var(--fx, 7px), var(--fy, 5px));
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
