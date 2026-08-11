@@ -455,12 +455,7 @@ export default function Drehbuehne() {
       <Kopf hell />
       <EntwurfSchalter hell />
       <div className="sb-titel" style={{ color: '#fff' }}>
-        <h2>{p.titel}</h2>
-      </div>
-
-      {/* Beschreibung direkt im Bühnenraum — nur auf großen Bildschirmen. */}
-      <div className="db-beschreibung" ref={panel} key={p.slug}>
-        <div className="db-pfeile ov-anim-1">
+        <div className="db-pfeile">
           <button onClick={() => schnappe(ctrl.current.tang + SCHRITT)} aria-label="Vorheriges Projekt">
             ←
           </button>
@@ -468,6 +463,11 @@ export default function Drehbuehne() {
             →
           </button>
         </div>
+        <h2>{p.titel}</h2>
+      </div>
+
+      {/* Beschreibung direkt im Bühnenraum — nur auf großen Bildschirmen. */}
+      <div className="db-beschreibung" ref={panel} key={p.slug}>
         <h3 className="db-titel ov-anim-2">{p.titel}</h3>
         <p className="db-meta ov-anim-2">
           {p.rolle} · {p.jahr} · {p.ort}

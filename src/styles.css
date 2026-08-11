@@ -523,13 +523,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   transition: transform 0.25s ease-out;
   will-change: transform;
 }
-.db-beschreibung .db-pfeile {
+.db-pfeile {
   display: flex;
   gap: 16px;
   font-size: 20px;
   margin-bottom: 10px;
+  pointer-events: auto;
 }
-.db-beschreibung .db-pfeile button:hover { transform: translateY(-1px); }
+.db-pfeile button:hover { transform: translateY(-1px); }
 .db-beschreibung .db-titel {
   font-size: 19px;
   letter-spacing: -0.01em;
