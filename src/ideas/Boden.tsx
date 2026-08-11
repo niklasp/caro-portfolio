@@ -34,20 +34,20 @@ const MAX_ZOOM = 4.5
 // Handgelegte Positionen: x = Jahre (2021 links … 2026 rechts),
 // y = Kostüm (unten) … Bühne (oben).
 const LAGE: Record<string, Lage> = {
-  parachutes: { p: [-58, -9], rot: -4 },
-  'um-ordnen': { p: [-47, 13], rot: 2 },
-  knast: { p: [-26, -17.5], rot: -3 },
-  'on-repeat': { p: [-17.5, -1.5], rot: 4 },
-  'hundekot-attacke': { p: [-28, 14], rot: -5 },
-  spuren: { p: [-4, -16], rot: 3 },
-  'bitte-auto-komm': { p: [2, 4], rot: -2 },
-  amygdala: { p: [-7.5, 19.5], rot: 5 },
-  lost: { p: [17.5, 18], rot: -4 },
-  'ein-stueck-vom-mond': { p: [15, 1.5], rot: 2 },
-  'draussen-feiern': { p: [23.5, -14], rot: -2 },
-  'love-western': { p: [40.5, -4], rot: 3 },
-  reden: { p: [48.5, 14], rot: -3 },
-  'heavy-matters': { p: [56, -17.5], rot: 5 },
+  parachutes: { p: [-64, -10], rot: -4 },
+  'um-ordnen': { p: [-52, 14.5], rot: 2 },
+  knast: { p: [-28.5, -19], rot: -3 },
+  'on-repeat': { p: [-19, -1.5], rot: 4 },
+  'hundekot-attacke': { p: [-31, 15.5], rot: -5 },
+  spuren: { p: [-4.5, -17.5], rot: 3 },
+  'bitte-auto-komm': { p: [0.5, 5.5], rot: -2 },
+  amygdala: { p: [-8, 21.5], rot: 5 },
+  lost: { p: [19, 20], rot: -4 },
+  'ein-stueck-vom-mond': { p: [18.5, 0.5], rot: 2 },
+  'draussen-feiern': { p: [26, -15.5], rot: -2 },
+  'love-western': { p: [44.5, -4.5], rot: 3 },
+  reden: { p: [53.5, 15.5], rot: -3 },
+  'heavy-matters': { p: [61.5, -19], rot: 5 },
 }
 
 // Vier Anker um die Mitte — die Fotos gruppieren sich darum.
@@ -394,7 +394,18 @@ export default function Boden() {
       const n = PROJEKTE.length
       let ni: number | null = null
       if (e.key === 'Escape') {
+        if (grossRef.current !== null) {
+          setGross(null)
+          return
+        }
         setSp({})
+        return
+      }
+      // Solange ein Foto groß ist, blättern die Pfeile durch die Fotos.
+      if (grossRef.current !== null) {
+        const anzahl = Math.min(4, PROJEKTE[i].bilder.length)
+        if (e.key === 'ArrowRight') setGross((g) => ((g ?? 0) + 1) % anzahl)
+        if (e.key === 'ArrowLeft') setGross((g) => ((g ?? 0) - 1 + anzahl) % anzahl)
         return
       }
       if (e.key === 'ArrowRight') ni = (i + 1) % n
