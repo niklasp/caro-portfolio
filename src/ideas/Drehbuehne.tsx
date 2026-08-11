@@ -303,10 +303,6 @@ function Buehnenraum({
     const c = ctrl.current
     c.ang = daempf(c.tang, c.ang, 5, dt)
     if (scheibe.current) scheibe.current.rotation.y = c.ang
-    // Der Blick wandert wie beim Kopfbewegen im Zuschauerraum — die Bühne steht.
-    cam.position.x = daempf(maus.x * 2.2, cam.position.x, 3.5, dt)
-    cam.position.y = daempf(3.1 + maus.y * -0.8, cam.position.y, 3.5, dt)
-    cam.lookAt(0, 2.0, 0)
 
     // Vorderstes Projekt aufhellen, alle anderen abdunkeln.
     szene.traverse((o) => {
