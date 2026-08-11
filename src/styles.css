@@ -252,16 +252,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-align: left;
   padding: 3px 8px;
 }
-/* Weiße Fläche, kürzer als der Text, dafür höher — Text darf überstehen. */
+/* Die Fläche fasst Titel und Untertitel komplett ein; aktiv wird sie
+   zur Farbfläche des Projekts. */
 .marke-titel .marke-flaeche {
   position: absolute;
-  top: -9px;
-  bottom: -11px;
-  left: -7px;
-  right: 30%;
+  inset: -3px -6px -5px -7px;
   background: #ffffff;
   transform: translate(var(--fx, 7px), var(--fy, 5px));
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s;
 }
 .marke-titel .marke-text {
   position: relative;
@@ -277,7 +275,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   letter-spacing: 0;
   margin-top: 2px;
 }
-.marke-titel { color: var(--tinte); transition: opacity 0.3s, transform 0.55s cubic-bezier(0.25, 1, 0.3, 1); }
+.marke-titel { transition: opacity 0.3s, transform 0.55s cubic-bezier(0.25, 1, 0.3, 1), color 0.4s; }
 /* Hover: die Fläche springt auf die Gegenseite und wächst — Druck außer Register. */
 .marke-titel.ist-hover .marke-flaeche {
   transform: translate(calc(var(--fx, 7px) * -0.8), calc(var(--fy, 5px) * -0.8)) scale(1.12, 1.35);

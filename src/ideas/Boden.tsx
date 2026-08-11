@@ -5,7 +5,6 @@ import { useSearchParams } from 'react-router-dom'
 import * as THREE from 'three'
 import { PROJEKTE, findProjekt, type Projekt } from '../data/projects'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
-import Lichtkasten from '../ui/Lichtkasten'
 import { flags } from '../ui/flags'
 import { Foto, Farbflaeche, daempf } from './helpers'
 
@@ -62,10 +61,10 @@ const ANKER: [number, number][] = [
 // Geöffnet weichen die Fotos an den Rand aus — frei von Titel,
 // Beschreibung und Farbfläche (lokale Koordinaten, Panelzone x −1…13, y −11…0).
 const OFFEN_PLAETZE: [number, number][] = [
-  [-9.5, 3.2],
-  [18, 3.6],
-  [-10.5, -8.5],
-  [18.5, -9.5],
+  [-12.5, 4.5],
+  [21, 5],
+  [-13.5, -10.5],
+  [21.5, -11.5],
 ]
 
 // Deterministischer Zufall — jedes Projekt fällt anders, aber immer gleich.
@@ -104,15 +103,18 @@ function Markierung({
   projekt,
   idx,
   offen,
+  gross,
   onOpen,
   onBild,
 }: {
   projekt: Projekt
   idx: number
   offen: boolean
+  gross: number | null
   onOpen: (slug: string) => void
   onBild: (index: number) => void
 }) {
+  const size = useThree((st) => st.size)
   const lage = LAGE[projekt.slug]
   const gruppe = useRef<THREE.Group>(null)
   const fotos = useRef<THREE.Group>(null)
@@ -136,17 +138,27 @@ function Markierung({
     const streuung = offen ? 3.1 : hover ? 1.18 : 1
     const richten = offen ? 0.12 : hover ? 0.3 : 1
     const groesse = offen ? 1.6 : 1 // geöffnet: die Abzüge selbst werden größer
+    // Sichtbare Weltbreite bei geöffnetem Zoom (2.2) — fürs Einpassen mit Rand.
+    const weltB = 92 / 2.2
+    const weltH = weltB * (size.height / size.width)
     fotos.current?.children.forEach((kind) => {
       const m = kind as THREE.Mesh
-      const b = m.userData as { bx?: number; by?: number; brot?: number; i?: number }
+      const b = m.userData as { bx?: number; by?: number; brot?: number; i?: number; breite?: number; ar?: number }
       if (b.bx === undefined || b.by === undefined || b.brot === undefined) return
+      const istGross = offen && gross === b.i
       const platz = OFFEN_PLAETZE[((b.i ?? 0) + idx) % OFFEN_PLAETZE.length]
-      const zx = offen ? platz[0] : b.bx * streuung
-      const zy = offen ? platz[1] : b.by * streuung
+      const zx = istGross ? 5 : offen ? platz[0] : b.bx * streuung
+      const zy = istGross ? -3.4 : offen ? platz[1] : b.by * streuung
+      let zielScale = groesse
+      if (istGross && b.breite && b.ar) {
+        zielScale = Math.min((weltB * 0.9) / b.breite, (weltH * 0.88) / (b.breite / b.ar))
+      }
+      const zz = istGross ? 3 : 0.4 + (b.i ?? 0) * 0.25
       m.position.x = daempf(zx, m.position.x, 9, dt)
       m.position.y = daempf(zy, m.position.y, 9, dt)
-      m.rotation.z = daempf(b.brot * richten, m.rotation.z, 9, dt)
-      m.scale.setScalar(daempf(groesse, m.scale.x, 9, dt))
+      m.position.z = daempf(zz, m.position.z, 9, dt)
+      m.rotation.z = daempf(istGross ? 0 : b.brot * richten, m.rotation.z, 9, dt)
+      m.scale.setScalar(daempf(zielScale, m.scale.x, 9, dt))
     })
     // … und wandert geöffnet hinter Titel und Beschreibung.
     const f = farbe.current
@@ -217,7 +229,7 @@ function Markierung({
                   ar={b.ar}
                   position={[bx, by, 0.4 + i * 0.25]}
                   rotation={[0, 0, brot]}
-                  userData={{ foto: true, bx, by, brot, i }}
+                  userData={{ foto: true, bx, by, brot, i, breite, ar: b.ar }}
                   materialProps={{ opacity: 0 }}
                   onClick={(e) => {
                     if (!offen) return
@@ -235,14 +247,16 @@ function Markierung({
             className={hover && !offen ? 'marke-titel ist-hover' : 'marke-titel'}
             style={
               {
+                color: offen ? textFarbeAuf(projekt.farbe) : 'var(--tinte)',
                 padding: `${padY}px ${padX}px`,
+                opacity: offen && gross !== null ? 0 : 1,
                 transform: offen ? 'translateX(50%)' : undefined,
                 '--fx': `${fx}px`,
                 '--fy': `${fy}px`,
               } as React.CSSProperties
             }
           >
-            <span className="marke-flaeche" />
+            <span className="marke-flaeche" style={{ background: offen ? projekt.farbe : '#ffffff' }} />
             <span className="marke-text">
               {projekt.titel}
               <span className="marke-unter">
@@ -290,7 +304,9 @@ export default function Boden() {
   const zeiger = useRef<{ x: number; y: number } | null>(null)
   const [sp, setSp] = useSearchParams()
   const projekt = findProjekt(sp.get('p'))
-  const [lichtkasten, setLichtkasten] = useState<number | null>(null)
+  const [gross, setGross] = useState<number | null>(null)
+  const grossRef = useRef<number | null>(null)
+  grossRef.current = gross
   const offenRef = useRef(false)
   const vorher = useRef<{ tx: number; ty: number; tz: number } | null>(null)
   offenRef.current = !!projekt
@@ -298,6 +314,7 @@ export default function Boden() {
   // Klick auf ein Projekt: Kamera rastet darauf ein und zoomt hinein.
   // Schließen bringt sie an den alten Ort zurück.
   useEffect(() => {
+    setGross(null)
     const c = ctrl.current
     if (projekt) {
       if (!vorher.current) vorher.current = { tx: c.tx, ty: c.ty, tz: c.tz }
@@ -308,7 +325,6 @@ export default function Boden() {
       c.ty = lage.p[1] - 3.4
       c.tz = 2.2
     } else {
-      setLichtkasten(null)
       if (vorher.current) {
         c.tx = vorher.current.tx
         c.ty = vorher.current.ty
@@ -401,7 +417,10 @@ export default function Boden() {
           dpr={[1, 2]}
           flat
           style={{ background: '#ffffff' }}
-          onPointerMissed={() => offenRef.current && setSp({})}
+          onPointerMissed={() => {
+            if (grossRef.current !== null) setGross(null)
+            else if (offenRef.current) setSp({})
+          }}
         >
           <Kamera ctrl={ctrl} />
           <Raster />
@@ -412,8 +431,9 @@ export default function Boden() {
                 projekt={p}
                 idx={i}
                 offen={projekt?.slug === p.slug}
+                gross={projekt?.slug === p.slug ? gross : null}
                 onOpen={(slug) => setSp({ p: slug })}
-                onBild={(bi) => setLichtkasten(bi)}
+                onBild={(bi) => setGross((g) => (g === bi ? null : bi))}
               />
             ))}
           </Suspense>
@@ -475,13 +495,6 @@ export default function Boden() {
           )}
           <div className="bo-hinweis ov-anim-3">← → nächstes Projekt · Foto anklicken: groß · Esc schließen</div>
         </div>
-      )}
-      {projekt && lichtkasten !== null && (
-        <Lichtkasten
-          projekt={projekt}
-          start={Math.min(lichtkasten, projekt.bilder.length - 1)}
-          onClose={() => setLichtkasten(null)}
-        />
       )}
     </>
   )
