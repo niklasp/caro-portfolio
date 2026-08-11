@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Kopf } from '../ui/Chrome'
 
 const AUSBILDUNG = [
@@ -55,6 +57,20 @@ const AUSZEICHNUNGEN = [
 ]
 
 export default function Lebenslauf() {
+  const navigate = useNavigate()
+
+  // Esc schließt den Lebenslauf wieder.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (window.history.length > 1) navigate(-1)
+        else navigate('/')
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [navigate])
+
   return (
     <>
       <Kopf />

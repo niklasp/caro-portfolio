@@ -203,7 +203,10 @@ function Markierung({
           >
             <span className="marke-flaeche" style={{ background: projekt.farbe }} />
             <span className="marke-text">
-              {projekt.titel} <span className="marke-jahr">{projekt.jahr}</span>
+              {projekt.titel}
+              <span className="marke-unter">
+                {projekt.rolle} · {projekt.jahr} · {projekt.ort}
+              </span>
             </span>
           </div>
         </Html>

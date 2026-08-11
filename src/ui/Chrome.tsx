@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { KONTAKT, type Projekt } from '../data/projects'
 
 const ENTWUERFE = [
@@ -10,6 +10,9 @@ const ENTWUERFE = [
 
 // Kopfzeile wie im gedruckten Portfolio: Name links, Navigation rechts.
 export function Kopf({ hell = false }: { hell?: boolean }) {
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const zurueck = () => (window.history.length > 1 ? navigate(-1) : navigate('/'))
   return (
     <header className={hell ? 'kopf hell' : 'kopf'}>
       <Link to="/" className="name">
@@ -17,6 +20,11 @@ export function Kopf({ hell = false }: { hell?: boolean }) {
         <span className="unter">{KONTAKT.untertitel}</span>
       </Link>
       <nav>
+        {pathname === '/lebenslauf' && (
+          <button onClick={zurueck} aria-label="Zurück" style={{ fontSize: 15, lineHeight: 1 }}>
+            ←
+          </button>
+        )}
         <NavLink to="/lebenslauf" className={({ isActive }) => (isActive ? 'aktiv' : '')}>
           Lebenslauf
         </NavLink>

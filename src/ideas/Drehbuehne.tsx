@@ -8,10 +8,9 @@ import { flags } from '../ui/flags'
 import { daempf } from './helpers'
 
 // Entwurf 2 — Die Drehbühne.
-// Ein schwarzer Bühnenraum: sacht bewegter Samtvorhang, ein Lichtkegel.
-// Alle Arbeiten stehen als Kulissen auf einer Drehscheibe — Ziehen oder
-// Scrollen dreht die Bühne, das vorderste Projekt steht im Licht. Die
-// Beschreibung steht auf großen Bildschirmen direkt im Raum.
+// Ein schwarzer Bühnenraum mit einem echten Verfolger: Die Maus führt das
+// Licht, die Fotos stehen als beleuchtete Blöcke auf der Drehscheibe, und
+// hinten hängt — stark abgedunkelt — das Hauptmotiv des vordersten Projekts.
 
 const N = PROJEKTE.length
 const SCHRITT = (Math.PI * 2) / N
@@ -24,11 +23,146 @@ interface DrehCtrl {
   tang: number
 }
 
-// Normierte Mausposition — kippt die Bühne leicht.
+// Normierte Mausposition — führt Verfolger und Blickpunkt.
 const maus = { x: 0, y: 0 }
 
-// Ein Foto als Objekt: Leinwand mit Tiefe, die Textur läuft um die Kanten
-// herum wie bei einem aufgezogenen Abzug.
+// ---------- Hintergrund: abgeschattetes Hauptmotiv, mit Dithering gegen Banding ----------
+
+const HG_FRAG = /* glsl */ `
+uniform sampler2D uBild;
+uniform sampler2D uAlt;
+uniform float uMix;
+uniform float uZeit;
+uniform float uBildA;
+uniform float uAltA;
+uniform float uPlaneA;
+varying vec2 vUv;
+
+float zufall(vec2 p) {
+  return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+vec2 abdecken(vec2 uv, float imgA) {
+  // cover-fit: die Fläche wird immer voll gefüllt
+  if (imgA < uPlaneA) {
+    return vec2(uv.x, (uv.y - 0.5) * (imgA / uPlaneA) + 0.5);
+  }
+  return vec2((uv.x - 0.5) * (uPlaneA / imgA) + 0.5, uv.y);
+}
+
+void main() {
+  vec3 alt = texture2D(uAlt, abdecken(vUv, uAltA)).rgb;
+  vec3 neu = texture2D(uBild, abdecken(vUv, uBildA)).rgb;
+  vec3 farbe = mix(alt, neu, smoothstep(0.0, 1.0, uMix));
+  // stark abgedunkelt, zur Mitte hin etwas offener
+  float vig = smoothstep(1.1, 0.3, distance(vUv, vec2(0.5, 0.42)));
+  farbe *= 0.10 + 0.26 * vig;
+  // Dithering gegen sichtbare Farbstufen im Dunkeln
+  farbe += (zufall(vUv * 917.0 + fract(uZeit)) - 0.5) / 96.0;
+  gl_FragColor = vec4(farbe, 1.0);
+  #include <colorspace_fragment>
+}
+`
+
+const hgLader = new THREE.TextureLoader()
+const hgCache = new Map<string, Promise<THREE.Texture>>()
+const ladeHg = (src: string) => {
+  let p = hgCache.get(src)
+  if (!p) {
+    p = hgLader.loadAsync(src).then((t) => {
+      t.colorSpace = THREE.SRGBColorSpace
+      return t
+    })
+    hgCache.set(src, p)
+  }
+  return p
+}
+
+function Hintergrund({ src }: { src: string }) {
+  const material = useMemo(() => {
+    const leer = new THREE.DataTexture(new Uint8Array([8, 8, 8, 255]), 1, 1)
+    leer.needsUpdate = true
+    return new THREE.ShaderMaterial({
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: HG_FRAG,
+      uniforms: {
+        uBild: { value: leer },
+        uAlt: { value: leer },
+        uMix: { value: 1 },
+        uZeit: { value: 0 },
+        uBildA: { value: 1.5 },
+        uAltA: { value: 1.5 },
+        uPlaneA: { value: 54 / 27 },
+      },
+    })
+  }, [])
+
+  useEffect(() => {
+    let lebendig = true
+    ladeHg(src).then((tex) => {
+      if (!lebendig) return
+      const u = material.uniforms
+      u.uAlt.value = u.uBild.value
+      u.uAltA.value = u.uBildA.value
+      u.uBild.value = tex
+      u.uBildA.value = (tex.image as HTMLImageElement).width / (tex.image as HTMLImageElement).height
+      u.uMix.value = 0
+    })
+    return () => {
+      lebendig = false
+    }
+  }, [src, material])
+
+  useFrame(({ clock }, dt) => {
+    material.uniforms.uZeit.value = clock.elapsedTime
+    material.uniforms.uMix.value = Math.min(1, (material.uniforms.uMix.value as number) + dt * 1.3)
+  })
+
+  return (
+    <mesh material={material} position={[0, 6.5, -16]}>
+      <planeGeometry args={[54, 27]} />
+    </mesh>
+  )
+}
+
+// ---------- Der Verfolger: ein echtes Licht, von der Maus geführt ----------
+
+function Verfolger() {
+  const licht = useRef<THREE.SpotLight>(null)
+  const ziel = useMemo(() => {
+    const o = new THREE.Object3D()
+    o.position.set(0, 0.8, RADIUS)
+    return o
+  }, [])
+
+  useFrame((_, dt) => {
+    ziel.position.x = daempf(maus.x * 10, ziel.position.x, 4, dt)
+    ziel.position.z = daempf(RADIUS - 3.5 + maus.y * 7.5, ziel.position.z, 4, dt)
+    ziel.updateMatrixWorld()
+  })
+
+  return (
+    <>
+      <primitive object={ziel} />
+      <spotLight
+        ref={licht}
+        position={[0, 13, 21]}
+        target={ziel}
+        angle={0.32}
+        penumbra={0.5}
+        intensity={3.2}
+        color="#fff3e0"
+        decay={0}
+        castShadow
+        shadow-mapSize={[1024, 1024]}
+        shadow-bias={-0.0004}
+      />
+    </>
+  )
+}
+
+// ---------- Foto als beleuchteter Block, Textur läuft um die Kanten ----------
+
 function FotoObjekt({
   url,
   breite,
@@ -50,107 +184,20 @@ function FotoObjekt({
       t.needsUpdate = true
       t.repeat.set(rx, ry)
       t.offset.set(ox, oy)
-      return new THREE.MeshBasicMaterial({ map: t, toneMapped: false })
+      return new THREE.MeshLambertMaterial({ map: t })
     }
     return [
       kante(0.94, 0, 0.06, 1), // rechts
       kante(0, 0, 0.06, 1), // links
       kante(0, 0.94, 1, 0.06), // oben
       kante(0, 0, 1, 0.06), // unten
-      new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), // vorn
-      new THREE.MeshBasicMaterial({ color: '#1a1a1a', toneMapped: false }), // hinten
+      new THREE.MeshLambertMaterial({ map: tex }), // vorn
+      new THREE.MeshLambertMaterial({ color: '#2a2a2a' }), // hinten
     ]
   }, [tex])
   return (
-    <mesh {...props} material={materialien}>
+    <mesh {...props} material={materialien} castShadow receiveShadow>
       <boxGeometry args={[breite, breite / ar, dicke]} />
-    </mesh>
-  )
-}
-
-// Der Samtvorhang: umschließt die Szene, mit gefaltetem Lichtspiel.
-const VORHANG_FRAG = /* glsl */ `
-varying vec2 vUv;
-uniform float uZeit;
-uniform vec3 uTon;
-void main() {
-  // Der Stoff bewegt sich leicht: eine langsame Welle wandert durch die Falten.
-  float x = vUv.x + 0.008 * sin(uZeit * 0.45 + vUv.y * 3.5 + vUv.x * 24.0)
-                  + 0.004 * sin(uZeit * 0.7 + vUv.y * 9.0);
-  float grob = sin(x * 43.0 + sin(x * 17.0) * 2.2 + uZeit * 0.12);
-  float fein = sin(x * 210.0 + uZeit * 0.2);
-  float falte = pow(abs(grob), 1.7) + 0.25 * pow(abs(fein), 2.0);
-  float hell = 0.012 + 0.030 * falte;
-  hell *= 1.0 + 0.10 * sin(uZeit * 0.3 + vUv.x * 6.0);
-  hell *= smoothstep(0.0, 0.28, vUv.y);              // unten im Dunkel
-  hell *= 1.0 - 0.55 * smoothstep(0.58, 1.0, vUv.y); // oben weg vom Licht
-  hell *= 0.78 + 0.22 * sin(vUv.x * 9.0 + 1.7);      // große Bahnen
-  vec3 farbe = vec3(hell) * mix(vec3(1.0, 0.97, 0.92), uTon * 2.4, 0.5);
-  gl_FragColor = vec4(farbe, 1.0);
-  #include <colorspace_fragment>
-}
-`
-
-function Vorhang({ farbe }: { farbe: string }) {
-  const ziel = useMemo(() => new THREE.Color(), [])
-  useMemo(() => ziel.set(farbe), [farbe, ziel])
-  const material = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: VORHANG_FRAG,
-        uniforms: { uZeit: { value: 0 }, uTon: { value: new THREE.Color('#ffffff') } },
-        side: THREE.BackSide,
-      }),
-    []
-  )
-  useFrame(({ clock }, dt) => {
-    material.uniforms.uZeit.value = clock.elapsedTime
-    ;(material.uniforms.uTon.value as THREE.Color).lerp(ziel, 1 - Math.exp(-2.2 * dt))
-  })
-  return (
-    <mesh material={material} position={[0, 5.4, 0]}>
-      <cylinderGeometry args={[20, 20, 15, 160, 1, true]} />
-    </mesh>
-  )
-}
-
-// Farbiger Schein hinter der Bühne — der Rundhorizont übernimmt die Projektfarbe.
-function Schein({ farbe }: { farbe: string }) {
-  const mesh = useRef<THREE.Mesh>(null)
-  const ziel = useMemo(() => new THREE.Color(), [])
-  useMemo(() => ziel.set(farbe), [farbe, ziel])
-  const tex = useMemo(() => {
-    const c = document.createElement('canvas')
-    c.width = c.height = 256
-    const g = c.getContext('2d')!
-    const grad = g.createRadialGradient(128, 128, 10, 128, 128, 128)
-    grad.addColorStop(0, 'rgba(255,255,255,0.85)')
-    grad.addColorStop(0.6, 'rgba(255,255,255,0.25)')
-    grad.addColorStop(1, 'rgba(255,255,255,0)')
-    g.fillStyle = grad
-    g.fillRect(0, 0, 256, 256)
-    const t = new THREE.CanvasTexture(c)
-    t.colorSpace = THREE.SRGBColorSpace
-    return t
-  }, [])
-  useFrame((_, dt) => {
-    const m = mesh.current
-    if (!m) return
-    ;((m.material as THREE.MeshBasicMaterial).color as THREE.Color).lerp(ziel, 1 - Math.exp(-2.2 * dt))
-  })
-  return (
-    <mesh ref={mesh} position={[0, 4.2, -13]}>
-      <planeGeometry args={[42, 22]} />
-      <meshBasicMaterial
-        map={tex}
-        color="#0c0c0c"
-        transparent
-        opacity={0.42}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-        toneMapped={false}
-      />
     </mesh>
   )
 }
@@ -177,7 +224,7 @@ function Kulisse({
       const m = o as THREE.Mesh
       if (m.isMesh && !m.userData.grundfarben) {
         const mats = Array.isArray(m.material) ? m.material : [m.material]
-        m.userData.grundfarben = mats.map((mat) => (mat as THREE.MeshBasicMaterial).color.clone())
+        m.userData.grundfarben = mats.map((mat) => (mat as THREE.MeshLambertMaterial).color.clone())
       }
     })
   })
@@ -247,22 +294,6 @@ function Buehnenraum({
     cam.lookAt(0, 2.0, 0)
   }, [cam])
 
-  // Weicher Lichtteppich statt harter Kreiskante.
-  const lache = useMemo(() => {
-    const c = document.createElement('canvas')
-    c.width = c.height = 256
-    const g = c.getContext('2d')!
-    const grad = g.createRadialGradient(128, 128, 12, 128, 128, 128)
-    grad.addColorStop(0, 'rgba(255, 240, 214, 0.9)')
-    grad.addColorStop(0.55, 'rgba(255, 240, 214, 0.28)')
-    grad.addColorStop(1, 'rgba(255, 240, 214, 0)')
-    g.fillStyle = grad
-    g.fillRect(0, 0, 256, 256)
-    const t = new THREE.CanvasTexture(c)
-    t.colorSpace = THREE.SRGBColorSpace
-    return t
-  }, [])
-
   useFrame((_, dt) => {
     const c = ctrl.current
     c.ang = daempf(c.tang, c.ang, 5, dt)
@@ -277,14 +308,14 @@ function Buehnenraum({
       if (!((o as THREE.Group).isGroup && o.userData.kulisse)) return
       const winkel = mod(c.ang + o.userData.index * SCHRITT + Math.PI, Math.PI * 2) - Math.PI
       const vorn = Math.abs(winkel) < SCHRITT / 2
-      const ziel = vorn ? 1 : 0.2
-      o.userData.b = daempf(ziel, o.userData.b ?? 0.2, 5, dt)
+      const ziel = vorn ? 1 : 0.35
+      o.userData.b = daempf(ziel, o.userData.b ?? 0.35, 5, dt)
       o.traverse((kind) => {
         const m = kind as THREE.Mesh
         if (m.isMesh && m.userData.grundfarben) {
           const mats = Array.isArray(m.material) ? m.material : [m.material]
           mats.forEach((mat, mi) => {
-            ;(mat as THREE.MeshBasicMaterial).color
+            ;(mat as THREE.MeshLambertMaterial).color
               .copy((m.userData.grundfarben as THREE.Color[])[mi])
               .multiplyScalar(o.userData.b as number)
           })
@@ -295,14 +326,15 @@ function Buehnenraum({
 
   return (
     <>
-      <Vorhang farbe={PROJEKTE[aktiv].farbe} />
-      <Schein farbe={PROJEKTE[aktiv].farbe} />
+      <Hintergrund src={PROJEKTE[aktiv].bilder[0].src} />
+      <ambientLight intensity={0.55} color="#f2ecff" />
+      <Verfolger />
 
       <group ref={scheibe}>
         {/* Drehscheibe */}
-        <mesh position={[0, -0.19, 0]}>
+        <mesh position={[0, -0.19, 0]} receiveShadow>
           <cylinderGeometry args={[13.4, 13.4, 0.38, 128]} />
-          <meshBasicMaterial color="#181818" toneMapped={false} />
+          <meshLambertMaterial color="#3a3a3a" />
         </mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
           <ringGeometry args={[13.1, 13.4, 128]} />
@@ -312,35 +344,19 @@ function Buehnenraum({
           <Kulisse key={p.slug} projekt={p} index={i} vorn={i === aktiv} onDrehen={onDrehen} onBild={onBild} />
         ))}
       </group>
-
-      {/* Lichtkegel auf die vorderste Position — fest im Raum, dreht nicht mit. */}
-      <mesh position={[0, 4.7, RADIUS]}>
-        <coneGeometry args={[3.3, 9.4, 48, 1, true]} />
-        <meshBasicMaterial
-          color="#fff3e0"
-          transparent
-          opacity={0.05}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, RADIUS]}>
-        <planeGeometry args={[9.5, 9.5]} />
-        <meshBasicMaterial
-          map={lache}
-          transparent
-          opacity={0.8}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
     </>
   )
 }
 
 export default function Drehbuehne() {
   const [aktiv, setAktiv] = useState(0)
+  const [lichtkasten, setLichtkasten] = useState<number | null>(null)
+  const wrap = useRef<HTMLDivElement>(null)
+  const panel = useRef<HTMLDivElement>(null)
+  const zeiger = useRef<{ x: number; roh: number } | null>(null)
+  const radAcc = useRef({ acc: 0, t: 0 })
+
+  const ctrl = useRef<DrehCtrl>({ ang: Math.PI, tang: 0 })
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -350,13 +366,6 @@ export default function Drehbuehne() {
     window.addEventListener('pointermove', onMove)
     return () => window.removeEventListener('pointermove', onMove)
   }, [])
-  const [lichtkasten, setLichtkasten] = useState<number | null>(null)
-  const wrap = useRef<HTMLDivElement>(null)
-  const panel = useRef<HTMLDivElement>(null)
-  const zeiger = useRef<{ x: number; roh: number } | null>(null)
-  const radAcc = useRef({ acc: 0, t: 0 })
-
-  const ctrl = useRef<DrehCtrl>({ ang: Math.PI, tang: 0 })
 
   const aktivAusTang = (tang: number) => mod(Math.round(-tang / SCHRITT), N)
 
@@ -444,7 +453,8 @@ export default function Drehbuehne() {
         <Canvas
           dpr={[1, 2]}
           flat
-          camera={{ fov: 37, position: [0, 3.1, 28.5], near: 0.1, far: 90 }}
+          shadows
+          camera={{ fov: 34, position: [0, 3.1, 28.5], near: 0.1, far: 90 }}
           style={{ background: '#0c0c0c' }}
         >
           <fog attach="fog" args={['#0c0c0c', 32, 60]} />
@@ -466,7 +476,7 @@ export default function Drehbuehne() {
         <h2>{p.titel}</h2>
       </div>
 
-      {/* Beschreibung direkt im Bühnenraum — nur auf großen Bildschirmen. */}
+      {/* Beschreibung unten rechts — über dunklem Boden, ohne Fläche. */}
       <div className="db-beschreibung" ref={panel} key={p.slug}>
         <h3 className="db-titel ov-anim-2">{p.titel}</h3>
         <p className="db-meta ov-anim-2">
@@ -489,7 +499,7 @@ export default function Drehbuehne() {
         )}
       </div>
 
-      <div className="hinweis hell">ziehen oder scrollen: drehen · Foto anklicken: groß</div>
+      <div className="hinweis hell">ziehen oder scrollen: drehen · Maus führt das Licht · Foto anklicken: groß</div>
       <Fuss hell fallback={['Entwurf 2', 'Die Drehbühne', 'alle Arbeiten, 2021–2026']} />
       {lichtkasten !== null && (
         <Lichtkasten projekt={p} start={Math.min(lichtkasten, p.bilder.length - 1)} onClose={() => setLichtkasten(null)} />
