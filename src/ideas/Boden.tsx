@@ -52,10 +52,10 @@ const LAGE: Record<string, Lage> = {
 
 // Vier Anker um die Mitte — die Fotos gruppieren sich darum.
 const ANKER: [number, number][] = [
-  [-2.0, 1.4],
-  [2.1, -1.2],
-  [-1.6, -2.0],
-  [2.2, 1.7],
+  [-3.0, 2.1],
+  [3.1, -1.8],
+  [-2.4, -2.9],
+  [3.2, 2.5],
 ]
 
 // Geöffnet weichen die Fotos an den Rand aus — frei von Titel,
@@ -201,7 +201,7 @@ function Markierung({
             document.body.style.cursor = ''
           }}
         >
-          <planeGeometry args={[11.5, 9]} />
+          <planeGeometry args={[14, 11]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
         <Farbflaeche
