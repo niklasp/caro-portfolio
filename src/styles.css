@@ -514,20 +514,22 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .db-beschreibung {
   position: fixed;
   right: 40px;
-  top: 50%;
-  margin-top: -180px;
-  width: min(348px, 27vw);
+  bottom: 84px;
+  width: min(44ch, 30vw);
   z-index: 30;
   color: #fff;
   font-size: 13px;
   line-height: 1.5;
-  padding: 18px 18px 20px;
-  background: rgba(12, 12, 12, 0.42);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   transition: transform 0.25s ease-out;
   will-change: transform;
 }
+.db-beschreibung .db-pfeile {
+  display: flex;
+  gap: 16px;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+.db-beschreibung .db-pfeile button:hover { transform: translateY(-1px); }
 .db-beschreibung .db-titel {
   font-size: 19px;
   letter-spacing: -0.01em;

@@ -240,7 +240,6 @@ function Buehnenraum({
   aktiv: number
 }) {
   const scheibe = useRef<THREE.Group>(null)
-  const kippen = useRef<THREE.Group>(null)
   const szene = useThree((s) => s.scene)
   const cam = useThree((s) => s.camera)
 
@@ -268,11 +267,10 @@ function Buehnenraum({
     const c = ctrl.current
     c.ang = daempf(c.tang, c.ang, 5, dt)
     if (scheibe.current) scheibe.current.rotation.y = c.ang
-    // Die ganze Bühne kippt sacht zur Maus.
-    if (kippen.current) {
-      kippen.current.rotation.x = daempf(maus.y * 0.035, kippen.current.rotation.x, 4, dt)
-      kippen.current.rotation.z = daempf(maus.x * -0.022, kippen.current.rotation.z, 4, dt)
-    }
+    // Der Blick wandert wie beim Kopfbewegen im Zuschauerraum — die Bühne steht.
+    cam.position.x = daempf(maus.x * 2.2, cam.position.x, 3.5, dt)
+    cam.position.y = daempf(3.1 + maus.y * -0.8, cam.position.y, 3.5, dt)
+    cam.lookAt(0, 2.0, 0)
 
     // Vorderstes Projekt aufhellen, alle anderen abdunkeln.
     szene.traverse((o) => {
@@ -300,7 +298,6 @@ function Buehnenraum({
       <Vorhang farbe={PROJEKTE[aktiv].farbe} />
       <Schein farbe={PROJEKTE[aktiv].farbe} />
 
-      <group ref={kippen}>
       <group ref={scheibe}>
         {/* Drehscheibe */}
         <mesh position={[0, -0.19, 0]}>
@@ -314,7 +311,6 @@ function Buehnenraum({
         {PROJEKTE.map((p, i) => (
           <Kulisse key={p.slug} projekt={p} index={i} vorn={i === aktiv} onDrehen={onDrehen} onBild={onBild} />
         ))}
-      </group>
       </group>
 
       {/* Lichtkegel auf die vorderste Position — fest im Raum, dreht nicht mit. */}
@@ -464,6 +460,14 @@ export default function Drehbuehne() {
 
       {/* Beschreibung direkt im Bühnenraum — nur auf großen Bildschirmen. */}
       <div className="db-beschreibung" ref={panel} key={p.slug}>
+        <div className="db-pfeile ov-anim-1">
+          <button onClick={() => schnappe(ctrl.current.tang + SCHRITT)} aria-label="Vorheriges Projekt">
+            ←
+          </button>
+          <button onClick={() => schnappe(ctrl.current.tang - SCHRITT)} aria-label="Nächstes Projekt">
+            →
+          </button>
+        </div>
         <h3 className="db-titel ov-anim-2">{p.titel}</h3>
         <p className="db-meta ov-anim-2">
           {p.rolle} · {p.jahr} · {p.ort}
@@ -485,16 +489,8 @@ export default function Drehbuehne() {
         )}
       </div>
 
-      <div className="pfeil-nav" style={{ color: '#fff' }}>
-        <button onClick={() => schnappe(ctrl.current.tang + SCHRITT)} aria-label="Vorheriges Projekt">
-          ←
-        </button>
-        <button onClick={() => schnappe(ctrl.current.tang - SCHRITT)} aria-label="Nächstes Projekt">
-          →
-        </button>
-      </div>
       <div className="hinweis hell">ziehen oder scrollen: drehen · Foto anklicken: groß</div>
-      <Fuss hell projekt={p} />
+      <Fuss hell fallback={['Entwurf 2', 'Die Drehbühne', 'alle Arbeiten, 2021–2026']} />
       {lichtkasten !== null && (
         <Lichtkasten projekt={p} start={Math.min(lichtkasten, p.bilder.length - 1)} onClose={() => setLichtkasten(null)} />
       )}
