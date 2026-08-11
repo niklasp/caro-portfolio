@@ -273,36 +273,22 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   transform: translate(3px, -2px);
 }
 
-/* Geöffnetes Projekt: Beschreibung mitten im freigeräumten Haufen. */
+/* Geöffnetes Projekt: Beschreibung unter dem Label — das Karten-Label
+   selbst gleitet an die Titelposition und bleibt der einzige Farbblock. */
 .bo-beschreibung {
   position: fixed;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: calc(50% - 82px);
+  transform: translateX(-50%);
   width: min(52ch, 46vw);
   z-index: 35;
   font-size: 13px;
   line-height: 1.5;
-  padding: 24px 26px;
+  padding: 20px 26px 24px;
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(9px);
   -webkit-backdrop-filter: blur(9px);
 }
-.bo-beschreibung .bo-titel {
-  position: relative;
-  width: fit-content;
-  font-size: 26px;
-  letter-spacing: -0.02em;
-  margin-bottom: 6px;
-  padding: 2px 10px 4px 6px;
-}
-.bo-beschreibung .bo-titel-flaeche {
-  position: absolute;
-  inset: 0;
-  transform: translate(9px, 7px) rotate(-1.4deg);
-  transform-origin: left center;
-}
-.bo-beschreibung .bo-titel-text { position: relative; z-index: 1; }
 .bo-beschreibung .bo-meta { color: var(--grau); margin-bottom: 14px; }
 .bo-beschreibung .bo-blurb { margin-bottom: 14px; }
 .bo-beschreibung .bo-credits div { margin-bottom: 2px; }

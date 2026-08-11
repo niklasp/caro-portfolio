@@ -196,7 +196,6 @@ function Markierung({
               {
                 color: textFarbeAuf(projekt.farbe),
                 padding: `${padY}px ${padX}px`,
-                opacity: offen ? 0 : 1,
                 '--fx': `${fx}px`,
                 '--fy': `${fy}px`,
               } as React.CSSProperties
@@ -260,7 +259,9 @@ export default function Boden() {
       if (!vorher.current) vorher.current = { tx: c.tx, ty: c.ty, tz: c.tz }
       const lage = LAGE[projekt.slug]
       c.tx = lage.p[0]
-      c.ty = lage.p[1]
+      // Etwas nach unten versetzt: das Projekt-Label gleitet an die
+      // Titelposition über der Beschreibung — ein Element, eine Farbe.
+      c.ty = lage.p[1] - 3.4
       c.tz = 2.2
     } else {
       setLichtkasten(null)
@@ -410,15 +411,6 @@ export default function Boden() {
       {/* Beschreibung mitten im freigeräumten Haufen */}
       {projekt && (
         <div className="bo-beschreibung" key={projekt.slug}>
-          <h2 className="bo-titel ov-anim-2">
-            <span
-              className="bo-titel-flaeche ov-anim-1"
-              style={{ background: projekt.farbe }}
-            />
-            <span className="bo-titel-text" style={{ color: textFarbeAuf(projekt.farbe) }}>
-              {projekt.titel}
-            </span>
-          </h2>
           <p className="bo-meta ov-anim-2">
             {projekt.rolle} · {projekt.jahr} · {projekt.ort}
           </p>
