@@ -153,7 +153,7 @@ function Verfolger() {
         target={ziel}
         angle={0.32}
         penumbra={0.5}
-        intensity={3.2}
+        intensity={5.2}
         color="#fff3e0"
         decay={0}
         castShadow
