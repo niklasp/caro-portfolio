@@ -172,13 +172,12 @@ function Markierung({
       m.scale.setScalar(daempf(zielScale, m.scale.x, 9, dt))
       ;(m.material as THREE.MeshBasicMaterial).opacity *= trueb.current
     })
-    // … und weicht geöffnet an den freien linken Rand aus — die Farbe
-    // trägt dann allein die Titelfläche, die Beschreibung steht auf Weiß.
+    // … und legt sich geöffnet als einzige Farbfläche hinter den Titel.
     const f = farbe.current
     if (f) {
       ;(f.material as THREE.MeshBasicMaterial).opacity = trueb.current
       const ziel = offen
-        ? { x: -8.5, y: -3.5, rot: fRot * 0.4, sx: 1.5, sy: 1.5 }
+        ? { x: 4.3, y: -0.55, rot: fRot * 0.3, sx: 10.4 / fBreite, sy: 3.4 / fHoehe }
         : { x: fX, y: fY, rot: fRot, sx: 1, sy: 1 }
       f.position.x = daempf(ziel.x, f.position.x, 8, dt)
       f.position.y = daempf(ziel.y, f.position.y, 8, dt)
@@ -261,7 +260,6 @@ function Markierung({
             className={hover && !offen ? 'marke-titel ist-hover' : 'marke-titel'}
             style={
               {
-                color: offen ? textFarbeAuf(projekt.farbe) : 'var(--tinte)',
                 padding: `${padY}px ${padX}px`,
                 opacity: labelsAus ? 0 : gedimmt ? 0.15 : 1,
                 transform: offen ? 'translateX(50%)' : undefined,
@@ -270,7 +268,7 @@ function Markierung({
               } as React.CSSProperties
             }
           >
-            <span className="marke-flaeche" style={{ background: offen ? projekt.farbe : '#ffffff' }} />
+            <span className="marke-flaeche" />
             <span className="marke-text">
               {projekt.titel}
               <span className="marke-unter">
@@ -502,9 +500,6 @@ export default function Boden() {
       {/* Beschreibung mitten im freigeräumten Haufen */}
       {projekt && gross === null && (
         <div className="bo-beschreibung" key={projekt.slug}>
-          <p className="bo-meta ov-anim-2">
-            {projekt.rolle} · {projekt.jahr} · {projekt.ort}
-          </p>
           <p className="bo-blurb ov-anim-3">{projekt.blurb}</p>
           <div className="bo-credits ov-anim-3">
             {projekt.credits.map((c) => (
