@@ -15,7 +15,7 @@ import { daempf } from './helpers'
 
 const N = PROJEKTE.length
 const SCHRITT = (Math.PI * 2) / N
-const RADIUS = 10.5
+const RADIUS = 11.2
 
 const mod = (a: number, n: number) => ((a % n) + n) % n
 
@@ -236,9 +236,9 @@ function Kulisse({
 
   const fotos = projekt.bilder.slice(0, 3)
   const lagen = [
-    { x: -0.95, z: 0.07, b: 2.8, ry: 0.05 },
-    { x: 1.3, z: 0.6, b: 1.8, ry: -0.12 },
-    { x: 0.3, z: 1.15, b: 1.45, ry: 0.09 },
+    { x: -0.85, z: 0.07, b: 2.6, ry: 0.05 },
+    { x: 1.18, z: 0.6, b: 1.68, ry: -0.12 },
+    { x: 0.28, z: 1.15, b: 1.35, ry: 0.09 },
   ]
 
   return (
