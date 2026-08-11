@@ -61,10 +61,10 @@ const ANKER: [number, number][] = [
 // Geöffnet weichen die Fotos an den Rand aus — frei von Titel,
 // Beschreibung und Farbfläche (lokale Koordinaten, Panelzone x −1…13, y −11…0).
 const OFFEN_PLAETZE: [number, number][] = [
-  [-12.5, 4.5],
-  [21, 5],
-  [-13.5, -10.5],
-  [21.5, -11.5],
+  [-10.5, 3.8],
+  [19, 4.2],
+  [-11.5, -9.5],
+  [19.5, -10.5],
 ]
 
 // Deterministischer Zufall — jedes Projekt fällt anders, aber immer gleich.
@@ -104,6 +104,7 @@ function Markierung({
   idx,
   offen,
   gross,
+  labelsAus,
   onOpen,
   onBild,
 }: {
@@ -111,6 +112,7 @@ function Markierung({
   idx: number
   offen: boolean
   gross: number | null
+  labelsAus: boolean
   onOpen: (slug: string) => void
   onBild: (index: number) => void
 }) {
@@ -250,7 +252,7 @@ function Markierung({
               {
                 color: offen ? textFarbeAuf(projekt.farbe) : 'var(--tinte)',
                 padding: `${padY}px ${padX}px`,
-                opacity: offen && gross !== null ? 0 : 1,
+                opacity: labelsAus ? 0 : 1,
                 transform: offen ? 'translateX(50%)' : undefined,
                 '--fx': `${fx}px`,
                 '--fy': `${fy}px`,
@@ -433,6 +435,7 @@ export default function Boden() {
                 idx={i}
                 offen={projekt?.slug === p.slug}
                 gross={projekt?.slug === p.slug ? gross : null}
+                labelsAus={gross !== null}
                 onOpen={(slug) => setSp({ p: slug })}
                 onBild={(bi) => setGross((g) => (g === bi ? null : bi))}
               />

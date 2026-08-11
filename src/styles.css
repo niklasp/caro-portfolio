@@ -390,6 +390,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   transition: color 0.2s;
 }
 .register button .marke { width: 14px; height: 9px; display: inline-block; }
+.register button .reg-jahr { font-size: 10px; color: var(--grau); }
 .register button.aktiv, .register button:hover { color: var(--tinte); }
 .register button span.titel-kurz { max-width: 0; overflow: hidden; white-space: nowrap; transition: max-width 0.3s; }
 .register button:hover span.titel-kurz, .register button.aktiv span.titel-kurz { max-width: 240px; }

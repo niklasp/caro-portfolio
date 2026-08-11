@@ -289,12 +289,18 @@ export default function Schnuerboden() {
         </div>
       </div>
       <div className="register">
-        {PROJEKTE.map((pr, i) => (
-          <button key={pr.slug} className={i === index ? 'aktiv' : ''} onClick={() => gehe(i)}>
-            <span className="titel-kurz">{pr.titel}</span>
-            <span className="marke" style={{ background: pr.farbe, opacity: i === index ? 1 : 0.45 }} />
-          </button>
-        ))}
+        {[...PROJEKTE]
+          .sort((a, b) => b.jahrNum - a.jahrNum)
+          .map((pr) => {
+            const i = PROJEKTE.indexOf(pr)
+            return (
+              <button key={pr.slug} className={i === index ? 'aktiv' : ''} onClick={() => gehe(i)}>
+                <span className="titel-kurz">{pr.titel}</span>
+                <span className="reg-jahr">{Math.floor(pr.jahrNum)}</span>
+                <span className="marke" style={{ background: pr.farbe, opacity: i === index ? 1 : 0.45 }} />
+              </button>
+            )
+          })}
       </div>
       <div className="pfeil-nav">
         <button onClick={() => gehe(index - 1)} aria-label="Vorheriges Projekt">
