@@ -516,20 +516,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   will-change: transform;
 }
 .db-beschreibung .db-titel {
-  position: relative;
-  width: fit-content;
   font-size: 19px;
   letter-spacing: -0.01em;
-  margin-bottom: 6px;
-  padding: 2px 9px 4px 5px;
+  margin-bottom: 4px;
 }
-.db-beschreibung .db-titel-flaeche {
-  position: absolute;
-  inset: 0;
-  transform: translate(8px, 6px) rotate(-1.4deg);
-  transform-origin: left center;
-}
-.db-beschreibung .db-titel-text { position: relative; z-index: 1; }
 .db-beschreibung .db-meta { color: rgba(255, 255, 255, 0.55); margin-bottom: 14px; }
 .db-beschreibung .db-blurb { margin-bottom: 14px; color: rgba(255, 255, 255, 0.92); }
 .db-beschreibung .db-credits { color: rgba(255, 255, 255, 0.7); }

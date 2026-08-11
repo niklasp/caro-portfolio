@@ -5,7 +5,7 @@ import { PROJEKTE, type Projekt } from '../data/projects'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
 import Lichtkasten from '../ui/Lichtkasten'
 import { flags } from '../ui/flags'
-import { Foto, Farbflaeche, daempf } from './helpers'
+import { Foto, daempf } from './helpers'
 
 // Entwurf 2 — Die Drehbühne.
 // Ein schwarzer Bühnenraum: sacht bewegter Samtvorhang, ein Lichtkegel.
@@ -19,13 +19,6 @@ const RADIUS = 12
 
 const mod = (a: number, n: number) => ((a % n) + n) % n
 
-// Heller Text auf dunklen Flächen, dunkler auf hellen.
-const textFarbeAuf = (hex: string) => {
-  const n = parseInt(hex.slice(1), 16)
-  const lum = (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255
-  return lum < 0.45 ? '#ffffff' : '#141414'
-}
-
 interface DrehCtrl {
   ang: number
   tang: number
@@ -35,6 +28,7 @@ interface DrehCtrl {
 const VORHANG_FRAG = /* glsl */ `
 varying vec2 vUv;
 uniform float uZeit;
+uniform vec3 uTon;
 void main() {
   // Der Stoff bewegt sich leicht: eine langsame Welle wandert durch die Falten.
   float x = vUv.x + 0.008 * sin(uZeit * 0.45 + vUv.y * 3.5 + vUv.x * 24.0)
@@ -47,29 +41,72 @@ void main() {
   hell *= smoothstep(0.0, 0.28, vUv.y);              // unten im Dunkel
   hell *= 1.0 - 0.55 * smoothstep(0.58, 1.0, vUv.y); // oben weg vom Licht
   hell *= 0.78 + 0.22 * sin(vUv.x * 9.0 + 1.7);      // große Bahnen
-  vec3 farbe = vec3(hell) * vec3(1.0, 0.97, 0.92);
+  vec3 farbe = vec3(hell) * mix(vec3(1.0, 0.97, 0.92), uTon * 2.4, 0.5);
   gl_FragColor = vec4(farbe, 1.0);
   #include <colorspace_fragment>
 }
 `
 
-function Vorhang() {
+function Vorhang({ farbe }: { farbe: string }) {
+  const ziel = useMemo(() => new THREE.Color(), [])
+  useMemo(() => ziel.set(farbe), [farbe, ziel])
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
         vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
         fragmentShader: VORHANG_FRAG,
-        uniforms: { uZeit: { value: 0 } },
+        uniforms: { uZeit: { value: 0 }, uTon: { value: new THREE.Color('#ffffff') } },
         side: THREE.BackSide,
       }),
     []
   )
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, dt) => {
     material.uniforms.uZeit.value = clock.elapsedTime
+    ;(material.uniforms.uTon.value as THREE.Color).lerp(ziel, 1 - Math.exp(-2.2 * dt))
   })
   return (
     <mesh material={material} position={[0, 5.4, 0]}>
       <cylinderGeometry args={[20, 20, 15, 160, 1, true]} />
+    </mesh>
+  )
+}
+
+// Farbiger Schein hinter der Bühne — der Rundhorizont übernimmt die Projektfarbe.
+function Schein({ farbe }: { farbe: string }) {
+  const mesh = useRef<THREE.Mesh>(null)
+  const ziel = useMemo(() => new THREE.Color(), [])
+  useMemo(() => ziel.set(farbe), [farbe, ziel])
+  const tex = useMemo(() => {
+    const c = document.createElement('canvas')
+    c.width = c.height = 256
+    const g = c.getContext('2d')!
+    const grad = g.createRadialGradient(128, 128, 10, 128, 128, 128)
+    grad.addColorStop(0, 'rgba(255,255,255,0.85)')
+    grad.addColorStop(0.6, 'rgba(255,255,255,0.25)')
+    grad.addColorStop(1, 'rgba(255,255,255,0)')
+    g.fillStyle = grad
+    g.fillRect(0, 0, 256, 256)
+    const t = new THREE.CanvasTexture(c)
+    t.colorSpace = THREE.SRGBColorSpace
+    return t
+  }, [])
+  useFrame((_, dt) => {
+    const m = mesh.current
+    if (!m) return
+    ;((m.material as THREE.MeshBasicMaterial).color as THREE.Color).lerp(ziel, 1 - Math.exp(-2.2 * dt))
+  })
+  return (
+    <mesh ref={mesh} position={[0, 4.2, -13]}>
+      <planeGeometry args={[42, 22]} />
+      <meshBasicMaterial
+        map={tex}
+        color="#0c0c0c"
+        transparent
+        opacity={0.42}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        toneMapped={false}
+      />
     </mesh>
   )
 }
@@ -119,7 +156,6 @@ function Kulisse({
         onPointerOver={() => (document.body.style.cursor = vorn ? 'zoom-in' : 'pointer')}
         onPointerOut={() => (document.body.style.cursor = '')}
       >
-        <Farbflaeche farbe={projekt.farbe} breite={4.6} hoehe={3.15} position={[0, 1.7, -0.95]} />
         <Suspense fallback={null}>
           {fotos.map((b, i) => {
             const l = lagen[i]
@@ -207,7 +243,8 @@ function Buehnenraum({
 
   return (
     <>
-      <Vorhang />
+      <Vorhang farbe={PROJEKTE[aktiv].farbe} />
+      <Schein farbe={PROJEKTE[aktiv].farbe} />
 
       <group ref={scheibe}>
         {/* Drehscheibe */}
@@ -362,12 +399,7 @@ export default function Drehbuehne() {
 
       {/* Beschreibung direkt im Bühnenraum — nur auf großen Bildschirmen. */}
       <div className="db-beschreibung" ref={panel} key={p.slug}>
-        <h3 className="db-titel ov-anim-2">
-          <span className="db-titel-flaeche ov-anim-1" style={{ background: p.farbe }} />
-          <span className="db-titel-text" style={{ color: textFarbeAuf(p.farbe) }}>
-            {p.titel}
-          </span>
-        </h3>
+        <h3 className="db-titel ov-anim-2">{p.titel}</h3>
         <p className="db-meta ov-anim-2">
           {p.rolle} · {p.jahr} · {p.ort}
         </p>
