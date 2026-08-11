@@ -33,7 +33,7 @@ function FotoObjekt({
   url,
   breite,
   ar,
-  dicke = 0.09,
+  dicke = 0.5,
   ...props
 }: {
   url: string
@@ -53,10 +53,10 @@ function FotoObjekt({
       return new THREE.MeshBasicMaterial({ map: t, toneMapped: false })
     }
     return [
-      kante(0.985, 0, 0.015, 1), // rechts
-      kante(0, 0, 0.015, 1), // links
-      kante(0, 0.985, 1, 0.015), // oben
-      kante(0, 0, 1, 0.015), // unten
+      kante(0.94, 0, 0.06, 1), // rechts
+      kante(0, 0, 0.06, 1), // links
+      kante(0, 0.94, 1, 0.06), // oben
+      kante(0, 0, 1, 0.06), // unten
       new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), // vorn
       new THREE.MeshBasicMaterial({ color: '#1a1a1a', toneMapped: false }), // hinten
     ]
