@@ -129,12 +129,12 @@ function Markierung({
     })
   })
 
-  // Textfläche in wechselnden Größen und Versätzen — nie zweimal gleich.
+  // Textfläche in wechselnden Größen und Versätzen — nie zweimal gleich,
+  // aber immer achsparallel.
   const padX = 8 + (idx % 4) * 6
   const padY = 3 + (idx % 3) * 4
   const fx = 6 + ((idx * 3) % 5) * 4
   const fy = 4 + ((idx * 5) % 4) * 3
-  const frot = ((idx % 5) - 2) * 1.6
 
   return (
     <group position={[lage.p[0], lage.p[1], 0]} rotation={[0, 0, (lage.rot * Math.PI) / 180]}>
@@ -184,13 +184,18 @@ function Markierung({
         </group>
         <Html position={[0, 0, 1.6]} center zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}>
           <div
-            className="marke-titel"
-            style={{ color: textFarbeAuf(projekt.farbe), padding: `${padY}px ${padX}px`, opacity: offen ? 0 : 1 }}
+            className={hover && !offen ? 'marke-titel ist-hover' : 'marke-titel'}
+            style={
+              {
+                color: textFarbeAuf(projekt.farbe),
+                padding: `${padY}px ${padX}px`,
+                opacity: offen ? 0 : 1,
+                '--fx': `${fx}px`,
+                '--fy': `${fy}px`,
+              } as React.CSSProperties
+            }
           >
-            <span
-              className="marke-flaeche"
-              style={{ background: projekt.farbe, transform: `translate(${fx}px, ${fy}px) rotate(${frot}deg)` }}
-            />
+            <span className="marke-flaeche" style={{ background: projekt.farbe }} />
             <span className="marke-text">
               {projekt.titel} <span className="marke-jahr">{projekt.jahr}</span>
             </span>

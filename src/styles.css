@@ -254,11 +254,24 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .marke-titel .marke-flaeche {
   position: absolute;
   inset: 0;
-  transform: translate(7px, 5px) rotate(-1.5deg);
+  transform: translate(var(--fx, 7px), var(--fy, 5px));
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.marke-titel .marke-text { position: relative; z-index: 1; }
+.marke-titel .marke-text {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 .marke-titel .marke-jahr { font-weight: 400; margin-left: 6px; }
 .marke-titel { transition: opacity 0.3s; }
+/* Hover: die Fläche springt auf die Gegenseite und wächst — Druck außer Register. */
+.marke-titel.ist-hover .marke-flaeche {
+  transform: translate(calc(var(--fx, 7px) * -0.8), calc(var(--fy, 5px) * -0.8)) scale(1.12, 1.35);
+}
+.marke-titel.ist-hover .marke-text {
+  transform: translate(3px, -2px);
+}
 
 /* Geöffnetes Projekt: Beschreibung mitten im freigeräumten Haufen. */
 .bo-beschreibung {
