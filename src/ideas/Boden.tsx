@@ -138,21 +138,27 @@ function Markierung({
 
   return (
     <group position={[lage.p[0], lage.p[1], 0]} rotation={[0, 0, (lage.rot * Math.PI) / 180]}>
-      <group
-        ref={gruppe}
-        onClick={(e) => {
-          e.stopPropagation()
-          if (e.delta < 6 && !offen) onOpen(projekt.slug)
-        }}
-        onPointerOver={() => {
-          setHover(true)
-          document.body.style.cursor = offen ? 'zoom-in' : 'pointer'
-        }}
-        onPointerOut={() => {
-          setHover(false)
-          document.body.style.cursor = ''
-        }}
-      >
+      <group ref={gruppe}>
+        {/* Unsichtbare Hover-Fläche über dem ganzen Projekt — so bleibt der
+            Zustand stabil, egal ob man über Fotos, Titel oder Lücken fährt. */}
+        <mesh
+          position={[0, 0, 0.05]}
+          onClick={(e) => {
+            e.stopPropagation()
+            if (e.delta < 6 && !offen) onOpen(projekt.slug)
+          }}
+          onPointerOver={() => {
+            setHover(true)
+            document.body.style.cursor = offen ? 'zoom-in' : 'pointer'
+          }}
+          onPointerOut={() => {
+            setHover(false)
+            document.body.style.cursor = ''
+          }}
+        >
+          <planeGeometry args={[11.5, 9]} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
         <group ref={fotos}>
           <Suspense fallback={null}>
             {projekt.bilder.slice(0, 4).map((b, i) => {
@@ -177,6 +183,7 @@ function Markierung({
                     e.stopPropagation()
                     if (e.delta < 6) onBild(i)
                   }}
+                  onPointerOver={() => offen && (document.body.style.cursor = 'zoom-in')}
                 />
               )
             })}
