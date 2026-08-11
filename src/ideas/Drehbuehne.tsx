@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState, Suspense, type RefObject } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useLoader, useThree, type ThreeElements } from '@react-three/fiber'
 import * as THREE from 'three'
 import { PROJEKTE, type Projekt } from '../data/projects'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
 import Lichtkasten from '../ui/Lichtkasten'
 import { flags } from '../ui/flags'
-import { Foto, daempf } from './helpers'
+import { daempf } from './helpers'
 
 // Entwurf 2 — Die Drehbühne.
 // Ein schwarzer Bühnenraum: sacht bewegter Samtvorhang, ein Lichtkegel.
@@ -22,6 +22,50 @@ const mod = (a: number, n: number) => ((a % n) + n) % n
 interface DrehCtrl {
   ang: number
   tang: number
+}
+
+// Normierte Mausposition — kippt die Bühne leicht.
+const maus = { x: 0, y: 0 }
+
+// Ein Foto als Objekt: Leinwand mit Tiefe, die Textur läuft um die Kanten
+// herum wie bei einem aufgezogenen Abzug.
+function FotoObjekt({
+  url,
+  breite,
+  ar,
+  dicke = 0.09,
+  ...props
+}: {
+  url: string
+  breite: number
+  ar: number
+  dicke?: number
+} & ThreeElements['mesh']) {
+  const tex = useLoader(THREE.TextureLoader, url)
+  const materialien = useMemo(() => {
+    tex.colorSpace = THREE.SRGBColorSpace
+    tex.anisotropy = 8
+    const kante = (ox: number, oy: number, rx: number, ry: number) => {
+      const t = tex.clone()
+      t.needsUpdate = true
+      t.repeat.set(rx, ry)
+      t.offset.set(ox, oy)
+      return new THREE.MeshBasicMaterial({ map: t, toneMapped: false })
+    }
+    return [
+      kante(0.985, 0, 0.015, 1), // rechts
+      kante(0, 0, 0.015, 1), // links
+      kante(0, 0.985, 1, 0.015), // oben
+      kante(0, 0, 1, 0.015), // unten
+      new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), // vorn
+      new THREE.MeshBasicMaterial({ color: '#1a1a1a', toneMapped: false }), // hinten
+    ]
+  }, [tex])
+  return (
+    <mesh {...props} material={materialien}>
+      <boxGeometry args={[breite, breite / ar, dicke]} />
+    </mesh>
+  )
 }
 
 // Der Samtvorhang: umschließt die Szene, mit gefaltetem Lichtspiel.
@@ -131,8 +175,9 @@ function Kulisse({
     // Grundfarben einmalig merken, damit das Abdunkeln nicht kumuliert.
     gruppe.current?.traverse((o) => {
       const m = o as THREE.Mesh
-      if (m.isMesh && !m.userData.grundfarbe) {
-        m.userData.grundfarbe = (m.material as THREE.MeshBasicMaterial).color.clone()
+      if (m.isMesh && !m.userData.grundfarben) {
+        const mats = Array.isArray(m.material) ? m.material : [m.material]
+        m.userData.grundfarben = mats.map((mat) => (mat as THREE.MeshBasicMaterial).color.clone())
       }
     })
   })
@@ -161,7 +206,7 @@ function Kulisse({
             const l = lagen[i]
             const h = l.b / b.ar
             return (
-              <Foto
+              <FotoObjekt
                 key={b.src}
                 url={b.src}
                 breite={l.b}
@@ -195,6 +240,7 @@ function Buehnenraum({
   aktiv: number
 }) {
   const scheibe = useRef<THREE.Group>(null)
+  const kippen = useRef<THREE.Group>(null)
   const szene = useThree((s) => s.scene)
   const cam = useThree((s) => s.camera)
 
@@ -222,6 +268,11 @@ function Buehnenraum({
     const c = ctrl.current
     c.ang = daempf(c.tang, c.ang, 5, dt)
     if (scheibe.current) scheibe.current.rotation.y = c.ang
+    // Die ganze Bühne kippt sacht zur Maus.
+    if (kippen.current) {
+      kippen.current.rotation.x = daempf(maus.y * 0.035, kippen.current.rotation.x, 4, dt)
+      kippen.current.rotation.z = daempf(maus.x * -0.022, kippen.current.rotation.z, 4, dt)
+    }
 
     // Vorderstes Projekt aufhellen, alle anderen abdunkeln.
     szene.traverse((o) => {
@@ -232,10 +283,13 @@ function Buehnenraum({
       o.userData.b = daempf(ziel, o.userData.b ?? 0.2, 5, dt)
       o.traverse((kind) => {
         const m = kind as THREE.Mesh
-        if (m.isMesh && m.userData.grundfarbe) {
-          ;(m.material as THREE.MeshBasicMaterial).color
-            .copy(m.userData.grundfarbe as THREE.Color)
-            .multiplyScalar(o.userData.b as number)
+        if (m.isMesh && m.userData.grundfarben) {
+          const mats = Array.isArray(m.material) ? m.material : [m.material]
+          mats.forEach((mat, mi) => {
+            ;(mat as THREE.MeshBasicMaterial).color
+              .copy((m.userData.grundfarben as THREE.Color[])[mi])
+              .multiplyScalar(o.userData.b as number)
+          })
         }
       })
     })
@@ -246,6 +300,7 @@ function Buehnenraum({
       <Vorhang farbe={PROJEKTE[aktiv].farbe} />
       <Schein farbe={PROJEKTE[aktiv].farbe} />
 
+      <group ref={kippen}>
       <group ref={scheibe}>
         {/* Drehscheibe */}
         <mesh position={[0, -0.19, 0]}>
@@ -259,6 +314,7 @@ function Buehnenraum({
         {PROJEKTE.map((p, i) => (
           <Kulisse key={p.slug} projekt={p} index={i} vorn={i === aktiv} onDrehen={onDrehen} onBild={onBild} />
         ))}
+      </group>
       </group>
 
       {/* Lichtkegel auf die vorderste Position — fest im Raum, dreht nicht mit. */}
@@ -289,6 +345,15 @@ function Buehnenraum({
 
 export default function Drehbuehne() {
   const [aktiv, setAktiv] = useState(0)
+
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      maus.x = (e.clientX / window.innerWidth) * 2 - 1
+      maus.y = (e.clientY / window.innerHeight) * 2 - 1
+    }
+    window.addEventListener('pointermove', onMove)
+    return () => window.removeEventListener('pointermove', onMove)
+  }, [])
   const [lichtkasten, setLichtkasten] = useState<number | null>(null)
   const wrap = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
