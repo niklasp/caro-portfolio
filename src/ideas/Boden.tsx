@@ -149,8 +149,12 @@ function Markierung({
       if (b.bx === undefined || b.by === undefined || b.brot === undefined) return
       const istGross = offen && gross === b.i
       const platz = OFFEN_PLAETZE[((b.i ?? 0) + idx) % OFFEN_PLAETZE.length]
-      const zx = istGross ? 5 : offen ? platz[0] : b.bx * streuung
-      const zy = istGross ? -3.4 : offen ? platz[1] : b.by * streuung
+      // Zielpunkt der Kamera in gedrehte Gruppen-Koordinaten umrechnen
+      const rotRad = (lage.rot * Math.PI) / 180
+      const gx = 5 * Math.cos(rotRad) + -3.4 * Math.sin(rotRad)
+      const gy = -5 * Math.sin(rotRad) + -3.4 * Math.cos(rotRad)
+      const zx = istGross ? gx : offen ? platz[0] : b.bx * streuung
+      const zy = istGross ? gy : offen ? platz[1] : b.by * streuung
       let zielScale = groesse
       if (istGross && b.breite && b.ar) {
         zielScale = Math.min((weltB * 0.9) / b.breite, (weltH * 0.88) / (b.breite / b.ar))
@@ -159,7 +163,7 @@ function Markierung({
       m.position.x = daempf(zx, m.position.x, 9, dt)
       m.position.y = daempf(zy, m.position.y, 9, dt)
       m.position.z = daempf(zz, m.position.z, 9, dt)
-      m.rotation.z = daempf(istGross ? 0 : b.brot * richten, m.rotation.z, 9, dt)
+      m.rotation.z = daempf(istGross ? -rotRad : b.brot * richten, m.rotation.z, 9, dt)
       m.scale.setScalar(daempf(zielScale, m.scale.x, 9, dt))
     })
     // … und weicht geöffnet an den freien linken Rand aus — die Farbe
@@ -488,7 +492,7 @@ export default function Boden() {
       <Fuss fallback={['Entwurf 1', 'Der Boden', 'alle Arbeiten, 2021–2026']} projekt={projekt} />
 
       {/* Beschreibung mitten im freigeräumten Haufen */}
-      {projekt && (
+      {projekt && gross === null && (
         <div className="bo-beschreibung" key={projekt.slug}>
           <p className="bo-meta ov-anim-2">
             {projekt.rolle} · {projekt.jahr} · {projekt.ort}
