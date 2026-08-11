@@ -1,0 +1,360 @@
+{
+ "love-western": [
+  {
+   "src": "/images/love-western-1.jpg",
+   "w": 1080,
+   "h": 785
+  },
+  {
+   "src": "/images/love-western-2.jpg",
+   "w": 1080,
+   "h": 709
+  },
+  {
+   "src": "/images/love-western-3.jpg",
+   "w": 1037,
+   "h": 1080
+  },
+  {
+   "src": "/images/love-western-4.jpg",
+   "w": 960,
+   "h": 1080
+  },
+  {
+   "src": "/images/love-western-5.jpg",
+   "w": 830,
+   "h": 1080
+  },
+  {
+   "src": "/images/love-western-6.jpg",
+   "w": 836,
+   "h": 1080
+  }
+ ],
+ "reden": [
+  {
+   "src": "/images/reden-1.jpg",
+   "w": 763,
+   "h": 1080
+  },
+  {
+   "src": "/images/reden-2.jpg",
+   "w": 1080,
+   "h": 748
+  },
+  {
+   "src": "/images/reden-3.jpg",
+   "w": 738,
+   "h": 1080
+  },
+  {
+   "src": "/images/reden-4.jpg",
+   "w": 1080,
+   "h": 913
+  }
+ ],
+ "lost": [
+  {
+   "src": "/images/lost-1.jpg",
+   "w": 1080,
+   "h": 620
+  },
+  {
+   "src": "/images/lost-2.jpg",
+   "w": 1080,
+   "h": 712
+  },
+  {
+   "src": "/images/lost-3.jpg",
+   "w": 1080,
+   "h": 952
+  },
+  {
+   "src": "/images/lost-4.jpg",
+   "w": 932,
+   "h": 1080
+  },
+  {
+   "src": "/images/lost-5.jpg",
+   "w": 1080,
+   "h": 869
+  }
+ ],
+ "draussen-feiern": [
+  {
+   "src": "/images/draussen-feiern-1.jpg",
+   "w": 1080,
+   "h": 619
+  },
+  {
+   "src": "/images/draussen-feiern-2.jpg",
+   "w": 1080,
+   "h": 710
+  },
+  {
+   "src": "/images/draussen-feiern-3.jpg",
+   "w": 1080,
+   "h": 868
+  },
+  {
+   "src": "/images/draussen-feiern-4.jpg",
+   "w": 1080,
+   "h": 1075
+  },
+  {
+   "src": "/images/draussen-feiern-5.jpg",
+   "w": 1080,
+   "h": 868
+  }
+ ],
+ "hundekot-attacke": [
+  {
+   "src": "/images/hundekot-attacke-1.jpg",
+   "w": 1080,
+   "h": 619
+  },
+  {
+   "src": "/images/hundekot-attacke-2.jpg",
+   "w": 1080,
+   "h": 728
+  },
+  {
+   "src": "/images/hundekot-attacke-3.jpg",
+   "w": 720,
+   "h": 1080
+  },
+  {
+   "src": "/images/hundekot-attacke-4.jpg",
+   "w": 1080,
+   "h": 627
+  },
+  {
+   "src": "/images/hundekot-attacke-5.jpg",
+   "w": 1080,
+   "h": 603
+  }
+ ],
+ "amygdala": [
+  {
+   "src": "/images/amygdala-1.jpg",
+   "w": 1080,
+   "h": 839
+  },
+  {
+   "src": "/images/amygdala-2.jpg",
+   "w": 761,
+   "h": 1080
+  },
+  {
+   "src": "/images/amygdala-3.jpg",
+   "w": 1080,
+   "h": 980
+  },
+  {
+   "src": "/images/amygdala-4.jpg",
+   "w": 1080,
+   "h": 980
+  }
+ ],
+ "bitte-auto-komm": [
+  {
+   "src": "/images/bitte-auto-komm-1.jpg",
+   "w": 1080,
+   "h": 618
+  },
+  {
+   "src": "/images/bitte-auto-komm-2.jpg",
+   "w": 681,
+   "h": 1080
+  },
+  {
+   "src": "/images/bitte-auto-komm-3.jpg",
+   "w": 1080,
+   "h": 854
+  },
+  {
+   "src": "/images/bitte-auto-komm-4.jpg",
+   "w": 1080,
+   "h": 854
+  }
+ ],
+ "knast": [
+  {
+   "src": "/images/knast-1.jpg",
+   "w": 1080,
+   "h": 618
+  },
+  {
+   "src": "/images/knast-2.jpg",
+   "w": 1080,
+   "h": 467
+  },
+  {
+   "src": "/images/knast-3.jpg",
+   "w": 553,
+   "h": 1080
+  },
+  {
+   "src": "/images/knast-4.jpg",
+   "w": 1080,
+   "h": 1080
+  },
+  {
+   "src": "/images/knast-5.jpg",
+   "w": 1080,
+   "h": 1080
+  },
+  {
+   "src": "/images/knast-6.jpg",
+   "w": 1080,
+   "h": 1080
+  }
+ ],
+ "ein-stueck-vom-mond": [
+  {
+   "src": "/images/ein-stueck-vom-mond-1.jpg",
+   "w": 1080,
+   "h": 619
+  },
+  {
+   "src": "/images/ein-stueck-vom-mond-2.jpg",
+   "w": 662,
+   "h": 1080
+  },
+  {
+   "src": "/images/ein-stueck-vom-mond-3.jpg",
+   "w": 1080,
+   "h": 874
+  },
+  {
+   "src": "/images/ein-stueck-vom-mond-4.jpg",
+   "w": 1080,
+   "h": 874
+  }
+ ],
+ "spuren": [
+  {
+   "src": "/images/spuren-1.jpg",
+   "w": 1080,
+   "h": 618
+  },
+  {
+   "src": "/images/spuren-2.jpg",
+   "w": 1080,
+   "h": 573
+  },
+  {
+   "src": "/images/spuren-3.jpg",
+   "w": 1080,
+   "h": 769
+  },
+  {
+   "src": "/images/spuren-4.jpg",
+   "w": 1080,
+   "h": 772
+  }
+ ],
+ "on-repeat": [
+  {
+   "src": "/images/on-repeat-1.jpg",
+   "w": 1080,
+   "h": 1018
+  },
+  {
+   "src": "/images/on-repeat-2.jpg",
+   "w": 774,
+   "h": 1080
+  },
+  {
+   "src": "/images/on-repeat-3.jpg",
+   "w": 679,
+   "h": 1080
+  },
+  {
+   "src": "/images/on-repeat-4.jpg",
+   "w": 679,
+   "h": 1080
+  },
+  {
+   "src": "/images/on-repeat-5.jpg",
+   "w": 1080,
+   "h": 715
+  },
+  {
+   "src": "/images/on-repeat-6.jpg",
+   "w": 1080,
+   "h": 813
+  }
+ ],
+ "um-ordnen": [
+  {
+   "src": "/images/um-ordnen-1.jpg",
+   "w": 1080,
+   "h": 811
+  },
+  {
+   "src": "/images/um-ordnen-2.jpg",
+   "w": 1080,
+   "h": 817
+  },
+  {
+   "src": "/images/um-ordnen-3.jpg",
+   "w": 1080,
+   "h": 803
+  },
+  {
+   "src": "/images/um-ordnen-4.jpg",
+   "w": 1080,
+   "h": 807
+  }
+ ],
+ "heavy-matters": [
+  {
+   "src": "/images/heavy-matters-1.jpg",
+   "w": 1080,
+   "h": 761
+  },
+  {
+   "src": "/images/heavy-matters-2.jpg",
+   "w": 1080,
+   "h": 761
+  },
+  {
+   "src": "/images/heavy-matters-3.jpg",
+   "w": 1080,
+   "h": 784
+  }
+ ],
+ "parachutes": [
+  {
+   "src": "/images/parachutes-1.jpg",
+   "w": 1080,
+   "h": 855
+  },
+  {
+   "src": "/images/parachutes-2.jpg",
+   "w": 1080,
+   "h": 854
+  },
+  {
+   "src": "/images/parachutes-3.jpg",
+   "w": 1080,
+   "h": 1028
+  },
+  {
+   "src": "/images/parachutes-4.jpg",
+   "w": 1080,
+   "h": 854
+  },
+  {
+   "src": "/images/parachutes-5.jpg",
+   "w": 612,
+   "h": 1080
+  },
+  {
+   "src": "/images/parachutes-6.jpg",
+   "w": 1080,
+   "h": 1029
+  }
+ ]
+}

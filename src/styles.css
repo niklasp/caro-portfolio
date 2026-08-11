@@ -1,0 +1,666 @@
+:root {
+  --papier: #ffffff;
+  --tinte: #141414;
+  --grau: #8a8a8a;
+  --linie: #141414;
+  --hairline: 1px solid var(--tinte);
+  --blau: #1512eb;
+  --orange: #e0873a;
+  --magenta: #ff00e6;
+  --pink: #ee5fc4;
+  --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--tinte);
+  background: var(--papier);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+.app { height: 100%; position: relative; }
+
+/* ---------- Chrome: Kopf- und Fußzeile wie im gedruckten Portfolio ---------- */
+
+.kopf {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 18px 24px;
+  z-index: 40;
+  pointer-events: none;
+}
+.kopf > * { pointer-events: auto; }
+.kopf .name { font-size: 13px; }
+.kopf .name .unter { color: var(--grau); margin-left: 10px; }
+.kopf nav { display: flex; gap: 18px; font-size: 13px; }
+.kopf nav a.aktiv { border-bottom: var(--hairline); }
+.kopf nav a:hover { border-bottom: var(--hairline); }
+.kopf.hell { color: #fff; }
+.kopf.hell nav a.aktiv, .kopf.hell nav a:hover { border-color: #fff; }
+
+.fuss {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  padding: 14px 24px;
+  font-size: 12px;
+  z-index: 40;
+  pointer-events: none;
+}
+.fuss span:nth-child(2) { text-align: center; }
+.fuss span:nth-child(3) { text-align: right; }
+.fuss.hell { color: #fff; }
+
+/* ---------- Entwurf-Schalter ---------- */
+
+.entwurf-schalter {
+  position: fixed;
+  top: 54px;
+  left: 24px;
+  z-index: 40;
+  font-size: 12px;
+  color: var(--grau);
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+.entwurf-schalter a { color: var(--grau); }
+.entwurf-schalter a.aktiv, .entwurf-schalter a:hover { color: inherit; border-bottom: 1px solid currentColor; }
+.entwurf-schalter.hell { color: rgba(255,255,255,0.55); }
+.entwurf-schalter.hell a { color: rgba(255,255,255,0.55); }
+.entwurf-schalter.hell a.aktiv, .entwurf-schalter.hell a:hover { color: #fff; }
+
+/* ---------- Hinweis (Bedienung) ---------- */
+
+.hinweis {
+  position: fixed;
+  bottom: 44px;
+  left: 24px;
+  font-size: 11px;
+  color: var(--grau);
+  z-index: 30;
+  pointer-events: none;
+}
+.hinweis.hell { color: rgba(255, 255, 255, 0.55); }
+
+/* ---------- Landing ---------- */
+
+.landing {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 120px 24px 80px;
+}
+.landing .intro { max-width: 400px; margin-bottom: 72px; }
+.landing .intro p { margin-top: 12px; color: var(--grau); }
+.entwurf-liste { display: flex; flex-direction: column; }
+.entwurf-eintrag {
+  position: relative;
+  display: block;
+  padding: 26px 0 30px;
+  border-top: var(--hairline);
+}
+.entwurf-eintrag:last-child { border-bottom: var(--hairline); }
+.entwurf-eintrag .nummer { font-size: 12px; display: block; margin-bottom: 6px; }
+.entwurf-eintrag h2 {
+  font-size: clamp(38px, 7vw, 84px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  position: relative;
+  z-index: 2;
+  width: fit-content;
+}
+.entwurf-eintrag .beschreibung {
+  margin-top: 10px;
+  max-width: 430px;
+  color: var(--grau);
+  position: relative;
+  z-index: 2;
+}
+.entwurf-eintrag .farbflaeche {
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: -24px;
+  right: 55%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.3, 1);
+  z-index: 1;
+}
+.entwurf-eintrag:hover .farbflaeche { transform: scaleX(1); }
+.entwurf-eintrag:hover .beschreibung { color: var(--tinte); }
+
+/* ---------- Googly Eyes ---------- */
+
+.augen { display: inline-flex; gap: 3px; }
+.auge {
+  width: 22px; height: 30px;
+  background: radial-gradient(ellipse at 35% 30%, #fff 55%, #c9c9c9);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: inset -1px -2px 3px rgba(0,0,0,0.25);
+}
+.pupille {
+  width: 12px; height: 12px;
+  background: #111;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%; left: 50%;
+}
+
+/* ---------- Lebenslauf ---------- */
+
+.lebenslauf {
+  padding: 110px 24px 80px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 64px;
+  max-width: 1400px;
+}
+.lebenslauf h2 {
+  font-size: 13px;
+  font-weight: 400;
+  border-bottom: var(--hairline);
+  padding-bottom: 6px;
+  margin-bottom: 28px;
+}
+.lebenslauf h3 { font-size: 13px; font-style: italic; font-weight: 400; margin: 26px 0 8px; }
+.ll-zeile { display: grid; grid-template-columns: 84px 1fr; gap: 12px; margin-bottom: 8px; }
+.ll-zeile .jahr { color: var(--tinte); }
+.ll-zeile em { font-style: italic; font-weight: 700; }
+.lebenslauf .werke .ll-zeile { margin-bottom: 12px; }
+@media (max-width: 800px) {
+  .lebenslauf { grid-template-columns: 1fr; gap: 40px; }
+}
+
+/* ---------- Bühnen-Container (3D) ---------- */
+
+.buehne {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+.buehne canvas { touch-action: none; }
+
+.lade {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--grau);
+}
+
+/* ---------- Zoom-Regler (Der Boden) ---------- */
+
+.zoom-regler {
+  position: fixed;
+  bottom: 44px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 40;
+  font-size: 15px;
+}
+.zoom-regler input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 140px;
+  height: 1px;
+  background: var(--tinte);
+  outline: none;
+}
+.zoom-regler input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px; height: 13px;
+  border: 1.5px solid var(--tinte);
+  border-radius: 50%;
+  background: var(--papier);
+  cursor: pointer;
+}
+
+/* ---------- Der Boden: Projekt-Marken ---------- */
+
+/* Größere Schrift, die Farbfläche sitzt versetzt dahinter — wie im Heft. */
+.marke-titel {
+  position: relative;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  text-align: center;
+  padding: 3px 8px;
+}
+.marke-titel .marke-flaeche {
+  position: absolute;
+  inset: 0;
+  transform: translate(7px, 5px) rotate(-1.5deg);
+}
+.marke-titel .marke-text { position: relative; z-index: 1; }
+.marke-titel .marke-jahr { font-weight: 400; margin-left: 6px; }
+.marke-titel { transition: opacity 0.3s; }
+
+/* Geöffnetes Projekt: Beschreibung mitten im freigeräumten Haufen. */
+.bo-beschreibung {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(52ch, 46vw);
+  z-index: 35;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 24px 26px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+}
+.bo-beschreibung .bo-titel {
+  position: relative;
+  width: fit-content;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+  padding: 2px 10px 4px 6px;
+}
+.bo-beschreibung .bo-titel-flaeche {
+  position: absolute;
+  inset: 0;
+  transform: translate(9px, 7px) rotate(-1.4deg);
+  transform-origin: left center;
+}
+.bo-beschreibung .bo-titel-text { position: relative; z-index: 1; }
+.bo-beschreibung .bo-meta { color: var(--grau); margin-bottom: 14px; }
+.bo-beschreibung .bo-blurb { margin-bottom: 14px; }
+.bo-beschreibung .bo-credits div { margin-bottom: 2px; }
+.bo-beschreibung .bo-links { margin-top: 12px; }
+.bo-beschreibung .bo-links a { border-bottom: var(--hairline); margin-right: 14px; }
+.bo-beschreibung .bo-hinweis { margin-top: 16px; font-size: 11px; color: var(--grau); }
+
+/* ---------- Achsen (Der Boden) ---------- */
+
+.achse {
+  position: fixed;
+  font-size: 12px;
+  color: var(--grau);
+  z-index: 30;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+}
+.achse.links { left: 10px; top: 50%; transform: rotate(-90deg) translateX(-50%); transform-origin: left center; }
+.achse.oben { top: 88px; left: 50%; transform: translateX(-50%); }
+
+/* ---------- Projekt-Overlay (Beschreibung) ---------- */
+
+.overlay-rueck {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(20, 20, 20, 0.25);
+}
+.overlay {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(560px, 92vw);
+  background: var(--papier);
+  z-index: 51;
+  overflow-y: auto;
+  padding: 24px 28px 60px;
+  animation: overlay-rein 0.35s cubic-bezier(0.25, 1, 0.3, 1);
+}
+@keyframes overlay-rein {
+  from { transform: translateX(40px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.overlay .ov-kopf {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: var(--hairline);
+  padding-bottom: 6px;
+  margin-bottom: 26px;
+}
+.overlay .ov-kopf .label { font-size: 13px; }
+.overlay .schliessen { font-size: 18px; line-height: 1; }
+.overlay .farbbalken { height: 14px; margin-bottom: 22px; }
+.overlay h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
+.overlay .meta { color: var(--grau); margin-bottom: 20px; }
+.overlay .blurb { margin-bottom: 20px; max-width: 46ch; }
+.overlay .credits { color: var(--tinte); margin-bottom: 26px; }
+.overlay .credits div { margin-bottom: 2px; }
+.overlay .links { margin-bottom: 26px; }
+.overlay .links a { border-bottom: var(--hairline); margin-right: 16px; }
+.overlay .bilder { display: flex; flex-direction: column; gap: 14px; }
+.overlay .bilder img { width: 100%; display: block; }
+.overlay .bild-unterschrift {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  font-size: 11px;
+  color: var(--grau);
+  margin-top: -8px;
+}
+.overlay .bild-unterschrift span:last-child { text-align: right; }
+
+/* ---------- Register (Schnürboden Index) ---------- */
+
+.register {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: flex-end;
+}
+.register button {
+  font-size: 11px;
+  color: var(--grau);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+.register button .marke { width: 14px; height: 9px; display: inline-block; }
+.register button.aktiv, .register button:hover { color: var(--tinte); }
+.register button span.titel-kurz { max-width: 0; overflow: hidden; white-space: nowrap; transition: max-width 0.3s; }
+.register button:hover span.titel-kurz, .register button.aktiv span.titel-kurz { max-width: 240px; }
+
+/* ---------- Schnürboden Titel ---------- */
+
+.app { isolation: isolate; }
+.sb-titel-blend {
+  color: #fff;
+  mix-blend-mode: difference;
+}
+.sb-titel {
+  position: fixed;
+  left: 24px;
+  bottom: 90px;
+  z-index: 30;
+  pointer-events: none;
+  max-width: 62vw;
+}
+.sb-titel h2 {
+  font-size: clamp(30px, 5.4vw, 68px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.sb-titel .sb-meta { margin-top: 8px; font-size: 12px; color: var(--grau); }
+
+.pfeil-nav {
+  position: fixed;
+  right: 24px;
+  bottom: 90px;
+  z-index: 35;
+  display: flex;
+  gap: 14px;
+  font-size: 20px;
+}
+.pfeil-nav button:hover { transform: translateY(-1px); }
+
+/* ---------- Overlay v2: Tiefe und Staffelung ---------- */
+
+.overlay {
+  box-shadow: -32px 0 80px rgba(20, 20, 20, 0.22);
+}
+.overlay .ov-kopf .ov-hinweis { font-size: 11px; color: var(--grau); }
+.overlay .farbbalken { transform-origin: left center; animation: ov-wisch 0.55s cubic-bezier(0.25, 1, 0.3, 1) both; }
+.ov-anim-2 { animation: ov-steig 0.5s 0.08s cubic-bezier(0.25, 1, 0.3, 1) both; }
+.ov-anim-3 { animation: ov-steig 0.5s 0.16s cubic-bezier(0.25, 1, 0.3, 1) both; }
+.ov-anim-4 { animation: ov-steig 0.55s 0.24s cubic-bezier(0.25, 1, 0.3, 1) both; }
+@keyframes ov-wisch { from { transform: scaleX(0); } to { transform: none; } }
+@keyframes ov-steig { from { transform: translateY(18px); opacity: 0; } to { transform: none; opacity: 1; } }
+.overlay .ov-bild {
+  display: block;
+  width: 100%;
+  padding: 0;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+.overlay .ov-bild img {
+  width: 100%;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.3, 1);
+}
+.overlay .ov-bild:hover img { transform: scale(1.015); }
+
+/* ---------- Lichtkasten ---------- */
+
+.lichtkasten {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(12, 12, 12, 0.92);
+  animation: lk-auf 0.25s ease both;
+}
+@keyframes lk-auf { from { opacity: 0; } to { opacity: 1; } }
+.lichtkasten .lk-canvas {
+  position: absolute;
+  inset: 3vh 5vw 8vh;
+}
+.lichtkasten .lk-schliessen {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  z-index: 2;
+}
+.lichtkasten .lk-nav {
+  position: absolute;
+  bottom: 44px;
+  right: 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  color: #fff;
+  font-size: 13px;
+  z-index: 2;
+}
+.lichtkasten .lk-nav button { color: #fff; font-size: 19px; }
+.lichtkasten .lk-unterschrift {
+  position: absolute;
+  bottom: 14px;
+  left: 24px;
+  right: 24px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+}
+.lichtkasten .lk-unterschrift span:nth-child(2) { text-align: center; }
+.lichtkasten .lk-unterschrift span:last-child { text-align: right; }
+
+/* ---------- Drehbühne: Beschreibung im Raum ---------- */
+
+.db-beschreibung {
+  position: fixed;
+  right: 40px;
+  top: 50%;
+  margin-top: -180px;
+  width: min(348px, 27vw);
+  z-index: 30;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 18px 18px 20px;
+  background: rgba(12, 12, 12, 0.42);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.25s ease-out;
+  will-change: transform;
+}
+.db-beschreibung .farbbalken { height: 12px; margin-bottom: 16px; }
+.db-beschreibung h3 { font-size: 17px; letter-spacing: -0.01em; margin-bottom: 3px; }
+.db-beschreibung .db-meta { color: rgba(255, 255, 255, 0.55); margin-bottom: 14px; }
+.db-beschreibung .db-blurb { margin-bottom: 14px; color: rgba(255, 255, 255, 0.92); }
+.db-beschreibung .db-credits { color: rgba(255, 255, 255, 0.7); }
+.db-beschreibung .db-credits div { margin-bottom: 2px; }
+.db-beschreibung .db-links { margin-top: 12px; }
+.db-beschreibung .db-links a { border-bottom: 1px solid rgba(255, 255, 255, 0.6); margin-right: 14px; }
+@media (max-width: 1100px) {
+  .db-beschreibung { display: none; }
+}
+
+/* ---------- Schnürboden: hängende Beschreibung ---------- */
+
+.sb-panel {
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--papier);
+  padding: 16px 18px 20px;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+}
+.sb-panel .sb-panel-kopf {
+  font-size: 11px;
+  border-bottom: 1px solid var(--tinte);
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+}
+.sb-panel .sb-panel-balken { height: 10px; margin-bottom: 12px; }
+.sb-panel h3 { font-size: 15px; letter-spacing: -0.01em; margin-bottom: 2px; }
+.sb-panel .sb-panel-meta { color: var(--grau); margin-bottom: 10px; }
+.sb-panel .sb-panel-credits { margin-top: 10px; color: var(--tinte); }
+.sb-panel .sb-panel-credits div { margin-bottom: 2px; }
+
+/* ---------- Der Spielplan (Entwurf 4) ---------- */
+
+.spielplan {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--papier);
+}
+.sp-spalten {
+  position: absolute;
+  inset: 90px 24px 70px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+}
+.sp-links { display: flex; flex-direction: column; justify-content: center; gap: 34px; min-width: 0; }
+.sp-nachbar {
+  position: relative;
+  text-align: left;
+  font-size: 14px;
+  color: var(--grau);
+  padding: 6px 0;
+  width: fit-content;
+  max-width: 100%;
+}
+.sp-nachbar .farbflaeche {
+  position: absolute;
+  inset: 0 -12px 0 -24px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.3, 1);
+}
+.sp-nachbar:hover .farbflaeche { transform: scaleX(1); }
+.sp-nachbar .sp-nachbar-text { position: relative; z-index: 1; }
+.sp-nachbar:hover .sp-nachbar-text { color: var(--tinte); }
+.sp-aktiv { position: relative; min-width: 0; }
+.sp-aktiv .sp-eyebrow { font-size: 12px; color: var(--grau); display: block; margin-bottom: 10px; }
+.sp-aktiv h2 {
+  position: relative;
+  font-size: clamp(34px, 5vw, 72px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  width: fit-content;
+  max-width: 100%;
+}
+.sp-aktiv h2 .sp-rect {
+  position: absolute;
+  inset: -6px -18px -10px -24px;
+  transform-origin: left center;
+  animation: ov-wisch 0.5s cubic-bezier(0.25, 1, 0.3, 1) both;
+}
+.sp-aktiv h2 .sp-titel-text { position: relative; z-index: 1; animation: ov-steig 0.45s 0.06s cubic-bezier(0.25, 1, 0.3, 1) both; }
+.sp-aktiv .sp-rolle { display: block; margin-top: 12px; font-size: 13px; animation: ov-steig 0.45s 0.12s cubic-bezier(0.25, 1, 0.3, 1) both; }
+/* Die Beschreibung sitzt zwischen Titel und Bild und darf das Bild
+   ein Stück überlappen — dort kehrt sie sich um (difference). */
+.spielplan { isolation: isolate; }
+/* Das Farbquadrat ersetzt den Cursor. */
+@media (min-width: 1100px) {
+  .spielplan,
+  .spielplan * {
+    cursor: none !important;
+  }
+}
+.sp-balken-maus {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  z-index: 12;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.sp-inline {
+  position: fixed;
+  left: 37vw;
+  top: 55%;
+  width: min(46ch, 34vw);
+  font-size: 13px;
+  z-index: 13;
+  color: #fff;
+  mix-blend-mode: difference;
+  transition: transform 0.25s ease-out;
+  will-change: transform;
+}
+.sp-inline .blurb { margin-bottom: 12px; }
+.sp-inline .credits { opacity: 0.72; }
+.sp-inline .credits div { margin-bottom: 2px; }
+.sp-inline .sp-inline-links a { border-bottom: 1px solid; margin-right: 12px; }
+.sp-rechts { position: relative; z-index: 11; min-width: 0; display: flex; flex-direction: column; gap: 12px; align-items: stretch; justify-content: center; height: 100%; }
+.sp-slide { flex: 0 1 auto; display: flex; align-items: center; justify-content: center; animation: sp-blatt 0.35s cubic-bezier(0.25, 1, 0.3, 1) both; min-height: 0; }
+@keyframes sp-blatt { from { transform: translateX(26px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sp-slide figure { margin: 0; cursor: e-resize; max-height: 62vh; display: flex; }
+.sp-slide figure img { max-width: 100%; max-height: 62vh; object-fit: contain; display: block; }
+.sp-beschreibung { max-width: 46ch; font-size: 13px; }
+.sp-beschreibung .sp-b-kopf { font-size: 12px; border-bottom: var(--hairline); padding-bottom: 5px; margin-bottom: 14px; }
+.sp-beschreibung .farbbalken { height: 12px; margin-bottom: 16px; }
+.sp-beschreibung .blurb { margin-bottom: 14px; }
+.sp-beschreibung .credits div { margin-bottom: 2px; }
+.sp-zaehler { display: flex; gap: 14px; align-items: baseline; justify-content: center; font-size: 12px; color: var(--grau); }
+.sp-zaehler button { font-size: 16px; color: var(--tinte); }
+
+@media (max-width: 900px) {
+  .sp-spalten { grid-template-columns: 1fr; inset: 80px 20px 70px; gap: 16px; }
+  .sp-slide figure img { max-height: 38vh; }
+}
+
+@media (max-width: 700px) {
+  .kopf .name .unter { display: none; }
+  .register { display: none; }
+  .achse { display: none; }
+}
