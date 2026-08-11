@@ -61,10 +61,10 @@ const ANKER: [number, number][] = [
 // Geöffnet weichen die Fotos an den Rand aus — frei von Titel,
 // Beschreibung und Farbfläche (lokale Koordinaten, Panelzone x −1…13, y −11…0).
 const OFFEN_PLAETZE: [number, number][] = [
-  [-10.5, 3.8],
-  [19, 4.2],
-  [-11.5, -9.5],
-  [19.5, -10.5],
+  [-9, 3.4],
+  [17.5, 4],
+  [-10, -9],
+  [18, -10],
 ]
 
 // Deterministischer Zufall — jedes Projekt fällt anders, aber immer gleich.
@@ -104,6 +104,7 @@ function Markierung({
   idx,
   offen,
   gross,
+  gedimmt,
   labelsAus,
   onOpen,
   onBild,
@@ -112,6 +113,7 @@ function Markierung({
   idx: number
   offen: boolean
   gross: number | null
+  gedimmt: boolean
   labelsAus: boolean
   onOpen: (slug: string) => void
   onBild: (index: number) => void
@@ -121,6 +123,7 @@ function Markierung({
   const gruppe = useRef<THREE.Group>(null)
   const fotos = useRef<THREE.Group>(null)
   const farbe = useRef<THREE.Mesh>(null)
+  const trueb = useRef(1)
   const [hover, setHover] = useState(false)
 
   // Die Farbfläche liegt wie ein Abzug im Haufen …
@@ -139,7 +142,9 @@ function Markierung({
     // ganz frei und macht Platz für die Beschreibung.
     const streuung = offen ? 3.1 : hover ? 1.18 : 1
     const richten = offen ? 0.12 : hover ? 0.3 : 1
-    const groesse = offen ? 1.6 : 1 // geöffnet: die Abzüge selbst werden größer
+    const groesse = offen ? 1.8 : 1 // geöffnet: die Abzüge selbst werden größer
+    // Fokus: andere Projekte treten zurück
+    trueb.current = daempf(gedimmt ? 0.15 : 1, trueb.current, 6, dt)
     // Sichtbare Weltbreite bei geöffnetem Zoom (2.2) — fürs Einpassen mit Rand.
     const weltB = 92 / 2.2
     const weltH = weltB * (size.height / size.width)
@@ -165,11 +170,13 @@ function Markierung({
       m.position.z = daempf(zz, m.position.z, 9, dt)
       m.rotation.z = daempf(istGross ? -rotRad : b.brot * richten, m.rotation.z, 9, dt)
       m.scale.setScalar(daempf(zielScale, m.scale.x, 9, dt))
+      ;(m.material as THREE.MeshBasicMaterial).opacity *= trueb.current
     })
     // … und weicht geöffnet an den freien linken Rand aus — die Farbe
     // trägt dann allein die Titelfläche, die Beschreibung steht auf Weiß.
     const f = farbe.current
     if (f) {
+      ;(f.material as THREE.MeshBasicMaterial).opacity = trueb.current
       const ziel = offen
         ? { x: -8.5, y: -3.5, rot: fRot * 0.4, sx: 1.5, sy: 1.5 }
         : { x: fX, y: fY, rot: fRot, sx: 1, sy: 1 }
@@ -256,7 +263,7 @@ function Markierung({
               {
                 color: offen ? textFarbeAuf(projekt.farbe) : 'var(--tinte)',
                 padding: `${padY}px ${padX}px`,
-                opacity: labelsAus ? 0 : 1,
+                opacity: labelsAus ? 0 : gedimmt ? 0.15 : 1,
                 transform: offen ? 'translateX(50%)' : undefined,
                 '--fx': `${fx}px`,
                 '--fy': `${fy}px`,
@@ -450,6 +457,7 @@ export default function Boden() {
                 idx={i}
                 offen={projekt?.slug === p.slug}
                 gross={projekt?.slug === p.slug ? gross : null}
+                gedimmt={!!projekt && projekt.slug !== p.slug}
                 labelsAus={gross !== null}
                 onOpen={(slug) => setSp({ p: slug })}
                 onBild={(bi) => setGross((g) => (g === bi ? null : bi))}
