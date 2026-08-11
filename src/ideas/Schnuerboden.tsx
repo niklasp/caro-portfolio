@@ -172,8 +172,7 @@ function Projekt({
         pendel={0}
         kinder={
           <Html transform scale={0.34} zIndexRange={[30, 0]} style={{ pointerEvents: aktiv ? 'auto' : 'none' }}>
-            <div className="sb-panel" onWheel={(e) => e.stopPropagation()}>
-              <div className="sb-panel-balken" style={{ background: projekt.farbe }} />
+            <div className="sb-panel" style={{ borderColor: projekt.farbe }} onWheel={(e) => e.stopPropagation()}>
               <h3>{projekt.titel}</h3>
               <p className="sb-panel-meta">
                 {projekt.rolle} · {projekt.jahr} · {projekt.ort}
