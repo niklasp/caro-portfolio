@@ -251,13 +251,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-align: left;
   padding: 3px 8px;
 }
-/* Die Fläche ist kürzer als der Text, dafür höher — Text darf überstehen. */
+/* Weiße Fläche, kürzer als der Text, dafür höher — Text darf überstehen. */
 .marke-titel .marke-flaeche {
   position: absolute;
   top: -9px;
   bottom: -11px;
   left: -7px;
   right: 30%;
+  background: #ffffff;
   transform: translate(var(--fx, 7px), var(--fy, 5px));
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -275,7 +276,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   letter-spacing: 0;
   margin-top: 2px;
 }
-.marke-titel { transition: opacity 0.3s; }
+.marke-titel { color: var(--tinte); transition: opacity 0.3s, transform 0.55s cubic-bezier(0.25, 1, 0.3, 1); }
 /* Hover: die Fläche springt auf die Gegenseite und wächst — Druck außer Register. */
 .marke-titel.ist-hover .marke-flaeche {
   transform: translate(calc(var(--fx, 7px) * -0.8), calc(var(--fy, 5px) * -0.8)) scale(1.12, 1.35);
@@ -288,9 +289,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
    selbst gleitet an die Titelposition und bleibt der einzige Farbblock. */
 .bo-beschreibung {
   position: fixed;
-  left: 50%;
-  top: calc(50% - 82px);
-  transform: translateX(-50%);
+  left: calc(50% - 187px);
+  top: calc(50% - 78px);
   width: min(52ch, 46vw);
   z-index: 35;
   font-size: 13px;

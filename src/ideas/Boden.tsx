@@ -194,14 +194,14 @@ function Markierung({
             className={hover && !offen ? 'marke-titel ist-hover' : 'marke-titel'}
             style={
               {
-                color: textFarbeAuf(projekt.farbe),
                 padding: `${padY}px ${padX}px`,
+                transform: offen ? 'translateX(50%)' : undefined,
                 '--fx': `${fx}px`,
                 '--fy': `${fy}px`,
               } as React.CSSProperties
             }
           >
-            <span className="marke-flaeche" style={{ background: projekt.farbe }} />
+            <span className="marke-flaeche" />
             <span className="marke-text">
               {projekt.titel}
               <span className="marke-unter">
@@ -261,9 +261,9 @@ export default function Boden() {
     if (projekt) {
       if (!vorher.current) vorher.current = { tx: c.tx, ty: c.ty, tz: c.tz }
       const lage = LAGE[projekt.slug]
-      c.tx = lage.p[0]
-      // Etwas nach unten versetzt: das Projekt-Label gleitet an die
-      // Titelposition über der Beschreibung — ein Element, eine Farbe.
+      // Anker etwas links der Mitte und nach oben versetzt: das Label
+      // gleitet an die Titelposition, linksbündig über der Beschreibung.
+      c.tx = lage.p[0] + 5
       c.ty = lage.p[1] - 3.4
       c.tz = 2.2
     } else {
