@@ -297,9 +297,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-size: 13px;
   line-height: 1.5;
   padding: 20px 26px 24px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
 }
 .bo-beschreibung .bo-meta { color: var(--grau); margin-bottom: 14px; }
 .bo-beschreibung .bo-blurb { margin-bottom: 14px; }
