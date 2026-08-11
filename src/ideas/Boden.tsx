@@ -59,6 +59,15 @@ const ANKER: [number, number][] = [
   [2.2, 1.7],
 ]
 
+// Geöffnet weichen die Fotos an den Rand aus — frei von Titel,
+// Beschreibung und Farbfläche (lokale Koordinaten, Panelzone x −1…13, y −11…0).
+const OFFEN_PLAETZE: [number, number][] = [
+  [-9.5, 3.2],
+  [18, 3.6],
+  [-10.5, -8.5],
+  [18.5, -9.5],
+]
+
 // Deterministischer Zufall — jedes Projekt fällt anders, aber immer gleich.
 const rnd = (a: number) => {
   const x = Math.sin(a * 127.1 + 311.7) * 43758.5453
@@ -129,10 +138,13 @@ function Markierung({
     const groesse = offen ? 1.6 : 1 // geöffnet: die Abzüge selbst werden größer
     fotos.current?.children.forEach((kind) => {
       const m = kind as THREE.Mesh
-      const b = m.userData as { bx?: number; by?: number; brot?: number }
+      const b = m.userData as { bx?: number; by?: number; brot?: number; i?: number }
       if (b.bx === undefined || b.by === undefined || b.brot === undefined) return
-      m.position.x = daempf(b.bx * streuung, m.position.x, 9, dt)
-      m.position.y = daempf(b.by * streuung, m.position.y, 9, dt)
+      const platz = OFFEN_PLAETZE[((b.i ?? 0) + idx) % OFFEN_PLAETZE.length]
+      const zx = offen ? platz[0] : b.bx * streuung
+      const zy = offen ? platz[1] : b.by * streuung
+      m.position.x = daempf(zx, m.position.x, 9, dt)
+      m.position.y = daempf(zy, m.position.y, 9, dt)
       m.rotation.z = daempf(b.brot * richten, m.rotation.z, 9, dt)
       m.scale.setScalar(daempf(groesse, m.scale.x, 9, dt))
     })
@@ -205,7 +217,7 @@ function Markierung({
                   ar={b.ar}
                   position={[bx, by, 0.4 + i * 0.25]}
                   rotation={[0, 0, brot]}
-                  userData={{ foto: true, bx, by, brot }}
+                  userData={{ foto: true, bx, by, brot, i }}
                   materialProps={{ opacity: 0 }}
                   onClick={(e) => {
                     if (!offen) return
