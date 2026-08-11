@@ -273,21 +273,23 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   transform: translate(3px, -2px);
 }
 
-/* Geöffnetes Projekt: Beschreibung mitten im freigeräumten Haufen. */
+/* Geöffnetes Projekt: Beschreibung unten rechts, ohne Fläche dahinter. */
 .bo-beschreibung {
   position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(52ch, 46vw);
+  right: 40px;
+  bottom: 88px;
+  width: min(46ch, 36vw);
   z-index: 35;
   font-size: 13px;
   line-height: 1.5;
-  padding: 24px 26px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
 }
+.bo-beschreibung .bo-pfeile {
+  display: flex;
+  gap: 16px;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+.bo-beschreibung .bo-pfeile button:hover { transform: translateY(-1px); }
 .bo-beschreibung .bo-titel {
   position: relative;
   width: fit-content;

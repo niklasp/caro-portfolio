@@ -312,24 +312,26 @@ export default function Boden() {
     zeiger.current = null
   }
 
-  // Offene Beschreibung: Pfeiltasten blättern durchs Register, die Karte fährt mit.
+  // Blättern durchs Register — die Kamera fährt mit.
+  const blaettere = (delta: number) => {
+    const slug = sp.get('p')
+    if (!slug) return
+    const i = PROJEKTE.findIndex((p) => p.slug === slug)
+    if (i < 0) return
+    const n = PROJEKTE.length
+    setSp({ p: PROJEKTE[(((i + delta) % n) + n) % n].slug })
+  }
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (flags.lightbox) return
-      const slug = sp.get('p')
-      if (!slug) return
-      const i = PROJEKTE.findIndex((p) => p.slug === slug)
-      if (i < 0) return
-      const n = PROJEKTE.length
-      let ni: number | null = null
+      if (!sp.get('p')) return
       if (e.key === 'Escape') {
         setSp({})
         return
       }
-      if (e.key === 'ArrowRight') ni = (i + 1) % n
-      if (e.key === 'ArrowLeft') ni = (i - 1 + n) % n
-      if (ni === null) return
-      setSp({ p: PROJEKTE[ni].slug })
+      if (e.key === 'ArrowRight') blaettere(1)
+      if (e.key === 'ArrowLeft') blaettere(-1)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -398,11 +400,19 @@ export default function Boden() {
           ⌖
         </button>
       </div>
-      <Fuss fallback={['Entwurf 1', 'Der Boden', 'alle Arbeiten, 2021–2026']} projekt={projekt} />
+      <Fuss fallback={['Entwurf 1', 'Der Boden', 'alle Arbeiten, 2021–2026']} />
 
-      {/* Beschreibung mitten im freigeräumten Haufen */}
+      {/* Beschreibung unten rechts — über freiem Boden, ohne Scrim */}
       {projekt && (
         <div className="bo-beschreibung" key={projekt.slug}>
+          <div className="bo-pfeile ov-anim-1">
+            <button onClick={() => blaettere(-1)} aria-label="Vorheriges Projekt">
+              ←
+            </button>
+            <button onClick={() => blaettere(1)} aria-label="Nächstes Projekt">
+              →
+            </button>
+          </div>
           <h2 className="bo-titel ov-anim-2">
             <span
               className="bo-titel-flaeche ov-anim-1"
