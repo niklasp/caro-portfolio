@@ -19,6 +19,13 @@ const RADIUS = 12
 
 const mod = (a: number, n: number) => ((a % n) + n) % n
 
+// Heller Text auf dunklen Flächen, dunkler auf hellen.
+const textFarbeAuf = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16)
+  const lum = (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255
+  return lum < 0.45 ? '#ffffff' : '#141414'
+}
+
 interface DrehCtrl {
   ang: number
   tang: number
@@ -355,8 +362,12 @@ export default function Drehbuehne() {
 
       {/* Beschreibung direkt im Bühnenraum — nur auf großen Bildschirmen. */}
       <div className="db-beschreibung" ref={panel} key={p.slug}>
-        <div className="farbbalken ov-anim-1" style={{ background: p.farbe }} />
-        <h3 className="ov-anim-2">{p.titel}</h3>
+        <h3 className="db-titel ov-anim-2">
+          <span className="db-titel-flaeche ov-anim-1" style={{ background: p.farbe }} />
+          <span className="db-titel-text" style={{ color: textFarbeAuf(p.farbe) }}>
+            {p.titel}
+          </span>
+        </h3>
         <p className="db-meta ov-anim-2">
           {p.rolle} · {p.jahr} · {p.ort}
         </p>
