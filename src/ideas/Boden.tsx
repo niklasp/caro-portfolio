@@ -7,7 +7,7 @@ import { PROJEKTE, findProjekt, type Projekt } from '../data/projects'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
 import Lichtkasten from '../ui/Lichtkasten'
 import { flags } from '../ui/flags'
-import { Foto, daempf } from './helpers'
+import { Foto, Farbflaeche, daempf } from './helpers'
 
 // Entwurf 1 — Der Boden.
 // Ein Bühnenboden von oben: jedes Projekt liegt als Haufen von Abzügen auf
@@ -107,7 +107,16 @@ function Markierung({
   const lage = LAGE[projekt.slug]
   const gruppe = useRef<THREE.Group>(null)
   const fotos = useRef<THREE.Group>(null)
+  const farbe = useRef<THREE.Mesh>(null)
   const [hover, setHover] = useState(false)
+
+  // Die Farbfläche liegt wie ein Abzug im Haufen …
+  const fSeed = idx * 31
+  const fBreite = 3.3 + rnd(fSeed) * 1.3
+  const fHoehe = fBreite * (0.6 + rnd(fSeed + 1) * 0.26)
+  const fRot = ((rnd(fSeed + 2) - 0.5) * 14 * Math.PI) / 180
+  const fX = (rnd(fSeed + 3) - 0.5) * 2.6
+  const fY = (rnd(fSeed + 4) - 0.5) * 2.2
 
   useFrame((_, dt) => {
     if (!gruppe.current) return
@@ -127,6 +136,18 @@ function Markierung({
       m.rotation.z = daempf(b.brot * richten, m.rotation.z, 9, dt)
       m.scale.setScalar(daempf(groesse, m.scale.x, 9, dt))
     })
+    // … und wandert geöffnet hinter Titel und Beschreibung.
+    const f = farbe.current
+    if (f) {
+      const ziel = offen
+        ? { x: 6.2, y: -5.2, rot: 0, sx: 14.5 / fBreite, sy: 11.5 / fHoehe }
+        : { x: fX, y: fY, rot: fRot, sx: 1, sy: 1 }
+      f.position.x = daempf(ziel.x, f.position.x, 8, dt)
+      f.position.y = daempf(ziel.y, f.position.y, 8, dt)
+      f.rotation.z = daempf(ziel.rot, f.rotation.z, 8, dt)
+      f.scale.x = daempf(ziel.sx, f.scale.x, 8, dt)
+      f.scale.y = daempf(ziel.sy, f.scale.y, 8, dt)
+    }
   })
 
   // Textfläche in wechselnden Größen und Versätzen — nie zweimal gleich,
@@ -159,6 +180,14 @@ function Markierung({
           <planeGeometry args={[11.5, 9]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
+        <Farbflaeche
+          ref={farbe}
+          farbe={projekt.farbe}
+          breite={fBreite}
+          hoehe={fHoehe}
+          position={[fX, fY, 0.3]}
+          rotation={[0, 0, fRot]}
+        />
         <group ref={fotos}>
           <Suspense fallback={null}>
             {projekt.bilder.slice(0, 4).map((b, i) => {

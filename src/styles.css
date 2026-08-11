@@ -48,6 +48,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .kopf nav a.aktiv { border-bottom: var(--hairline); }
 .kopf nav a:hover { border-bottom: var(--hairline); }
 .kopf.hell { color: #fff; }
+.kopf.hell .name .unter { color: #fff; }
 .kopf.hell nav a.aktiv, .kopf.hell nav a:hover { border-color: #fff; }
 
 .fuss {
