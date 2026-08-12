@@ -36,6 +36,7 @@ uniform float uBildA;
 uniform float uAltA;
 uniform float uPlaneA;
 uniform float uHell;
+uniform float uFokus;
 varying vec2 vUv;
 
 float zufall(vec2 p) {
@@ -43,9 +44,11 @@ float zufall(vec2 p) {
 }
 
 vec2 abdecken(vec2 uv, float imgA) {
-  // cover-fit: die Fläche wird immer voll gefüllt
+  // cover-fit: die Fläche wird immer voll gefüllt; der Fokus wandert
+  // mit der Maushöhe durch den abgeschnittenen Bildbereich
   if (imgA < uPlaneA) {
-    return vec2(uv.x, (uv.y - 0.5) * (imgA / uPlaneA) + 0.5);
+    float band = imgA / uPlaneA;
+    return vec2(uv.x, (uv.y - 0.5) * band + 0.5 + (uFokus - 0.5) * (1.0 - band));
   }
   return vec2((uv.x - 0.5) * (uPlaneA / imgA) + 0.5, uv.y);
 }
@@ -95,6 +98,7 @@ function Hintergrund({ src, hell, video }: { src: string; hell: boolean; video?:
         uAltA: { value: 1.5 },
         uPlaneA: { value: 2.85 },
         uHell: { value: 1 },
+        uFokus: { value: 0.5 },
       },
       side: THREE.BackSide,
     })
@@ -146,6 +150,9 @@ function Hintergrund({ src, hell, video }: { src: string; hell: boolean; video?:
     material.uniforms.uMix.value = Math.min(1, (material.uniforms.uMix.value as number) + dt * 1.3)
     const u = material.uniforms.uHell
     u.value += ((hell || video ? 2.3 : 1) - (u.value as number)) * (1 - Math.exp(-4 * dt))
+    // Maus oben → Bildfokus oben, unten → unten
+    const uf = material.uniforms.uFokus
+    uf.value += (0.5 - maus.y * 0.5 - (uf.value as number)) * (1 - Math.exp(-3 * dt))
   })
 
   const BOGEN = 2.4 // ~140° Rückwand-Segment
