@@ -541,6 +541,20 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .db-beschreibung { display: none; }
 }
 
+/* Video auf dem Rundhorizont (Drehbühne) */
+.db-video {
+  position: fixed;
+  left: 50%;
+  top: 31%;
+  transform: translate(-50%, -50%);
+  width: min(50vw, 860px);
+  aspect-ratio: 16 / 9;
+  border: 0;
+  z-index: 5;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
 /* ---------- Schnürboden: hängende Beschreibung ---------- */
 
 /* Beschreibung frei hängend — kein Rahmen, keine Fläche, die

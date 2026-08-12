@@ -32,6 +32,7 @@ export interface Projekt {
   blurb: string
   credits: string[]
   links?: ProjektLink[]
+  video?: string
   bilder: Bild[]
 }
 
@@ -75,6 +76,7 @@ export const PROJEKTE: Projekt[] = [
       'Ein performativer Walk im öffentlichen Raum, der sich mit Müll, körperlicher Arbeit und geschlechtlich codierten Zuschreibungen von Gewicht, Wert und Sichtbarkeit auseinandersetzt. Wer trägt was — und unter welchen Bedingungen? Der Weg zur Entsorgungsstelle wird zur Choreografie.',
     credits: ['Konzept und Performance: Carolin Pflüger'],
     links: [{ label: 'Video', url: 'https://vimeo.com/1190920248' }],
+    video: 'https://player.vimeo.com/video/1190920248',
     bilder: [img('heavy-matters', 1, 1080, 761), img('heavy-matters', 2, 1080, 761), img('heavy-matters', 3, 1080, 784)],
   },
   {
