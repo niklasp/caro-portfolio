@@ -658,7 +658,34 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   height: 22px;
   z-index: 12;
   pointer-events: none;
-  mix-blend-mode: multiply;
+  mix-blend-mode: multiply; /* Standard — der Schalter unten rechts übersteuert */
+}
+/* Testschalter: Mischmodus des Mausquadrats. */
+.sp-mischwahl {
+  position: fixed;
+  right: 24px;
+  bottom: 58px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--grau);
+}
+.sp-mischwahl select {
+  font: inherit;
+  font-size: 11px;
+  color: var(--tinte);
+  background: #fff;
+  border: var(--hairline);
+  border-radius: 0;
+  padding: 3px 6px;
+}
+@media (min-width: 1100px) {
+  .spielplan .sp-mischwahl,
+  .spielplan .sp-mischwahl * {
+    cursor: pointer !important;
+  }
 }
 .sp-inline {
   position: fixed;
