@@ -329,6 +329,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-size: 11px;
   color: var(--grau);
 }
+.licht-wahl.muster { bottom: 116px; }
 .licht-wahl select {
   font: inherit;
   font-size: 11px;
