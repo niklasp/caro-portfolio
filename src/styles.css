@@ -284,25 +284,42 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   transform: translate(3px, -2px);
 }
 
-/* Geöffnetes Projekt: Beschreibung unter dem Label — das Karten-Label
-   selbst gleitet an die Titelposition und bleibt der einzige Farbblock. */
-.bo-beschreibung {
-  position: fixed;
-  left: calc(50% - 187px);
-  top: calc(50% - 78px);
-  width: min(52ch, 46vw);
-  z-index: 35;
-  font-size: 13px;
-  line-height: 1.5;
-  padding: 20px 26px 24px;
+/* Geöffnetes Projekt: Die Beschreibung gleitet aus dem Titelschild heraus —
+   absolut positioniert, damit das Schild selbst seine Größe (und damit die
+   Zentrierung im Raum) behält. */
+.marke-titel .marke-beschreibung {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: -7px;
+  width: min(48ch, 44vw);
+  padding: 16px 20px 20px;
   background: #ffffff;
+  white-space: normal;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.5;
+  clip-path: inset(0 0 100% 0);
+  opacity: 0;
+  transform: translateY(-14px);
+  transition:
+    clip-path 0.6s cubic-bezier(0.25, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.25, 1, 0.3, 1),
+    opacity 0.3s;
+  pointer-events: none;
 }
-.bo-beschreibung .bo-meta { color: var(--grau); margin-bottom: 14px; }
-.bo-beschreibung .bo-blurb { margin-bottom: 14px; }
-.bo-beschreibung .bo-credits div { margin-bottom: 2px; }
-.bo-beschreibung .bo-links { margin-top: 12px; }
-.bo-beschreibung .bo-links a { border-bottom: var(--hairline); margin-right: 14px; }
-.bo-beschreibung .bo-hinweis { margin-top: 16px; font-size: 11px; color: var(--grau); }
+.marke-titel.ist-offen .marke-beschreibung {
+  clip-path: inset(-4px -4px -4px -4px);
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.18s;
+  pointer-events: auto;
+}
+.marke-beschreibung .bo-blurb { margin-bottom: 12px; }
+.marke-beschreibung .bo-credits div { margin-bottom: 2px; }
+.marke-beschreibung .bo-links { margin-top: 12px; }
+.marke-beschreibung .bo-links a { border-bottom: var(--hairline); margin-right: 14px; }
+.marke-beschreibung .bo-hinweis { margin-top: 14px; font-size: 11px; color: var(--grau); }
 
 /* ---------- Achsen (Der Boden) ---------- */
 

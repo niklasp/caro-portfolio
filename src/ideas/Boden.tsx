@@ -336,12 +336,13 @@ function Markierung({
         </group>
         <Html position={[0, 0, 1.6]} center zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}>
           <div
-            className={hover && !offen ? 'marke-titel ist-hover' : 'marke-titel'}
+            className={`marke-titel${hover && !offen ? ' ist-hover' : ''}${offen ? ' ist-offen' : ''}`}
             style={
               {
                 padding: `${padY}px ${padX}px`,
                 opacity: labelsAus ? 0 : gedimmt ? 0.15 : 1,
                 transform: offen ? 'translateX(50%)' : undefined,
+                pointerEvents: offen && !labelsAus ? 'auto' : 'none',
                 '--fx': `${fx}px`,
                 '--fy': `${fy}px`,
               } as React.CSSProperties
@@ -354,6 +355,25 @@ function Markierung({
                 {projekt.rolle} · {projekt.jahr} · {projekt.ort}
               </span>
             </span>
+            {/* Die Beschreibung gleitet aus dem Titelschild heraus. */}
+            <div className="marke-beschreibung">
+              <p className="bo-blurb">{projekt.blurb}</p>
+              <div className="bo-credits">
+                {projekt.credits.map((c) => (
+                  <div key={c}>{c}</div>
+                ))}
+              </div>
+              {projekt.links && (
+                <div className="bo-links">
+                  {projekt.links.map((l) => (
+                    <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
+                      {l.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+              <div className="bo-hinweis">← → nächstes Projekt · Foto anklicken: groß · Esc schließen</div>
+            </div>
           </div>
         </Html>
       </group>
@@ -605,27 +625,6 @@ export default function Boden() {
       </label>
       <Fuss fallback={['', 'Der Boden', 'alle Arbeiten, 2021–2026']} projekt={projekt} hell={licht.dunkel} />
 
-      {/* Beschreibung mitten im freigeräumten Haufen */}
-      {projekt && gross === null && (
-        <div className="bo-beschreibung" key={projekt.slug}>
-          <p className="bo-blurb ov-anim-3">{projekt.blurb}</p>
-          <div className="bo-credits ov-anim-3">
-            {projekt.credits.map((c) => (
-              <div key={c}>{c}</div>
-            ))}
-          </div>
-          {projekt.links && (
-            <div className="bo-links ov-anim-3">
-              {projekt.links.map((l) => (
-                <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
-                  {l.label}
-                </a>
-              ))}
-            </div>
-          )}
-          <div className="bo-hinweis ov-anim-3">← → nächstes Projekt · Foto anklicken: groß · Esc schließen</div>
-        </div>
-      )}
     </>
   )
 }
