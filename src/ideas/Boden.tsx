@@ -96,20 +96,16 @@ const LICHTER = [
   { id: 'blackout', name: 'Blackout', css: 'radial-gradient(circle at 50% 45%, #2a2a2a 0%, #0e0e0e 75%)', raster: '#ffffff', alpha: 0.09, dunkel: true },
 ] as const
 
-// Der Boden: entweder die gezeichnete Bühnenskizze oder ein historischer
-// Theatergrundriss als großes Hintergrundbild (Quellen: Wikimedia Commons,
-// public/images/plaene/LIZENZEN.txt).
+// Der Boden: entweder die gezeichnete Bühnenskizze oder der handgezeichnete
+// Grundriss vom Theater die Tonne als eigene Ebene, die beim Schieben
+// langsamer mitläuft (Parallaxe).
 type MusterEintrag =
   | { id: string; name: string; art: 'linien' }
   | { id: string; name: string; art: 'bild'; datei: string; ar: number; breite: number }
 
 const MUSTER: MusterEintrag[] = [
+  { id: 'tonne', name: 'Grundriss Tonne', art: 'bild', datei: 'tonne', ar: 1.412, breite: 175 },
   { id: 'zeichnung', name: 'Zeichnung', art: 'linien' },
-  { id: 'semperoper', name: 'Semperoper Dresden', art: 'bild', datei: 'semperoper', ar: 1.001, breite: 120 },
-  { id: 'hoftheater', name: 'Kgl. Hoftheater Dresden', art: 'bild', datei: 'hoftheater', ar: 0.685, breite: 88 },
-  { id: 'karlsruhe', name: 'Hoftheater Karlsruhe', art: 'bild', datei: 'karlsruhe', ar: 1.333, breite: 150 },
-  { id: 'nuernberg', name: 'Stadttheater Nürnberg 1829', art: 'bild', datei: 'nuernberg', ar: 1.515, breite: 160 },
-  { id: 'stuttgart', name: 'Theater Stuttgart', art: 'bild', datei: 'stuttgart', ar: 1.329, breite: 150 },
 ]
 
 // Bühnenmaße des Grundrisses (Weltkoordinaten, Projekte liegen innerhalb).
@@ -123,6 +119,16 @@ function liniengeo(pts: number[]) {
 }
 
 function Muster({ eintrag, farbe, alpha }: { eintrag: MusterEintrag; farbe: string; alpha: number }) {
+  // Der Plan liegt auf einer tieferen Ebene: Er folgt der Kamera zu 40 % —
+  // die Fotohaufen ziehen beim Schieben schneller darüber hinweg (Parallaxe).
+  const ebene = useRef<THREE.Group>(null)
+  useFrame(({ camera }) => {
+    if (ebene.current) {
+      ebene.current.position.x = camera.position.x * 0.4
+      ebene.current.position.y = camera.position.y * 0.4
+    }
+  })
+
   const geo = useMemo(() => {
     if (eintrag.art !== 'linien') return null
     const Z = -0.2
@@ -150,13 +156,15 @@ function Muster({ eintrag, farbe, alpha }: { eintrag: MusterEintrag; farbe: stri
 
   if (eintrag.art === 'bild') {
     return (
-      <Foto
-        url={`${import.meta.env.BASE_URL}images/plaene/${eintrag.datei}.jpg`}
-        breite={eintrag.breite}
-        ar={eintrag.ar}
-        position={[0, 0, -0.2]}
-        materialProps={{ opacity: 0.4 }}
-      />
+      <group ref={ebene}>
+        <Foto
+          url={`${import.meta.env.BASE_URL}images/plaene/${eintrag.datei}.jpg`}
+          breite={eintrag.breite}
+          ar={eintrag.ar}
+          position={[0, 0, -0.2]}
+          materialProps={{ opacity: 0.5 }}
+        />
+      </group>
     )
   }
   return (
