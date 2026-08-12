@@ -4,7 +4,6 @@ import * as THREE from 'three'
 import { PROJEKTE, type Projekt } from '../data/projects'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
 import Lichtkasten from '../ui/Lichtkasten'
-import { ContactShadows } from '@react-three/drei'
 import { flags } from '../ui/flags'
 import { daempf } from './helpers'
 
@@ -158,7 +157,7 @@ function Verfolger() {
         color="#fff3e0"
         decay={0}
         castShadow
-        shadow-mapSize={[1024, 1024]}
+        shadow-mapSize={[2048, 2048]}
         shadow-bias={-0.0004}
         shadow-radius={5}
       />
@@ -328,10 +327,8 @@ function Buehnenraum({
   return (
     <>
       <Hintergrund src={PROJEKTE[aktiv].bilder[0].src} />
-      <ambientLight intensity={0.42} color="#f2ecff" />
+      <ambientLight intensity={0.34} color="#f2ecff" />
       <Verfolger />
-
-      <ContactShadows position={[0, 0.02, 0]} scale={30} far={4.5} blur={2.4} opacity={0.55} resolution={512} />
 
       <group ref={scheibe}>
         {/* Drehscheibe */}
