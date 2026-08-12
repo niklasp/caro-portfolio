@@ -3,7 +3,6 @@ import { Canvas, useFrame, useLoader, useThree, type ThreeElements } from '@reac
 import * as THREE from 'three'
 import { PROJEKTE, type Projekt } from '../data/projects'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
-import Lichtkasten from '../ui/Lichtkasten'
 import { flags } from '../ui/flags'
 import { daempf } from './helpers'
 
@@ -36,6 +35,7 @@ uniform float uZeit;
 uniform float uBildA;
 uniform float uAltA;
 uniform float uPlaneA;
+uniform float uHell;
 varying vec2 vUv;
 
 float zufall(vec2 p) {
@@ -55,9 +55,9 @@ void main() {
   vec3 alt = texture2D(uAlt, abdecken(uv, uAltA)).rgb;
   vec3 neu = texture2D(uBild, abdecken(uv, uBildA)).rgb;
   vec3 farbe = mix(alt, neu, smoothstep(0.0, 1.0, uMix));
-  // stark abgedunkelt, zur Mitte hin etwas offener
+  // stark abgedunkelt, zur Mitte hin etwas offener — als Projektion heller
   float vig = smoothstep(1.1, 0.3, distance(vUv, vec2(0.5, 0.42)));
-  farbe *= 0.10 + 0.26 * vig;
+  farbe *= (0.10 + 0.26 * vig) * uHell;
   // Dithering gegen sichtbare Farbstufen im Dunkeln
   farbe += (zufall(vUv * 917.0 + fract(uZeit)) - 0.5) / 96.0;
   gl_FragColor = vec4(farbe, 1.0);
@@ -79,7 +79,7 @@ const ladeHg = (src: string) => {
   return p
 }
 
-function Hintergrund({ src }: { src: string }) {
+function Hintergrund({ src, hell }: { src: string; hell: boolean }) {
   const material = useMemo(() => {
     const leer = new THREE.DataTexture(new Uint8Array([8, 8, 8, 255]), 1, 1)
     leer.needsUpdate = true
@@ -94,6 +94,7 @@ function Hintergrund({ src }: { src: string }) {
         uBildA: { value: 1.5 },
         uAltA: { value: 1.5 },
         uPlaneA: { value: 2.85 },
+        uHell: { value: 1 },
       },
       side: THREE.BackSide,
     })
@@ -118,6 +119,8 @@ function Hintergrund({ src }: { src: string }) {
   useFrame(({ clock }, dt) => {
     material.uniforms.uZeit.value = clock.elapsedTime
     material.uniforms.uMix.value = Math.min(1, (material.uniforms.uMix.value as number) + dt * 1.3)
+    const u = material.uniforms.uHell
+    u.value += ((hell ? 2.3 : 1) - (u.value as number)) * (1 - Math.exp(-4 * dt))
   })
 
   const BOGEN = 2.4 // ~140° Rückwand-Segment
@@ -284,11 +287,13 @@ function Buehnenraum({
   onDrehen,
   onBild,
   aktiv,
+  projiziert,
 }: {
   ctrl: RefObject<DrehCtrl>
   onDrehen: (index: number) => void
   onBild: (bildIndex: number) => void
   aktiv: number
+  projiziert: number | null
 }) {
   const scheibe = useRef<THREE.Group>(null)
   const szene = useThree((s) => s.scene)
@@ -326,7 +331,10 @@ function Buehnenraum({
 
   return (
     <>
-      <Hintergrund src={PROJEKTE[aktiv].bilder[0].src} />
+      <Hintergrund
+        src={PROJEKTE[aktiv].bilder[Math.min(projiziert ?? 0, PROJEKTE[aktiv].bilder.length - 1)].src}
+        hell={projiziert !== null}
+      />
       <ambientLight intensity={0.34} color="#f2ecff" />
       <Verfolger />
 
@@ -350,7 +358,7 @@ function Buehnenraum({
 
 export default function Drehbuehne() {
   const [aktiv, setAktiv] = useState(0)
-  const [lichtkasten, setLichtkasten] = useState<number | null>(null)
+  const [projiziert, setProjiziert] = useState<number | null>(null)
   const wrap = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const zeiger = useRef<{ x: number; roh: number } | null>(null)
@@ -372,7 +380,7 @@ export default function Drehbuehne() {
   const schnappe = (tang: number) => {
     ctrl.current.tang = tang
     setAktiv(aktivAusTang(tang))
-    setLichtkasten(null)
+    setProjiziert(null)
   }
 
   const dreheZu = (index: number) => {
@@ -458,7 +466,13 @@ export default function Drehbuehne() {
           style={{ background: '#0c0c0c' }}
         >
           <fog attach="fog" args={['#0c0c0c', 32, 60]} />
-          <Buehnenraum ctrl={ctrl} aktiv={aktiv} onDrehen={dreheZu} onBild={(i) => setLichtkasten(i)} />
+          <Buehnenraum
+            ctrl={ctrl}
+            aktiv={aktiv}
+            projiziert={projiziert}
+            onDrehen={dreheZu}
+            onBild={(i) => setProjiziert((v) => (v === i ? null : i))}
+          />
         </Canvas>
       </div>
 
@@ -499,11 +513,8 @@ export default function Drehbuehne() {
         )}
       </div>
 
-      <div className="hinweis hell">ziehen oder scrollen: drehen · Maus führt das Licht · Foto anklicken: groß</div>
+      <div className="hinweis hell">ziehen oder scrollen: drehen · Maus führt das Licht · Foto anklicken: auf den Rundhorizont</div>
       <Fuss hell fallback={['Entwurf 2', 'Die Drehbühne', 'alle Arbeiten, 2021–2026']} />
-      {lichtkasten !== null && (
-        <Lichtkasten projekt={p} start={Math.min(lichtkasten, p.bilder.length - 1)} onClose={() => setLichtkasten(null)} />
-      )}
     </>
   )
 }
