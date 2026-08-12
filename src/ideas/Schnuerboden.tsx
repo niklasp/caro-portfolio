@@ -61,6 +61,8 @@ function Behang({
     if (!ref.current) return
     const dt = Math.min(roheDt, 1 / 30) // große Frame-Lücken (Tab-Wechsel) nicht in die Feder integrieren
     const f = feder.current
+    // Geparkte Behänge (oben/unten außer Sicht) kosten keine Rechenzeit.
+    if (Math.abs(f.ziel) > 1 && Math.abs(f.ziel - f.y) < 0.005 && Math.abs(f.v) < 0.005) return
     const kraft = (f.ziel - f.y) * 34
     f.v = (f.v + kraft * dt) * Math.exp(-10.5 * dt)
     f.y += f.v * dt
@@ -269,8 +271,9 @@ export default function Schnuerboden() {
     <>
       <div className="buehne" ref={wrap}>
         <Canvas
-          dpr={[1, 2]}
+          dpr={[1, 1.75]}
           flat
+          gl={{ powerPreference: 'high-performance' }}
           camera={{ fov: 35, position: [0, 0.4, 11.5], near: 0.1, far: 60 }}
           style={{ background: '#ffffff' }}
         >

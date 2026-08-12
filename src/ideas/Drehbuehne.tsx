@@ -202,6 +202,8 @@ function Verfolger() {
         shadow-mapSize={[2048, 2048]}
         shadow-bias={-0.0004}
         shadow-radius={5}
+        shadow-camera-near={8}
+        shadow-camera-far={45}
       />
     </>
   )
@@ -501,9 +503,10 @@ export default function Drehbuehne() {
         style={{ cursor: 'grab', background: '#0c0c0c' }}
       >
         <Canvas
-          dpr={[1, 2]}
+          dpr={[1, 1.75]}
           flat
           shadows
+          gl={{ powerPreference: 'high-performance' }}
           camera={{ fov: 34, position: [0, 3.1, 28.5], near: 0.1, far: 90 }}
           style={{ background: '#0c0c0c' }}
         >
@@ -569,7 +572,7 @@ export default function Drehbuehne() {
       </div>
 
       <div className="hinweis hell">ziehen oder scrollen: drehen · Maus führt das Licht · Foto anklicken: auf den Rundhorizont</div>
-      <Fuss hell fallback={['Entwurf 2', 'Die Drehbühne', 'alle Arbeiten, 2021–2026']} />
+      <Fuss hell fallback={['', 'Die Drehbühne', 'alle Arbeiten, 2021–2026']} />
     </>
   )
 }

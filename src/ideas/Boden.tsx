@@ -173,7 +173,7 @@ function Markierung({
       m.position.z = daempf(zz, m.position.z, 9, dt)
       m.rotation.z = daempf(istGross ? -rotRad : b.brot * richten, m.rotation.z, 9, dt)
       m.scale.setScalar(daempf(zielScale, m.scale.x, 9, dt))
-      ;(m.material as THREE.MeshBasicMaterial).opacity *= trueb.current
+      ;(m.material as THREE.MeshBasicMaterial).opacity = trueb.current
     })
     // … und legt sich geöffnet als einzige Farbfläche hinter den Titel.
     const f = farbe.current
@@ -249,7 +249,6 @@ function Markierung({
                   position={[bx, by, 0.4 + i * 0.25]}
                   rotation={[0, 0, brot]}
                   userData={{ foto: true, bx, by, brot, i, breite, ar }}
-                  materialProps={{ opacity: 0 }}
                   onClick={(e) => {
                     if (!offen) return
                     e.stopPropagation()
@@ -291,7 +290,6 @@ function Markierung({
 function Kamera({ ctrl }: { ctrl: RefObject<BodenCtrl> }) {
   const cam = useRef<THREE.OrthographicCamera>(null)
   const size = useThree((s) => s.size)
-  const szene = useThree((s) => s.scene)
 
   useFrame((_, dt) => {
     const c = ctrl.current
@@ -303,13 +301,6 @@ function Kamera({ ctrl }: { ctrl: RefObject<BodenCtrl> }) {
       cam.current.zoom = (size.width / 92) * c.z
       cam.current.updateProjectionMatrix()
     }
-    // Ganz weit draußen beruhigt sich die Karte leicht.
-    const op = THREE.MathUtils.clamp((c.z - 0.5) / 0.25, 0, 1)
-    szene.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh && o.userData.foto) {
-        ;((o as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = op
-      }
-    })
   })
 
   return <OrthographicCamera ref={cam} makeDefault position={[0, 0, 50]} />
@@ -450,8 +441,9 @@ export default function Boden() {
         style={{ cursor: 'grab' }}
       >
         <Canvas
-          dpr={[1, 2]}
+          dpr={[1, 1.75]}
           flat
+          gl={{ powerPreference: 'high-performance' }}
           style={{ background: '#ffffff' }}
           onPointerMissed={() => {
             if (grossRef.current !== null) setGross(null)
@@ -508,7 +500,7 @@ export default function Boden() {
           ⌖
         </button>
       </div>
-      <Fuss fallback={['Entwurf 1', 'Der Boden', 'alle Arbeiten, 2021–2026']} projekt={projekt} />
+      <Fuss fallback={['', 'Der Boden', 'alle Arbeiten, 2021–2026']} projekt={projekt} />
 
       {/* Beschreibung mitten im freigeräumten Haufen */}
       {projekt && gross === null && (

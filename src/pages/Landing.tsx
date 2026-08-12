@@ -9,28 +9,28 @@ const ENTWUERFE = [
     nr: 'Entwurf 1',
     name: 'Der Boden',
     farbe: FARBEN.blau,
-    text: 'Alle Arbeiten liegen als farbige Markierungen auf einem Bühnenboden, gesehen von oben. Ziehen verschiebt den Blick, Scrollen zoomt — je näher man kommt, desto mehr Fotos tauchen um die Flächen auf.',
+    text: 'Alle Arbeiten liegen als Fotohaufen auf einem Bühnenboden, gesehen von oben. Ziehen verschiebt den Blick, Scrollen zoomt. Ein Klick rastet auf ein Projekt ein: Die Fotos treten auseinander, die Beschreibung liegt in der Mitte.',
   },
   {
     pfad: '/drehbuehne',
     nr: 'Entwurf 2',
     name: 'Die Drehbühne',
     farbe: FARBEN.orange,
-    text: 'Ein schwarzer Bühnenraum mit einer Drehbühne. Jede Arbeit steht als Kulisse auf der Scheibe: Farbfläche als Prospekt, Fotos als Stellwände. Ziehen dreht die Bühne, das vorderste Projekt steht im Licht.',
+    text: 'Ein dunkler Bühnenraum mit Drehscheibe: Die Fotos stehen als Blöcke auf der Bühne, die Maus führt den Verfolger, und auf dem Rundhorizont erscheint das Motiv des vordersten Projekts — bei Heavy Matters läuft dort das Video.',
   },
   {
     pfad: '/schnuerboden',
     nr: 'Entwurf 3',
     name: 'Der Schnürboden',
     farbe: FARBEN.magenta,
-    text: 'Die Projekte hängen an Zügen wie Prospekte im Schnürboden. Scrollen fährt ein Bühnenbild nach dem anderen ein und aus — auch die Beschreibung hängt mit, als scrollbare Karte am eigenen Zug.',
+    text: 'Die Projekte schweben herein wie Prospekte aus dem Schnürboden — je nach Blätterrichtung von oben oder unten. Jedes Element antwortet eigenständig auf die Maus, die Beschreibung steht frei zwischen den Fotos.',
   },
   {
     pfad: '/spielplan',
     nr: 'Entwurf 4',
     name: 'Der Spielplan',
     farbe: FARBEN.pink,
-    text: 'Flach wie das gedruckte Portfolio: eine Liste. Hoch und runter wechselt das Projekt, links und rechts blättert durch Fotos und Beschreibung — die Farbfläche fährt hinter den Titel.',
+    text: 'Flach wie das gedruckte Portfolio: eine Liste. Hoch und runter wechselt das Projekt, links und rechts blättert durch die Fotos — ein Farbquadrat läuft der Maus hinterher und wächst über dem, was es berührt.',
   },
 ]
 
