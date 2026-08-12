@@ -79,7 +79,7 @@ const ladeHg = (src: string) => {
   return p
 }
 
-function Hintergrund({ src, hell }: { src: string; hell: boolean }) {
+function Hintergrund({ src, hell, video }: { src: string; hell: boolean; video?: string }) {
   const material = useMemo(() => {
     const leer = new THREE.DataTexture(new Uint8Array([8, 8, 8, 255]), 1, 1)
     leer.needsUpdate = true
@@ -101,6 +101,31 @@ function Hintergrund({ src, hell }: { src: string; hell: boolean }) {
   }, [])
 
   useEffect(() => {
+    // Läuft ein Video, spielt es direkt auf der Leinwand.
+    if (video) {
+      const v = document.createElement('video')
+      v.src = video
+      v.muted = true
+      v.loop = true
+      v.playsInline = true
+      v.crossOrigin = 'anonymous'
+      const tex = new THREE.VideoTexture(v)
+      tex.colorSpace = THREE.SRGBColorSpace
+      const u = material.uniforms
+      u.uAlt.value = u.uBild.value
+      u.uAltA.value = u.uBildA.value
+      u.uBild.value = tex
+      u.uMix.value = 0
+      v.addEventListener('loadedmetadata', () => {
+        u.uBildA.value = v.videoWidth / v.videoHeight
+      })
+      v.play().catch(() => {})
+      return () => {
+        v.pause()
+        v.removeAttribute('src')
+        tex.dispose()
+      }
+    }
     let lebendig = true
     ladeHg(src).then((tex) => {
       if (!lebendig) return
@@ -114,13 +139,13 @@ function Hintergrund({ src, hell }: { src: string; hell: boolean }) {
     return () => {
       lebendig = false
     }
-  }, [src, material])
+  }, [src, video, material])
 
   useFrame(({ clock }, dt) => {
     material.uniforms.uZeit.value = clock.elapsedTime
     material.uniforms.uMix.value = Math.min(1, (material.uniforms.uMix.value as number) + dt * 1.3)
     const u = material.uniforms.uHell
-    u.value += ((hell ? 2.3 : 1) - (u.value as number)) * (1 - Math.exp(-4 * dt))
+    u.value += ((hell || video ? 2.3 : 1) - (u.value as number)) * (1 - Math.exp(-4 * dt))
   })
 
   const BOGEN = 2.4 // ~140° Rückwand-Segment
@@ -334,6 +359,7 @@ function Buehnenraum({
       <Hintergrund
         src={PROJEKTE[aktiv].bilder[Math.min(projiziert ?? 0, PROJEKTE[aktiv].bilder.length - 1)].src}
         hell={projiziert !== null}
+        video={PROJEKTE[aktiv].videoDatei}
       />
       <ambientLight intensity={0.34} color="#f2ecff" />
       <Verfolger />
@@ -478,7 +504,7 @@ export default function Drehbuehne() {
 
       <Kopf hell />
       <EntwurfSchalter hell />
-      {p.video && (
+      {p.video && !p.videoDatei && (
         <div className="db-video-zone">
           <iframe
             src={`${p.video}?background=1&autoplay=1&muted=1&loop=1`}

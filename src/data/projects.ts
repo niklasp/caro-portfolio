@@ -33,6 +33,7 @@ export interface Projekt {
   credits: string[]
   links?: ProjektLink[]
   video?: string
+  videoDatei?: string
   bilder: Bild[]
 }
 
