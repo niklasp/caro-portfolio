@@ -658,34 +658,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   height: 22px;
   z-index: 12;
   pointer-events: none;
-  mix-blend-mode: multiply; /* Standard — der Schalter unten rechts übersteuert */
-}
-/* Testschalter: Mischmodus des Mausquadrats. */
-.sp-mischwahl {
-  position: fixed;
-  right: 24px;
-  bottom: 58px;
-  z-index: 14;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  color: var(--grau);
-}
-.sp-mischwahl select {
-  font: inherit;
-  font-size: 11px;
-  color: var(--tinte);
-  background: #fff;
-  border: var(--hairline);
-  border-radius: 0;
-  padding: 3px 6px;
-}
-@media (min-width: 1100px) {
-  .spielplan .sp-mischwahl,
-  .spielplan .sp-mischwahl * {
-    cursor: pointer !important;
-  }
+  mix-blend-mode: multiply;
 }
 .sp-inline {
   position: fixed;
@@ -693,7 +666,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   top: 55%;
   width: min(46ch, 34vw);
   font-size: 13px;
-  z-index: 13;
+  z-index: 14;
   color: #fff;
   mix-blend-mode: difference;
   transition: transform 0.25s ease-out;
@@ -703,12 +676,13 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .sp-inline .credits { opacity: 0.72; }
 .sp-inline .credits div { margin-bottom: 2px; }
 .sp-inline .sp-inline-links a { border-bottom: 1px solid; margin-right: 12px; }
-.sp-rechts { position: relative; z-index: 11; min-width: 0; display: flex; flex-direction: column; gap: 12px; align-items: stretch; justify-content: center; height: 100%; }
+/* Bild vor dem Mausquadrat (12), Beschreibung (14) bleibt zuoberst. */
+.sp-rechts { position: relative; z-index: 13; min-width: 0; display: flex; flex-direction: column; gap: 12px; align-items: stretch; justify-content: center; height: 100%; }
 .sp-slide { flex: 0 1 auto; display: flex; align-items: center; justify-content: center; animation: sp-blatt 0.35s cubic-bezier(0.25, 1, 0.3, 1) both; min-height: 0; }
 @keyframes sp-blatt { from { transform: translateX(26px); opacity: 0; } to { transform: none; opacity: 1; } }
 .sp-slide figure { margin: 0; cursor: e-resize; max-height: 62vh; display: flex; }
 .sp-slide figure img,
-.sp-slide figure video { max-width: 100%; max-height: 62vh; object-fit: contain; display: block; }
+.sp-slide figure video { max-width: 100%; max-height: 62vh; object-fit: contain; display: block; opacity: 0.9; }
 .sp-beschreibung { max-width: 46ch; font-size: 13px; }
 .sp-beschreibung .sp-b-kopf { font-size: 12px; border-bottom: var(--hairline); padding-bottom: 5px; margin-bottom: 14px; }
 .sp-beschreibung .farbbalken { height: 12px; margin-bottom: 16px; }
