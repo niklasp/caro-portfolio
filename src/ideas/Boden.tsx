@@ -62,10 +62,10 @@ const ANKER: [number, number][] = [
 // Geöffnet weichen die Fotos an den Rand aus — frei von Titel,
 // Beschreibung und Farbfläche (lokale Koordinaten, Panelzone x −1…13, y −11…0).
 const OFFEN_PLAETZE: [number, number][] = [
-  [-9, 3.4],
-  [17.5, 4],
-  [-10, -9],
-  [18, -10],
+  [-6, 2.8],
+  [15.2, 3.2],
+  [-6.5, -7],
+  [15.5, -7.8],
 ]
 
 // Deterministischer Zufall — jedes Projekt fällt anders, aber immer gleich.
