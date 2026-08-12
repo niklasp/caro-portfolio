@@ -78,6 +78,7 @@ export const PROJEKTE: Projekt[] = [
     credits: ['Konzept und Performance: Carolin Pflüger'],
     links: [{ label: 'Video', url: 'https://vimeo.com/1190920248' }],
     video: 'https://player.vimeo.com/video/1190920248',
+    videoDatei: `${import.meta.env.BASE_URL}videos/heavy-matters.mp4`,
     bilder: [img('heavy-matters', 1, 1080, 761), img('heavy-matters', 2, 1080, 761), img('heavy-matters', 3, 1080, 784)],
   },
   {

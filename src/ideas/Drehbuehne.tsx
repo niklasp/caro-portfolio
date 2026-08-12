@@ -345,8 +345,8 @@ function Buehnenraum({
       if (!((o as THREE.Group).isGroup && o.userData.kulisse)) return
       const winkel = mod(c.ang + o.userData.index * SCHRITT + Math.PI, Math.PI * 2) - Math.PI
       const vorn = Math.abs(winkel) < SCHRITT / 2
-      const ziel = vorn ? 1 : 0.35
-      o.userData.b = daempf(ziel, o.userData.b ?? 0.35, 5, dt)
+      const ziel = vorn ? 1 : 0.55
+      o.userData.b = daempf(ziel, o.userData.b ?? 0.55, 5, dt)
       o.traverse((kind) => {
         const m = kind as THREE.Mesh
         if (m.isMesh && m.userData.grundfarben) {
@@ -368,7 +368,7 @@ function Buehnenraum({
         hell={projiziert !== null}
         video={PROJEKTE[aktiv].videoDatei}
       />
-      <ambientLight intensity={0.34} color="#f2ecff" />
+      <ambientLight intensity={0.42} color="#f2ecff" />
       <Verfolger />
 
       <group ref={scheibe}>
