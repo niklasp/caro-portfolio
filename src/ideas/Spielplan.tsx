@@ -15,34 +15,12 @@ import { flags } from '../ui/flags'
 const N = PROJEKTE.length
 const mod = (a: number, n: number) => ((a % n) + n) % n
 
-// Zum Ausprobieren: Mischmodus des Mausquadrats.
-const MISCHMODI = [
-  'multiply',
-  'difference',
-  'exclusion',
-  'screen',
-  'overlay',
-  'hard-light',
-  'soft-light',
-  'color-burn',
-  'color-dodge',
-  'darken',
-  'lighten',
-  'hue',
-  'saturation',
-  'color',
-  'luminosity',
-  'normal',
-] as const
-type Mischmodus = (typeof MISCHMODI)[number]
-
 export default function Spielplan() {
   const { projekt: linkParam } = useParams()
   const [pi, setPi] = useState(() => startIndexAusUrl(linkParam))
   useProjektUrlSync('/spielplan', PROJEKTE[pi])
   const [si, setSi] = useState(0)
   const [lichtkasten, setLichtkasten] = useState<number | null>(null)
-  const [mischung, setMischung] = useState<Mischmodus>('multiply')
   const radAcc = useRef({ x: 0, y: 0, t: 0 })
   const wrap = useRef<HTMLDivElement>(null)
   const inline = useRef<HTMLDivElement>(null)
@@ -258,25 +236,7 @@ export default function Spielplan() {
       </div>
 
       <div className="hinweis">↑ ↓ Projekt · ← → Bilder · Bild anklicken: groß</div>
-      {breit && (
-        <div
-          className="sp-balken-maus"
-          ref={balken}
-          style={{ background: projekt.farbe, mixBlendMode: mischung }}
-        />
-      )}
-      {breit && (
-        <label className="sp-mischwahl">
-          <span>Mischmodus</span>
-          <select value={mischung} onChange={(e) => setMischung(e.target.value as Mischmodus)}>
-            {MISCHMODI.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
+      {breit && <div className="sp-balken-maus" ref={balken} style={{ background: projekt.farbe }} />}
       <Fuss projekt={projekt} />
       {lichtkasten !== null && (
         <Lichtkasten

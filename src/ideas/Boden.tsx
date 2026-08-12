@@ -81,7 +81,22 @@ const textFarbeAuf = (hex: string) => {
   return lum < 0.45 ? '#ffffff' : '#141414'
 }
 
-function Raster() {
+// Zum Ausprobieren: Lichtstimmungen für den Bühnenboden — CSS-Hintergründe
+// hinter dem transparenten Canvas, benannt nach Situationen im Theater.
+const LICHTER = [
+  { id: 'arbeitslicht', name: 'Arbeitslicht', css: '#ffffff', raster: '#e9e9e9', alpha: 1, dunkel: false },
+  { id: 'probebuehne', name: 'Probebühne', css: 'radial-gradient(ellipse at 50% 38%, #fdfcf7 0%, #f1ece0 55%, #e2dbc9 100%)', raster: '#d8d1bd', alpha: 0.8, dunkel: false },
+  { id: 'verfolger', name: 'Verfolger', css: 'radial-gradient(circle at 50% 44%, #f8f3e3 0%, #ece3ca 16%, #75705f 48%, #2e2c26 78%, #1b1a16 100%)', raster: '#ffffff', alpha: 0.1, dunkel: true },
+  { id: 'rampe', name: 'Rampenlicht', css: 'linear-gradient(to top, #ffe9b4 0%, #ecbd6e 14%, #6b573d 48%, #241d14 85%, #14100b 100%)', raster: '#ffffff', alpha: 0.1, dunkel: true },
+  { id: 'blaue-stunde', name: 'Blaue Stunde', css: 'radial-gradient(ellipse at 50% 32%, #3d59c0 0%, #22307c 55%, #0d1338 100%)', raster: '#ffffff', alpha: 0.12, dunkel: true },
+  { id: 'gasse', name: 'Gasse', css: 'linear-gradient(105deg, #fff4dd 0%, #ecd39c 16%, #6e6449 50%, #262218 88%, #17140d 100%)', raster: '#ffffff', alpha: 0.1, dunkel: true },
+  { id: 'gobo', name: 'Gobo', css: 'repeating-linear-gradient(72deg, #efe7cf 0px, #efe7cf 55px, #3a362b 120px, #3a362b 200px, #efe7cf 265px)', raster: '#ffffff', alpha: 0.12, dunkel: true },
+  { id: 'magenta', name: 'Magenta-Wash', css: 'radial-gradient(ellipse at 50% 40%, #ff9fd3 0%, #cf3f9b 45%, #571246 100%)', raster: '#ffffff', alpha: 0.14, dunkel: true },
+  { id: 'bernstein', name: 'Bernstein', css: 'radial-gradient(ellipse at 50% 44%, #ffdda6 0%, #e59247 45%, #6e3512 100%)', raster: '#ffffff', alpha: 0.14, dunkel: true },
+  { id: 'blackout', name: 'Blackout', css: 'radial-gradient(circle at 50% 45%, #2a2a2a 0%, #0e0e0e 75%)', raster: '#ffffff', alpha: 0.09, dunkel: true },
+] as const
+
+function Raster({ farbe, alpha }: { farbe: string; alpha: number }) {
   const geo = useMemo(() => {
     const pts = []
     const S = 110
@@ -95,7 +110,7 @@ function Raster() {
   }, [])
   return (
     <lineSegments geometry={geo}>
-      <lineBasicMaterial color="#e9e9e9" toneMapped={false} />
+      <lineBasicMaterial color={farbe} transparent opacity={alpha} toneMapped={false} />
     </lineSegments>
   )
 }
@@ -321,6 +336,14 @@ export default function Boden() {
   }
   const schliesse = () => navigate('/boden')
   const [gross, setGross] = useState<number | null>(null)
+  const [lichtIdx, setLichtIdx] = useState(0)
+  const licht = LICHTER[lichtIdx]
+
+  // Dunkle Lichtstimmungen hellen die UI-Beschriftung auf (Achsen, Hinweise).
+  useEffect(() => {
+    document.body.classList.toggle('boden-dunkel', licht.dunkel)
+    return () => document.body.classList.remove('boden-dunkel')
+  }, [licht.dunkel])
   const grossRef = useRef<number | null>(null)
   grossRef.current = gross
   const offenRef = useRef(false)
@@ -444,14 +467,14 @@ export default function Boden() {
           dpr={[1, 1.75]}
           flat
           gl={{ powerPreference: 'high-performance' }}
-          style={{ background: '#ffffff' }}
+          style={{ background: licht.css }}
           onPointerMissed={() => {
             if (grossRef.current !== null) setGross(null)
             else if (offenRef.current) schliesse()
           }}
         >
           <Kamera ctrl={ctrl} />
-          <Raster />
+          <Raster farbe={licht.raster} alpha={licht.alpha} />
           <Suspense fallback={null}>
             {PROJEKTE.map((p, i) => (
               <Markierung
@@ -470,8 +493,8 @@ export default function Boden() {
         </Canvas>
       </div>
 
-      <Kopf />
-      <EntwurfSchalter />
+      <Kopf hell={licht.dunkel} />
+      <EntwurfSchalter hell={licht.dunkel} />
       <div className="achse oben">2021 — 2026</div>
       <div className="achse links">Kostüm — Bühne</div>
       <div className="hinweis">ziehen: schieben · scrollen: zoomen · klicken: öffnen</div>
@@ -500,7 +523,17 @@ export default function Boden() {
           ⌖
         </button>
       </div>
-      <Fuss fallback={['', 'Der Boden', 'alle Arbeiten, 2021–2026']} projekt={projekt} />
+      <label className="licht-wahl">
+        <span>Licht</span>
+        <select value={lichtIdx} onChange={(e) => setLichtIdx(parseInt(e.target.value, 10))}>
+          {LICHTER.map((l, i) => (
+            <option key={l.id} value={i}>
+              {l.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <Fuss fallback={['', 'Der Boden', 'alle Arbeiten, 2021–2026']} projekt={projekt} hell={licht.dunkel} />
 
       {/* Beschreibung mitten im freigeräumten Haufen */}
       {projekt && gross === null && (
