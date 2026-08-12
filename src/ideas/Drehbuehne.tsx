@@ -479,12 +479,13 @@ export default function Drehbuehne() {
       <Kopf hell />
       <EntwurfSchalter hell />
       {p.video && (
-        <iframe
-          className="db-video"
-          src={`${p.video}?background=1&autoplay=1&muted=1&loop=1`}
-          allow="autoplay; fullscreen"
-          title={`${p.titel} — Video`}
-        />
+        <div className="db-video-zone">
+          <iframe
+            src={`${p.video}?background=1&autoplay=1&muted=1&loop=1`}
+            allow="autoplay; fullscreen"
+            title={`${p.titel} — Video`}
+          />
+        </div>
       )}
       <div className="sb-titel" style={{ color: '#fff' }}>
         <div className="db-pfeile">

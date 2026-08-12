@@ -541,18 +541,29 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .db-beschreibung { display: none; }
 }
 
-/* Video auf dem Rundhorizont (Drehbühne) */
-.db-video {
+/* Video auf dem Rundhorizont (Drehbühne) — füllt die Fläche,
+   auf der sonst das projizierte Bild liegt. */
+.db-video-zone {
   position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60vh;
+  overflow: hidden;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.92;
+  mask-image: linear-gradient(to bottom, black 72%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black 72%, transparent);
+}
+.db-video-zone iframe {
+  position: absolute;
   left: 50%;
-  top: 31%;
+  top: 50%;
   transform: translate(-50%, -50%);
-  width: min(50vw, 860px);
+  width: max(100vw, calc(60vh * 16 / 9));
   aspect-ratio: 16 / 9;
   border: 0;
-  z-index: 5;
-  opacity: 0.9;
-  pointer-events: none;
 }
 
 /* ---------- Schnürboden: hängende Beschreibung ---------- */
