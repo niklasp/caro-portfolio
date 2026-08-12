@@ -33,10 +33,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/lebenslauf" element={<Lebenslauf />} />
-        <Route path="/boden" element={<Boden />} />
-        <Route path="/drehbuehne" element={<Drehbuehne />} />
-        <Route path="/schnuerboden" element={<Schnuerboden />} />
-        <Route path="/spielplan" element={<Spielplan />} />
+        <Route path="/boden/:projekt?" element={<Boden />} />
+        <Route path="/drehbuehne/:projekt?" element={<Drehbuehne />} />
+        <Route path="/schnuerboden/:projekt?" element={<Schnuerboden />} />
+        <Route path="/spielplan/:projekt?" element={<Spielplan />} />
       </Routes>
     </div>
   )

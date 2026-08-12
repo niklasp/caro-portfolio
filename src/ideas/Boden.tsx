@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState, Suspense, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Html, OrthographicCamera } from '@react-three/drei'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import * as THREE from 'three'
-import { PROJEKTE, findProjekt, type Projekt } from '../data/projects'
+import { PROJEKTE, findByPermalink, permalink, type Projekt } from '../data/projects'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
 import { flags } from '../ui/flags'
-import { Foto, Farbflaeche, daempf } from './helpers'
+import { useProjektUrlSync } from '../ui/permalink'
+import { Foto, Farbflaeche, daempf, useVideoTextur } from './helpers'
 
 // Entwurf 1 — Der Boden.
 // Ein Bühnenboden von oben: jedes Projekt liegt als Haufen von Abzügen auf
@@ -125,6 +126,8 @@ function Markierung({
   const farbe = useRef<THREE.Mesh>(null)
   const trueb = useRef(1)
   const [hover, setHover] = useState(false)
+  // Heavy Matters: das Poster-Foto spielt geöffnet als Video
+  const videoTex = useVideoTextur(offen ? projekt.videoDatei : undefined, offen)
 
   // Die Farbfläche liegt wie ein Abzug im Haufen …
   const fSeed = idx * 31
@@ -234,15 +237,18 @@ function Markierung({
               const anker = ANKER[(i + idx) % ANKER.length]
               const bx = anker[0] * (0.85 + rnd(seed + 2) * 0.55)
               const by = anker[1] * (0.85 + rnd(seed + 3) * 0.55)
+              const istVideo = i === 0 && !!videoTex
+              const ar = istVideo ? 16 / 9 : b.ar
               return (
                 <Foto
-                  key={b.src}
+                  key={`${b.src}-${istVideo ? 'video' : 'bild'}`}
                   url={b.src}
+                  ersatz={istVideo ? videoTex : undefined}
                   breite={breite}
-                  ar={b.ar}
+                  ar={ar}
                   position={[bx, by, 0.4 + i * 0.25]}
                   rotation={[0, 0, brot]}
-                  userData={{ foto: true, bx, by, brot, i, breite, ar: b.ar }}
+                  userData={{ foto: true, bx, by, brot, i, breite, ar }}
                   materialProps={{ opacity: 0 }}
                   onClick={(e) => {
                     if (!offen) return
@@ -314,8 +320,15 @@ export default function Boden() {
   const [zoomUI, setZoomUI] = useState(START_ZOOM)
   const wrap = useRef<HTMLDivElement>(null)
   const zeiger = useRef<{ x: number; y: number } | null>(null)
-  const [sp, setSp] = useSearchParams()
-  const projekt = findProjekt(sp.get('p'))
+  const { projekt: linkParam } = useParams()
+  const navigate = useNavigate()
+  const projekt = findByPermalink(linkParam)
+  useProjektUrlSync('/boden', projekt)
+  const oeffne = (slug: string) => {
+    const pr = PROJEKTE.find((x) => x.slug === slug)
+    if (pr) navigate(`/boden/${permalink(pr)}`)
+  }
+  const schliesse = () => navigate('/boden')
   const [gross, setGross] = useState<number | null>(null)
   const grossRef = useRef<number | null>(null)
   grossRef.current = gross
@@ -396,7 +409,7 @@ export default function Boden() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (flags.lightbox) return
-      const slug = sp.get('p')
+      const slug = projekt?.slug
       if (!slug) return
       const i = PROJEKTE.findIndex((p) => p.slug === slug)
       if (i < 0) return
@@ -407,7 +420,7 @@ export default function Boden() {
           setGross(null)
           return
         }
-        setSp({})
+        schliesse()
         return
       }
       // Solange ein Foto groß ist, blättern die Pfeile durch die Fotos.
@@ -420,11 +433,11 @@ export default function Boden() {
       if (e.key === 'ArrowRight') ni = (i + 1) % n
       if (e.key === 'ArrowLeft') ni = (i - 1 + n) % n
       if (ni === null) return
-      setSp({ p: PROJEKTE[ni].slug })
+      oeffne(PROJEKTE[ni].slug)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [sp])
+  }, [projekt?.slug])
 
   return (
     <>
@@ -442,7 +455,7 @@ export default function Boden() {
           style={{ background: '#ffffff' }}
           onPointerMissed={() => {
             if (grossRef.current !== null) setGross(null)
-            else if (offenRef.current) setSp({})
+            else if (offenRef.current) schliesse()
           }}
         >
           <Kamera ctrl={ctrl} />
@@ -457,7 +470,7 @@ export default function Boden() {
                 gross={projekt?.slug === p.slug ? gross : null}
                 gedimmt={!!projekt && projekt.slug !== p.slug}
                 labelsAus={gross !== null}
-                onOpen={(slug) => setSp({ p: slug })}
+                onOpen={oeffne}
                 onBild={(bi) => setGross((g) => (g === bi ? null : bi))}
               />
             ))}

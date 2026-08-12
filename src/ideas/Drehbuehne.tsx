@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState, Suspense, type RefObject } from '
 import { Canvas, useFrame, useLoader, useThree, type ThreeElements } from '@react-three/fiber'
 import * as THREE from 'three'
 import { PROJEKTE, type Projekt } from '../data/projects'
+import { useParams } from 'react-router-dom'
+import { startIndexAusUrl, useProjektUrlSync } from '../ui/permalink'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
 import { flags } from '../ui/flags'
 import { daempf } from './helpers'
@@ -68,6 +70,9 @@ void main() {
 }
 `
 
+// Abspielposition pro Videodatei merken — Pause statt Neustart
+const videoZeiten = new Map<string, number>()
+
 const hgLader = new THREE.TextureLoader()
 const hgCache = new Map<string, Promise<THREE.Texture>>()
 const ladeHg = (src: string) => {
@@ -113,6 +118,7 @@ function Hintergrund({ src, hell, video }: { src: string; hell: boolean; video?:
       v.loop = true
       v.playsInline = true
       v.crossOrigin = 'anonymous'
+      v.currentTime = videoZeiten.get(video) ?? 0
       const tex = new THREE.VideoTexture(v)
       tex.colorSpace = THREE.SRGBColorSpace
       const u = material.uniforms
@@ -125,6 +131,7 @@ function Hintergrund({ src, hell, video }: { src: string; hell: boolean; video?:
       })
       v.play().catch(() => {})
       return () => {
+        videoZeiten.set(video, v.currentTime)
         v.pause()
         v.removeAttribute('src')
         tex.dispose()
@@ -366,7 +373,7 @@ function Buehnenraum({
       <Hintergrund
         src={PROJEKTE[aktiv].bilder[Math.min(projiziert ?? 0, PROJEKTE[aktiv].bilder.length - 1)].src}
         hell={projiziert !== null}
-        video={PROJEKTE[aktiv].videoDatei}
+        video={projiziert === null ? PROJEKTE[aktiv].videoDatei : undefined}
       />
       <ambientLight intensity={0.42} color="#f2ecff" />
       <Verfolger />
@@ -390,14 +397,16 @@ function Buehnenraum({
 }
 
 export default function Drehbuehne() {
-  const [aktiv, setAktiv] = useState(0)
+  const { projekt: linkParam } = useParams()
+  const [aktiv, setAktiv] = useState(() => startIndexAusUrl(linkParam))
+  useProjektUrlSync('/drehbuehne', PROJEKTE[aktiv])
   const [projiziert, setProjiziert] = useState<number | null>(null)
   const wrap = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const zeiger = useRef<{ x: number; roh: number } | null>(null)
   const radAcc = useRef({ acc: 0, t: 0 })
 
-  const ctrl = useRef<DrehCtrl>({ ang: Math.PI, tang: 0 })
+  const ctrl = useRef<DrehCtrl>({ ang: Math.PI - aktiv * SCHRITT, tang: -aktiv * SCHRITT })
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -504,7 +513,11 @@ export default function Drehbuehne() {
             aktiv={aktiv}
             projiziert={projiziert}
             onDrehen={dreheZu}
-            onBild={(i) => setProjiziert((v) => (v === i ? null : i))}
+            onBild={(i) =>
+              PROJEKTE[aktiv].videoDatei && i === 0
+                ? setProjiziert(null)
+                : setProjiziert((v) => (v === i ? null : i))
+            }
           />
         </Canvas>
       </div>

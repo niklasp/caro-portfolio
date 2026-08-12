@@ -37,8 +37,10 @@ export interface Projekt {
   bilder: Bild[]
 }
 
+const BASE = import.meta.env ? import.meta.env.BASE_URL : '/'
+
 const img = (slug: string, n: number, w: number, h: number): Bild => ({
-  src: `${import.meta.env.BASE_URL}images/${slug}-${n}.jpg`,
+  src: `${BASE}images/${slug}-${n}.jpg`,
   w,
   h,
   ar: w / h,
@@ -78,7 +80,7 @@ export const PROJEKTE: Projekt[] = [
     credits: ['Konzept und Performance: Carolin Pflüger'],
     links: [{ label: 'Video', url: 'https://vimeo.com/1190920248' }],
     video: 'https://player.vimeo.com/video/1190920248',
-    videoDatei: `${import.meta.env.BASE_URL}videos/heavy-matters.mp4`,
+    videoDatei: `${BASE}videos/heavy-matters.mp4`,
     bilder: [img('heavy-matters', 1, 1080, 761), img('heavy-matters', 2, 1080, 761), img('heavy-matters', 3, 1080, 784)],
   },
   {
@@ -259,6 +261,11 @@ export const KONTAKT = {
   telefon: '+49 162 330 8594',
   instagram: 'https://www.instagram.com/_carolinpflueger_',
 }
+
+// Permalink: slug plus Jahr — z. B. lost-2025
+export const permalink = (p: Projekt): string => `${p.slug}-${Math.floor(p.jahrNum)}`
+export const findByPermalink = (link: string | null | undefined): Projekt | undefined =>
+  PROJEKTE.find((p) => permalink(p) === link)
 
 export const byArt = (art: ProjektArt): Projekt[] => PROJEKTE.filter((p) => p.art === art)
 export const findProjekt = (slug: string | null | undefined): Projekt | undefined =>

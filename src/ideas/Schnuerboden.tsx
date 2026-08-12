@@ -3,10 +3,12 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { PROJEKTE, type Projekt as ProjektDaten } from '../data/projects'
+import { useParams } from 'react-router-dom'
+import { startIndexAusUrl, useProjektUrlSync } from '../ui/permalink'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
 import Lichtkasten from '../ui/Lichtkasten'
 import { flags } from '../ui/flags'
-import { Foto, Farbflaeche } from './helpers'
+import { Foto, Farbflaeche, useVideoTextur } from './helpers'
 
 // Entwurf 3 — Der Schnürboden.
 // Die Projekte hängen an Zügen wie Prospekte über der Bühne. Scrollen fährt
@@ -92,6 +94,7 @@ function Projekt({
   onBild: (index: number) => void
 }) {
   const fotos = projekt.bilder.slice(0, 3)
+  const videoTex = useVideoTextur(aktiv ? projekt.videoDatei : undefined, aktiv)
   const lagen: { p: [number, number, number]; b: number }[] = [
     { p: [-2.7, 0.25, 0.1], b: 3.4 },
     { p: [0.55, 1.25, 0.6], b: 2.2 },
@@ -147,8 +150,9 @@ function Projekt({
               kinder={
                 <Foto
                   url={b.src}
+                  ersatz={i === 0 ? videoTex : undefined}
                   breite={l.b}
-                  ar={b.ar}
+                  ar={i === 0 && videoTex ? 16 / 9 : b.ar}
                   onClick={(e) => {
                     e.stopPropagation()
                     if (aktiv && e.delta < 6) onBild(i)
@@ -201,7 +205,9 @@ function Projekt({
 }
 
 export default function Schnuerboden() {
-  const [index, setIndex] = useState(0)
+  const { projekt: linkParam } = useParams()
+  const [index, setIndex] = useState(() => startIndexAusUrl(linkParam))
+  useProjektUrlSync('/schnuerboden', PROJEKTE[index])
   const richtung = useRef(0)
 
   useEffect(() => {

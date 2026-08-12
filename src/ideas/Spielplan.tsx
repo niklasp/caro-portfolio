@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { PROJEKTE } from '../data/projects'
+import { useParams } from 'react-router-dom'
+import { startIndexAusUrl, useProjektUrlSync } from '../ui/permalink'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
 import Lichtkasten from '../ui/Lichtkasten'
 import { flags } from '../ui/flags'
@@ -14,7 +16,9 @@ const N = PROJEKTE.length
 const mod = (a: number, n: number) => ((a % n) + n) % n
 
 export default function Spielplan() {
-  const [pi, setPi] = useState(0)
+  const { projekt: linkParam } = useParams()
+  const [pi, setPi] = useState(() => startIndexAusUrl(linkParam))
+  useProjektUrlSync('/spielplan', PROJEKTE[pi])
   const [si, setSi] = useState(0)
   const [lichtkasten, setLichtkasten] = useState<number | null>(null)
   const radAcc = useRef({ x: 0, y: 0, t: 0 })
@@ -194,7 +198,11 @@ export default function Spielplan() {
           <div className="sp-slide" key={`${projekt.slug}-${siC}`}>
             {bild ? (
               <figure data-balken-ziel onClick={() => setLichtkasten(siC)} style={{ cursor: 'zoom-in' }}>
-                <img src={bild.src} alt={`${projekt.titel}, Bild ${siC + 1}`} />
+                {projekt.videoDatei && siC === 0 ? (
+                  <video src={projekt.videoDatei} autoPlay muted loop playsInline />
+                ) : (
+                  <img src={bild.src} alt={`${projekt.titel}, Bild ${siC + 1}`} />
+                )}
               </figure>
             ) : (
               <div className="sp-beschreibung">
