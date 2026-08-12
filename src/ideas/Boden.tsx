@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Html, OrthographicCamera } from '@react-three/drei'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as THREE from 'three'
-import { FARBEN, PROJEKTE, findByPermalink, permalink, type Projekt } from '../data/projects'
+import { PROJEKTE, findByPermalink, permalink, type Projekt } from '../data/projects'
 import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
 import { flags } from '../ui/flags'
 import { useProjektUrlSync } from '../ui/permalink'
@@ -96,20 +96,21 @@ const LICHTER = [
   { id: 'blackout', name: 'Blackout', css: 'radial-gradient(circle at 50% 45%, #2a2a2a 0%, #0e0e0e 75%)', raster: '#ffffff', alpha: 0.09, dunkel: true },
 ] as const
 
-// Zum Ausprobieren: Bodenzeichnungen statt des Rasters — alles Dinge,
-// die man auf einem echten Bühnenboden findet.
+// Der Boden ist eine technische Bühnenzeichnung — hier die Varianten,
+// was der Grundriss zusätzlich zur Bühnenkante zeigt.
 const MUSTER = [
-  { id: 'raster', name: 'Raster' },
-  { id: 'ohne', name: 'Leer' },
-  { id: 'karo', name: 'Grobes Raster' },
-  { id: 'punkte', name: 'Punktraster' },
-  { id: 'dielen', name: 'Dielen' },
-  { id: 'tanzboden', name: 'Tanzboden' },
-  { id: 'spike', name: 'Spike-Tape' },
-  { id: 'grundriss', name: 'Grundriss' },
-  { id: 'kreide', name: 'Kreide' },
-  { id: 'schraffur', name: 'Schraffur' },
+  { id: 'spielkreise', name: 'Spielkreise' },
+  { id: 'drehscheibe', name: 'Drehscheibe' },
+  { id: 'gassen', name: 'Gassen & Portal' },
+  { id: 'zuege', name: 'Zugstangen' },
+  { id: 'podeste', name: 'Podeste' },
+  { id: 'lichtplan', name: 'Lichtplan' },
+  { id: 'sichtlinien', name: 'Sichtlinien' },
 ] as const
+
+// Bühnenmaße des Grundrisses (Weltkoordinaten, Projekte liegen innerhalb).
+const GR_W = 150
+const GR_H = 66
 
 function liniengeo(pts: number[]) {
   const g = new THREE.BufferGeometry()
@@ -118,118 +119,127 @@ function liniengeo(pts: number[]) {
 }
 
 function Muster({ art, farbe, alpha }: { art: string; farbe: string; alpha: number }) {
-  const { linien, punkte, tape } = useMemo(() => {
-    const S = 110
+  const geo = useMemo(() => {
     const Z = -0.2
-    const linien: number[] = []
-    const punkte: number[] = []
-    const tape = new Map<string, number[]>()
-    const li = (x1: number, y1: number, x2: number, y2: number) => linien.push(x1, y1, Z, x2, y2, Z)
-
-    if (art === 'raster') {
-      for (let i = -S; i <= S; i += 3) {
-        li(-S, i, S, i)
-        li(i, -S, i, S)
-      }
-    } else if (art === 'karo') {
-      for (let i = -S; i <= S; i += 12) {
-        li(-S, i, S, i)
-        li(i, -S, i, S)
-      }
-    } else if (art === 'punkte') {
-      for (let x = -S; x <= S; x += 4)
-        for (let y = -S; y <= S; y += 4) punkte.push(x, y, Z)
-    } else if (art === 'dielen') {
-      // Bretter längs, Stöße versetzt.
-      const B = 2.4
-      let r = 0
-      for (let y = -S; y <= S; y += B) {
-        li(-S, y, S, y)
-        let x = -S + rnd(r * 7.3) * 8
-        while (x < S) {
-          li(x, y, x, y + B)
-          x += 7 + rnd(r * 13.7 + x) * 9
-        }
-        r++
-      }
-    } else if (art === 'tanzboden') {
-      // Verlegte Bahnen: nur die Nähte.
-      for (let x = -S; x <= S; x += 20) li(x, -S, x, S)
-    } else if (art === 'schraffur') {
-      for (let c = -2 * S; c <= 2 * S; c += 7) {
-        const t0 = Math.max(-S, -S - c)
-        const t1 = Math.min(S, S - c)
-        if (t1 > t0) li(t0, t0 + c, t1, t1 + c)
-      }
-    } else if (art === 'kreide') {
-      // Angeschnittene Kreise, wie mit Kreide angerissen.
-      for (let k = 0; k < 14; k++) {
-        const cx = (rnd(k * 3.1) - 0.5) * 1.7 * S
-        const cy = (rnd(k * 5.7) - 0.5) * 1.3 * S
-        const r = 3 + rnd(k * 7.9) * 9
-        const a0 = rnd(k * 11.3) * Math.PI * 2
-        const span = (0.5 + rnd(k * 13.1) * 1.3) * Math.PI
-        const nSeg = 28
-        for (let s = 0; s < nSeg; s++) {
-          const a = a0 + (span * s) / nSeg
-          const b = a0 + (span * (s + 1)) / nSeg
-          li(cx + Math.cos(a) * r, cy + Math.sin(a) * r, cx + Math.cos(b) * r, cy + Math.sin(b) * r)
-        }
-      }
-    } else if (art === 'grundriss') {
-      // Technische Bühnenzeichnung: Kante, Mittellinien, Spielkreise.
-      const W = 150
-      const H = 66
-      li(-W / 2, -H / 2, W / 2, -H / 2)
-      li(-W / 2, H / 2, W / 2, H / 2)
-      li(-W / 2, -H / 2, -W / 2, H / 2)
-      li(W / 2, -H / 2, W / 2, H / 2)
-      for (let y = -H / 2; y < H / 2; y += 4) li(0, y, 0, y + 2)
-      for (let x = -W / 2; x < W / 2; x += 4) li(x, 0, x + 2, 0)
-      for (const r of [16, 30, 44]) {
-        const nSeg = 48
-        for (let s = 0; s < nSeg; s++) {
-          const a = (Math.PI * s) / nSeg
-          const b = (Math.PI * (s + 1)) / nSeg
-          li(Math.cos(a) * r, -H / 2 + Math.sin(a) * r, Math.cos(b) * r, -H / 2 + Math.sin(b) * r)
-        }
-      }
-    } else if (art === 'spike') {
-      // Spike-Marken in den Projektfarben, kreuz und quer.
-      const farben = Object.values(FARBEN)
-      for (let k = 0; k < 120; k++) {
-        const x = (rnd(k * 2.3) - 0.5) * 2 * S
-        const y = (rnd(k * 4.9) - 0.5) * 1.5 * S
-        const w = rnd(k * 6.1) * Math.PI
-        const l = 0.9 + rnd(k * 8.3) * 0.9
-        const f = farben[Math.floor(rnd(k * 9.7) * farben.length)]
-        const pts = tape.get(f) ?? []
-        const dx = Math.cos(w) * l
-        const dy = Math.sin(w) * l
-        pts.push(x - dx, y - dy, Z, x + dx, y + dy, Z)
-        if (rnd(k * 12.7) > 0.35) pts.push(x + dy, y - dx, Z, x - dy, y + dx, Z)
-        tape.set(f, pts)
+    const W = GR_W
+    const H = GR_H
+    const pts: number[] = []
+    const li = (x1: number, y1: number, x2: number, y2: number) => pts.push(x1, y1, Z, x2, y2, Z)
+    const kreis = (cx: number, cy: number, r: number, von = 0, bis = Math.PI * 2, nSeg = 48) => {
+      for (let s = 0; s < nSeg; s++) {
+        const a = von + ((bis - von) * s) / nSeg
+        const b = von + ((bis - von) * (s + 1)) / nSeg
+        li(cx + Math.cos(a) * r, cy + Math.sin(a) * r, cx + Math.cos(b) * r, cy + Math.sin(b) * r)
       }
     }
-    return { linien, punkte, tape }
+
+    // Basis: Bühnenkante und gestrichelte Mittellinien.
+    li(-W / 2, -H / 2, W / 2, -H / 2)
+    li(-W / 2, H / 2, W / 2, H / 2)
+    li(-W / 2, -H / 2, -W / 2, H / 2)
+    li(W / 2, -H / 2, W / 2, H / 2)
+    for (let y = -H / 2; y < H / 2; y += 4) li(0, y, 0, y + 2)
+    for (let x = -W / 2; x < W / 2; x += 4) li(x, 0, x + 2, 0)
+
+    if (art === 'spielkreise') {
+      for (const r of [16, 30, 44]) kreis(0, -H / 2, r, 0, Math.PI)
+    } else if (art === 'drehscheibe') {
+      kreis(0, 0, 24, 0, Math.PI * 2, 72)
+      kreis(0, 0, 7.5)
+      // Teilungsmarken am Rand der Scheibe.
+      for (let k = 0; k < 12; k++) {
+        const a = (Math.PI * 2 * k) / 12
+        li(Math.cos(a) * 22, Math.sin(a) * 22, Math.cos(a) * 24, Math.sin(a) * 24)
+      }
+    } else if (art === 'gassen') {
+      // Gassen: Beine von den Seiten, Portal an der Vorderkante.
+      for (let k = 1; k <= 4; k++) {
+        const y = -H / 2 + (H * k) / 5
+        li(-W / 2, y, -W / 2 + 22, y)
+        li(W / 2 - 22, y, W / 2, y)
+      }
+      for (const x of [-40, 40]) {
+        li(x, -H / 2, x, -H / 2 + 7)
+        li(x + (x < 0 ? 1.4 : -1.4), -H / 2, x + (x < 0 ? 1.4 : -1.4), -H / 2 + 7)
+      }
+    } else if (art === 'zuege') {
+      // Zugstangen mit Endmarken, wie im Schnürbodenplan.
+      for (let y = -H / 2 + 8; y <= H / 2 - 4; y += 4.5) {
+        li(-W / 2 + 10, y, W / 2 - 10, y)
+        li(-W / 2 + 10, y - 0.8, -W / 2 + 10, y + 0.8)
+        li(W / 2 - 10, y - 0.8, W / 2 - 10, y + 0.8)
+      }
+    } else if (art === 'podeste') {
+      // Praktikabel, kreuzweise diagonal markiert.
+      for (let k = 0; k < 7; k++) {
+        const bw = 10 + rnd(k * 3.7) * 10
+        const bh = 6 + rnd(k * 5.3) * 7
+        const x = (rnd(k * 7.1) - 0.5) * (W - bw - 14)
+        const y = (rnd(k * 9.7) - 0.5) * (H - bh - 10)
+        li(x - bw / 2, y - bh / 2, x + bw / 2, y - bh / 2)
+        li(x - bw / 2, y + bh / 2, x + bw / 2, y + bh / 2)
+        li(x - bw / 2, y - bh / 2, x - bw / 2, y + bh / 2)
+        li(x + bw / 2, y - bh / 2, x + bw / 2, y + bh / 2)
+        li(x - bw / 2, y - bh / 2, x + bw / 2, y + bh / 2)
+      }
+    } else if (art === 'lichtplan') {
+      // Traversen mit Scheinwerfersymbolen (Kreis + Richtungsstrich).
+      for (const ty of [26, 0, -26]) {
+        li(-W / 2 + 15, ty, W / 2 - 15, ty)
+        for (let x = -W / 2 + 21; x <= W / 2 - 21; x += 12) {
+          kreis(x, ty, 1.6, 0, Math.PI * 2, 12)
+          li(x, ty, x, ty - 3.2)
+        }
+      }
+    } else if (art === 'sichtlinien') {
+      // Zuschauerreihen vor der Rampe, mit zwei Gängen; Sichtlinien.
+      for (let r = 10; r <= 38; r += 4) {
+        kreis(0, -H / 2, r, Math.PI + 0.35, Math.PI + 1.25, 12)
+        kreis(0, -H / 2, r, Math.PI + 1.45, Math.PI + 1.85, 8)
+        kreis(0, -H / 2, r, Math.PI + 2.05, Math.PI + 2.95, 12)
+      }
+      li(-W / 2, -H / 2, 0, H / 2)
+      li(W / 2, -H / 2, 0, H / 2)
+    }
+    return liniengeo(pts)
   }, [art])
 
   return (
+    <lineSegments geometry={geo}>
+      <lineBasicMaterial color={farbe} transparent opacity={alpha} toneMapped={false} />
+    </lineSegments>
+  )
+}
+
+// Fundstücke aus dem Bühnenbau — gemeinfreie bzw. CC-lizenzierte Fotos und
+// Čapek-Illustrationen (Quellen: public/images/fundus/LIZENZEN.txt), in
+// Graustufen als Referenzbilder neben dem Grundriss.
+const FUNDUS: { datei: string; ar: number; p: [number, number]; rot: number; breite: number }[] = [
+  { datei: 'capek-30', ar: 0.903, p: [-70, 34.5], rot: -3, breite: 9 },
+  { datei: 'gegengewicht', ar: 1.333, p: [-37, 37], rot: 2, breite: 10.5 },
+  { datei: 'schnuerboden', ar: 1.497, p: [-1, 38], rot: -2, breite: 11 },
+  { datei: 'capek-122', ar: 0.848, p: [33, 35.5], rot: 3, breite: 8.5 },
+  { datei: 'ghostlight', ar: 1.505, p: [67, 34], rot: -2, breite: 10 },
+  { datei: 'capek-82', ar: 0.745, p: [-76, -34], rot: 2, breite: 8.5 },
+  { datei: 'rolle', ar: 1.333, p: [-31, -37], rot: -3, breite: 10 },
+  { datei: 'buehnenzuege', ar: 0.784, p: [19, -36], rot: 2, breite: 8 },
+  { datei: 'capek-150', ar: 0.807, p: [63, -35], rot: -2, breite: 9 },
+]
+
+function Fundus() {
+  const BASE = import.meta.env.BASE_URL
+  return (
     <>
-      {linien.length > 0 && (
-        <lineSegments geometry={liniengeo(linien)}>
-          <lineBasicMaterial color={farbe} transparent opacity={alpha} toneMapped={false} />
-        </lineSegments>
-      )}
-      {punkte.length > 0 && (
-        <points geometry={liniengeo(punkte)}>
-          <pointsMaterial color={farbe} size={2.5} sizeAttenuation={false} transparent opacity={Math.min(1, alpha * 2)} toneMapped={false} />
-        </points>
-      )}
-      {[...tape.entries()].map(([f, pts]) => (
-        <lineSegments key={f} geometry={liniengeo(pts)}>
-          <lineBasicMaterial color={f} transparent opacity={0.85} toneMapped={false} />
-        </lineSegments>
+      {FUNDUS.map((f) => (
+        <Foto
+          key={f.datei}
+          url={`${BASE}images/fundus/${f.datei}.jpg`}
+          breite={f.breite}
+          ar={f.ar}
+          position={[f.p[0], f.p[1], -0.15]}
+          rotation={[0, 0, (f.rot * Math.PI) / 180]}
+          materialProps={{ opacity: 0.6 }}
+        />
       ))}
     </>
   )
@@ -597,6 +607,7 @@ export default function Boden() {
           <Kamera ctrl={ctrl} />
           <Muster art={MUSTER[musterIdx].id} farbe={licht.raster} alpha={licht.alpha} />
           <Suspense fallback={null}>
+            <Fundus />
             {PROJEKTE.map((p, i) => (
               <Markierung
                 key={p.slug}
