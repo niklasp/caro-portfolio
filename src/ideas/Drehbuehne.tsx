@@ -58,9 +58,9 @@ void main() {
   vec3 alt = texture2D(uAlt, abdecken(uv, uAltA)).rgb;
   vec3 neu = texture2D(uBild, abdecken(uv, uBildA)).rgb;
   vec3 farbe = mix(alt, neu, smoothstep(0.0, 1.0, uMix));
-  // stark abgedunkelt, zur Mitte hin etwas offener — als Projektion heller
-  float vig = smoothstep(1.1, 0.3, distance(vUv, vec2(0.5, 0.42)));
-  farbe *= (0.10 + 0.26 * vig) * uHell;
+  // abgeschattet, zur Mitte hin offen — als Projektion noch heller
+  float vig = smoothstep(1.15, 0.3, distance(vUv, vec2(0.5, 0.42)));
+  farbe *= (0.24 + 0.42 * vig) * uHell;
   // Dithering gegen sichtbare Farbstufen im Dunkeln
   farbe += (zufall(vUv * 917.0 + fract(uZeit)) - 0.5) / 96.0;
   gl_FragColor = vec4(farbe, 1.0);
@@ -149,7 +149,7 @@ function Hintergrund({ src, hell, video }: { src: string; hell: boolean; video?:
     material.uniforms.uZeit.value = clock.elapsedTime
     material.uniforms.uMix.value = Math.min(1, (material.uniforms.uMix.value as number) + dt * 1.3)
     const u = material.uniforms.uHell
-    u.value += ((hell || video ? 2.3 : 1) - (u.value as number)) * (1 - Math.exp(-4 * dt))
+    u.value += ((hell || video ? 1.7 : 1) - (u.value as number)) * (1 - Math.exp(-4 * dt))
     // Maus oben → Bildfokus oben, unten → unten
     const uf = material.uniforms.uFokus
     uf.value += (0.5 - maus.y * 0.5 - (uf.value as number)) * (1 - Math.exp(-3 * dt))
