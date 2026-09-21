@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import Landing from './pages/Landing'
 import Lebenslauf from './pages/Lebenslauf'
+import About from './pages/About'
 import Boden from './ideas/Boden'
 import Drehbuehne from './ideas/Drehbuehne'
 import Schnuerboden from './ideas/Schnuerboden'
@@ -33,6 +34,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/lebenslauf" element={<Lebenslauf />} />
+        <Route path="/about" element={<About />} />
         <Route path="/boden/:projekt?" element={<Boden />} />
         <Route path="/drehbuehne/:projekt?" element={<Drehbuehne />} />
         <Route path="/schnuerboden/:projekt?" element={<Schnuerboden />} />

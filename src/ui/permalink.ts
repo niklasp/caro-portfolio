@@ -8,16 +8,17 @@ export function useProjektAusUrl(): Projekt | undefined {
   return findByPermalink(link)
 }
 
-export function useProjektUrlSync(basis: string, projekt: Projekt | null | undefined) {
+// `anhang` (z. B. '#projekt') bleibt beim Synchronisieren an der URL hängen.
+export function useProjektUrlSync(basis: string, projekt: Projekt | null | undefined, anhang = '') {
   const navigate = useNavigate()
   useEffect(() => {
     if (projekt) {
       document.title = `${projekt.titel} (${projekt.jahr}) — Carolin Pflüger`
-      navigate(`${basis}/${permalink(projekt)}`, { replace: true })
+      navigate(`${basis}/${permalink(projekt)}${anhang}`, { replace: true })
     } else {
       document.title = 'Carolin Pflüger — Bühne und Kostüm'
     }
-  }, [basis, navigate, projekt])
+  }, [basis, navigate, projekt, anhang])
 }
 
 export const startIndexAusUrl = (link: string | undefined): number => {

@@ -182,11 +182,29 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   padding-bottom: 6px;
   margin-bottom: 28px;
 }
+.lebenslauf h2.ll-kopf { display: flex; justify-content: space-between; align-items: baseline; }
+.lebenslauf h2.ll-kopf a:hover { border-bottom: var(--hairline); }
 .lebenslauf h3 { font-size: 13px; font-style: italic; font-weight: 400; margin: 26px 0 8px; }
 .ll-zeile { display: grid; grid-template-columns: 84px 1fr; gap: 12px; margin-bottom: 8px; }
 .ll-zeile .jahr { color: var(--tinte); }
 .ll-zeile em { font-style: italic; font-weight: 700; }
 .lebenslauf .werke .ll-zeile { margin-bottom: 12px; }
+/* Werkliste: Zeilen mit Projekt sind Links, ihr Hauptbild folgt der Maus */
+a.ll-projekt { cursor: pointer; }
+a.ll-projekt:hover em { text-decoration: underline; text-underline-offset: 3px; }
+.ll-vorschau {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  max-width: min(220px, 22vw);
+  max-height: 28vh;
+  pointer-events: none;
+  scale: 0;
+  transition: scale 0.32s cubic-bezier(0.3, 0, 0.6, 0.2);
+  will-change: translate, scale;
+}
+.ll-vorschau.offen { scale: 1; transition: scale 0.38s cubic-bezier(0.2, 1.3, 0.4, 1); }
 @media (max-width: 800px) {
   .lebenslauf { grid-template-columns: 1fr; gap: 40px; }
 }
@@ -583,9 +601,118 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 .db-beschreibung .db-credits div { margin-bottom: 2px; }
 .db-beschreibung .db-links { margin-top: 12px; }
 .db-beschreibung .db-links a { border-bottom: 1px solid rgba(255, 255, 255, 0.6); margin-right: 14px; }
-@media (max-width: 1100px) {
-  .db-beschreibung { display: none; }
+/* Schmal (Telefon, Hochformat — dieselbe Grenze wie istSchmal in Drehbuehne.tsx): auf der
+   Bühne keine Beschreibung; in der Detailansicht steht sie unter dem Bildraster und scrollt. */
+@media (max-width: 899px), (max-aspect-ratio: 11/10) {
+  .db .db-beschreibung {
+    display: none;
+    width: auto;
+    font-size: 14px;
+    transform: none !important;
+    translate: none !important;
+  }
+  /* Detail: die ganze Seite scrollt — Bildraster (im Canvas, rollt mit), darunter Text, dann der Titel. */
+  .db.detail { display: flex; flex-direction: column; min-height: 100%; padding-bottom: 48px; }
+  .db.detail .db-beschreibung {
+    display: block;
+    position: static;
+    order: 1;
+    margin: calc(var(--raster-unten) + 20px) 24px 0;
+    animation: ov-ein 0.6s 0.45s both;
+  }
+  .db.detail .sb-titel { position: static; order: 2; margin: 32px 24px 0; max-width: none; }
+  .db.detail .buehne canvas { touch-action: pan-y; }
+  /* Beim Scrollen verschwinden Raster und Text unter Kopf und Zurück-Knopf, statt sie zu überlagern. */
+  .db.detail::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 96px;
+    background: linear-gradient(var(--db-grund) 68px, transparent);
+    z-index: 34;
+    pointer-events: none;
+  }
+  .db .db-beschreibung .db-titel { display: none; } /* der große Titel steht schon unten */
+  .db .hinweis, .db-stellwerk { display: none; }
+  .db .sb-titel { bottom: 56px; max-width: calc(100vw - 48px); }
+  .db .sb-titel h2 { font-size: clamp(26px, 8vw, 44px); }
+  .db .db-kategorien { top: 44px; gap: 14px; }
+  .db .db-zurueck { top: 44px; }
+  .db.detail .kopf .name .unter { display: none; }
+  .db.detail .fuss { display: none; } /* steht schon über der Beschreibung */
 }
+@keyframes ov-ein { from { opacity: 0; } to { opacity: 1; } }
+
+/* Kategorien — die drei Seiten der Münze */
+.db-kategorien {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  display: flex;
+  gap: 18px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.db-kategorien button { color: var(--db-matt); padding-bottom: 1px; border-bottom: 1px solid transparent; }
+.db-kategorien button:hover { color: var(--db-text); }
+.db-kategorien button.aktiv { color: var(--db-text); border-bottom-color: var(--db-text); }
+
+/* Detailansicht: dieselbe Seite, nur umgeräumt — die Bühnen-Bedienung tritt zurück,
+   die Beschreibung rückt neben das Bildraster und wächst auf Lesegröße. */
+.db-zurueck {
+  position: fixed;
+  left: 24px;
+  top: 46px;
+  z-index: 35;
+  font-size: 12px;
+  border-bottom: 1px solid transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.db-zurueck:hover { border-bottom-color: currentColor; }
+.db.detail .db-zurueck { opacity: 1; pointer-events: auto; }
+.db .db-kategorien, .db .db-wenden, .db .db-zaehler, .db .sb-titel, .db .hinweis { transition: opacity 0.4s; }
+.db .db-zaehler { opacity: 0; }
+.db.detail .db-zaehler { opacity: 1; }
+.db.detail .db-kategorien, .db.detail .db-wenden { opacity: 0; pointer-events: none; }
+.db .db-beschreibung {
+  transform-origin: bottom right;
+  transition: transform 0.95s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.3s;
+}
+.db.detail .db-beschreibung { transform: translateY(-20vh) scale(1.23); }
+/* Steht ein Foto groß vor der Kamera, tritt die Schrift zurück. */
+.db.gross .sb-titel, .db.gross .db-beschreibung, .db.gross .hinweis { opacity: 0; pointer-events: none; }
+
+/* Farben aus dem Stellwerk (dat.gui): Text und Hintergrund der Drehbühne */
+.db {
+  --db-text: #fff;
+  --db-grund: #0c0c0c;
+  --db-matt: color-mix(in srgb, var(--db-text) 55%, transparent);
+  color: var(--db-text);
+}
+.db .kopf.hell, .db .fuss.hell, .db .kopf.hell .name .unter { color: var(--db-text); }
+.db .kopf.hell nav a.aktiv, .db .kopf.hell nav a:hover { border-color: var(--db-text); }
+.db .entwurf-schalter.hell, .db .entwurf-schalter.hell a, .db .hinweis.hell, .db .sb-titel .sb-meta { color: var(--db-matt); }
+.db .entwurf-schalter.hell a.aktiv, .db .entwurf-schalter.hell a:hover { color: var(--db-text); }
+.db .db-beschreibung { color: var(--db-text); }
+.db .db-beschreibung .db-meta { color: var(--db-matt); }
+.db .db-beschreibung .db-blurb { color: color-mix(in srgb, var(--db-text) 92%, transparent); }
+.db .db-beschreibung .db-credits { color: color-mix(in srgb, var(--db-text) 70%, transparent); }
+.db .db-beschreibung .db-links a { border-bottom-color: color-mix(in srgb, var(--db-text) 60%, transparent); }
+
+.db-stellwerk {
+  position: fixed;
+  top: 44px;
+  right: 16px;
+  z-index: 60;
+}
+/* Scrollen nur in der Liste — am Panel selbst würde overflow den Öffnen-Balken abschneiden. */
+.db-stellwerk > ul { max-height: calc(100vh - 90px); overflow-y: auto; }
+.db-stellwerk .property-name { width: 46%; }
+.db-stellwerk .c { width: 54%; }
 
 /* Video auf dem Rundhorizont (Drehbühne) — füllt die Fläche,
    auf der sonst das projizierte Bild liegt. */

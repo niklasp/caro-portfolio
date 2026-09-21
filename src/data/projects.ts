@@ -20,6 +20,15 @@ export interface ProjektLink {
 
 export type ProjektArt = 'bühne' | 'kostüm' | 'beides' | 'intervention'
 
+// Die drei Seiten der Drehbühne — jede Bühne zeigt eine Kategorie.
+export type Kategorie = 'theater' | 'kunstvermittlung' | 'bildende-kunst'
+
+export const KATEGORIEN: { id: Kategorie; name: string }[] = [
+  { id: 'theater', name: 'Theater' },
+  { id: 'kunstvermittlung', name: 'Kunstvermittlung' },
+  { id: 'bildende-kunst', name: 'Bildende Kunst' },
+]
+
 export interface Projekt {
   slug: string
   titel: string
@@ -28,6 +37,7 @@ export interface Projekt {
   jahrNum: number
   ort: string
   art: ProjektArt
+  kategorie: Kategorie
   farbe: string
   blurb: string
   credits: string[]
@@ -47,6 +57,7 @@ const img = (slug: string, n: number, w: number, h: number): Bild => ({
 })
 
 // Reihenfolge = Reihenfolge im gedruckten Portfolio.
+// Kategorie: vorläufige Zuordnung — Theater = Bühne/Kostüm, der Rest nach Augenmaß.
 export const PROJEKTE: Projekt[] = [
   {
     slug: 'um-ordnen',
@@ -56,6 +67,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2021.5,
     ort: 'urbaner Raum, Berlin',
     art: 'intervention',
+    kategorie: 'bildende-kunst',
     farbe: FARBEN.orange,
     blurb:
       'Berlin ist voll mit Dingen. Oder ist es voll mit Müll? Was einmal wertvoll war, wird plötzlich zum Abfall — weggeworfen, vergessen, liegen gelassen. Wir steigen ein, mitten in den Verfall. Dokumentieren. Sortieren. Spielen. Wir ordnen die Unordnung. Oder wir ordnen die Unordnung um.',
@@ -74,6 +86,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2026,
     ort: 'performativer Müllwalk',
     art: 'intervention',
+    kategorie: 'bildende-kunst',
     farbe: FARBEN.magenta,
     blurb:
       'Ein performativer Walk im öffentlichen Raum, der sich mit Müll, körperlicher Arbeit und geschlechtlich codierten Zuschreibungen von Gewicht, Wert und Sichtbarkeit auseinandersetzt. Wer trägt was — und unter welchen Bedingungen? Der Weg zur Entsorgungsstelle wird zur Choreografie.',
@@ -91,6 +104,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2026,
     ort: 'Theater Freiburg',
     art: 'kostüm',
+    kategorie: 'theater',
     farbe: FARBEN.blau,
     blurb:
       '»Wanted: Wilder Westen trifft queere Liebe!« In einer dystopischen Zukunft erzählt das Stück von einem queeren Paar, dessen geplante Hochzeit durch das Verbot der gleichgeschlechtlichen Ehe in Ohio verhindert wird. Eine rebellische Neuerzählung amerikanischer Geschichte als queerer Western.',
@@ -105,6 +119,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2026,
     ort: 'Theater für Niedersachsen',
     art: 'beides',
+    kategorie: 'theater',
     farbe: FARBEN.blau,
     blurb:
       'Eine Versuchsanordnung. Text, Schauspiel, Tanz, Ausstattung, Licht und Musik sind nicht aufeinander abgestimmt. Die Positionen gehen improvisiert und reagierend in ein Gespräch auf Augenhöhe — ein Gespräch, an dem auch das Publikum teilnimmt.',
@@ -119,6 +134,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2025,
     ort: 'Staatstheater Braunschweig',
     art: 'bühne',
+    kategorie: 'theater',
     farbe: FARBEN.orange,
     blurb:
       'In »LOST« forschen wir nach den körperlichen Reaktionen der allgegenwärtigen paralysierenden Überforderung. Zwischen Ekstase und Erschöpfung, Fluktuation, Stagnation und Stillstand glauben wir fest daran, uns gemeinsam aus der Erstarrung zu lösen. Tanzperformance beim tanzstark! Festival.',
@@ -133,6 +149,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2025,
     ort: 'Das Weite Theater Berlin',
     art: 'beides',
+    kategorie: 'theater',
     farbe: FARBEN.blau,
     blurb:
       'Kindertheater ab 4 Jahren. Bei dem Versuch, einen neuen Stern zu erschaffen, stellen die beiden Weltenbauer*innen so Einiges her, nur keinen strahlenden Himmelskörper. Von der Erkenntnis, dass Scheitern auch Schönheit hervorbringen kann. Mit Rauch, Licht und ein bisschen Magie.',
@@ -147,6 +164,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2025,
     ort: 'Theater Bremen',
     art: 'beides',
+    kategorie: 'theater',
     farbe: FARBEN.pink,
     blurb:
       'Uraufführung nach dem Roman von Sven Pfizenmaier. In einem Dorf in Niedersachsen verschwinden junge Menschen. Die inneren Konflikte des Coming-of-Age, der Wunsch nach Zugehörigkeit sowie die Suche nach Glück werden in einer fantastisch-komischen Formsprache nach außen getragen.',
@@ -161,6 +179,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2024,
     ort: 'Theaterhaus Jena',
     art: 'kostüm',
+    kategorie: 'theater',
     farbe: FARBEN.orange,
     blurb:
       '»If the past gets twisted all the time, what’s the base for research?« Leon Pfannenmüller und Maxim Mamochkin schlüpfen versuchsweise in die Figuren ihrer Großmütter. Sie streiten, tanzen und singen — was versperrt den Blick in die Vergangenheit?',
@@ -175,6 +194,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2024,
     ort: 'Theaterhaus Jena',
     art: 'beides',
+    kategorie: 'theater',
     farbe: FARBEN.orange,
     blurb:
       'Eine Frau begeht einen Tabubruch: Nach einem Unfall und einer scheinbaren Amnesie entscheidet sie sich für eine neue Identität. Jenseits ihrer Rolle als Mutter und Ehefrau sucht sie nach einem neuen Platz — vielleicht in einem anderen Universum. Eingeladen zum Heidelberger Stückemarkt 2025.',
@@ -189,6 +209,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2024,
     ort: 'Theaterhaus Jena',
     art: 'beides',
+    kategorie: 'theater',
     farbe: FARBEN.magenta,
     blurb:
       'Die vier Bewohner*innen einer WG in einem Haus in einer Straßenkurve haben die Wahrscheinlichkeit, dass ein Auto in ihr Zuhause fahren wird, gut berechnet. Also bleibt ihnen wohl nichts anderes übrig, als darauf zu warten. Warum kam ihnen nicht die Idee, nicht zu warten?',
@@ -203,6 +224,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2023,
     ort: 'Theaterhaus Jena',
     art: 'kostüm',
+    kategorie: 'theater',
     farbe: FARBEN.magenta,
     blurb:
       'Eine Vorstellung über Finsternis, Schönheit und Vergebung, basierend auf einer wahren Begebenheit. Eine Koproduktion mit Wunderbaum. Eingeladen zum Berliner Theatertreffen 2024 und zum Heidelberger Stückemarkt 2024.',
@@ -217,6 +239,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2023,
     ort: 'Theaterhaus Jena',
     art: 'kostüm',
+    kategorie: 'theater',
     farbe: FARBEN.blau,
     blurb:
       '»Das hat mir gerade noch gefehlt… Immer, wenn ich einen Stein umdrehe, sehe ich mein eigenes Gesicht.« Stückentwicklung am Theaterhaus Jena, eine Koproduktion mit dem Theater Rotterdam.',
@@ -231,11 +254,12 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2023,
     ort: 'Theaterhaus Jena',
     art: 'kostüm',
+    kategorie: 'theater',
     farbe: FARBEN.blau,
     blurb:
       'Für die Stückentwicklung »Knast« spielen die Spieler*innen des Theaterhaus Jena die Theatergruppe der JVA Hohenleuben unter dem Coaching der Theatergruppe JVA Hohenleuben.',
     credits: ['Konzept und Regie: Leon Pfannenmüller', 'Kostüm: Carolin Pflüger', 'Premiere: 03.03.2023'],
-    bilder: [img('knast', 1, 1080, 618), img('knast', 2, 1080, 467), img('knast', 3, 553, 1080), img('knast', 4, 1080, 1080), img('knast', 5, 1080, 1080), img('knast', 6, 1080, 1080)],
+    bilder: [img('knast', 1, 1080, 618), img('knast', 2, 1080, 467), img('knast', 3, 553, 1080), img('knast', 4, 1080, 1080), img('knast', 5, 1080, 1080), img('knast', 6, 1080, 1080), img('knast', 7, 1077, 1080), img('knast', 8, 1080, 1080), img('knast', 9, 1080, 1080), img('knast', 10, 1080, 1080), img('knast', 11, 1077, 1080)],
   },
   {
     slug: 'parachutes',
@@ -245,6 +269,7 @@ export const PROJEKTE: Projekt[] = [
     jahrNum: 2021,
     ort: '48 Stunden Neukölln',
     art: 'intervention',
+    kategorie: 'kunstvermittlung',
     farbe: FARBEN.pink,
     blurb:
       'Eine multimediale, interdisziplinäre und digitale Ausstellung zum Thema Luft, deren Werke mit Hilfe von Fallschirmen im Stadtraum sichtbar und aufrufbar gemacht werden. QUO möchte eine Brücke zwischen Luft und Erde, Vergangenheit und Zukunft, Digital- und Stadtraum schaffen.',
@@ -267,6 +292,7 @@ export const permalink = (p: Projekt): string => `${p.slug}-${Math.floor(p.jahrN
 export const findByPermalink = (link: string | null | undefined): Projekt | undefined =>
   PROJEKTE.find((p) => permalink(p) === link)
 
+export const byKategorie = (k: Kategorie): Projekt[] => PROJEKTE.filter((p) => p.kategorie === k)
 export const byArt = (art: ProjektArt): Projekt[] => PROJEKTE.filter((p) => p.art === art)
 export const findProjekt = (slug: string | null | undefined): Projekt | undefined =>
   PROJEKTE.find((p) => p.slug === slug)

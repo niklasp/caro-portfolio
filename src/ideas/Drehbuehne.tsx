@@ -1,33 +1,166 @@
-import { useEffect, useMemo, useRef, useState, Suspense, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, Suspense, type RefObject } from 'react'
 import { Canvas, useFrame, useLoader, useThree, type ThreeElements } from '@react-three/fiber'
 import * as THREE from 'three'
-import { PROJEKTE, type Projekt } from '../data/projects'
-import { useParams } from 'react-router-dom'
-import { startIndexAusUrl, useProjektUrlSync } from '../ui/permalink'
-import { Kopf, Fuss, EntwurfSchalter } from '../ui/Chrome'
+import { KATEGORIEN, byKategorie, findByPermalink, type Projekt } from '../data/projects'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useProjektUrlSync } from '../ui/permalink'
+import { Kopf, Fuss } from '../ui/Chrome'
 import { flags } from '../ui/flags'
 import { daempf } from './helpers'
+import { cfg, useDrehConfig, LICHT_WIRKUNG, type DrehConfig, type Leinwand, type Licht } from './drehConfig'
+import { ledRaster } from './ledSchrift'
 
 // Entwurf 2 — Die Drehbühne.
 // Ein schwarzer Bühnenraum mit einem echten Verfolger: Die Maus führt das
 // Licht, die Fotos stehen als beleuchtete Blöcke auf der Drehscheibe, und
 // hinten hängt — stark abgedunkelt — das Hauptmotiv des vordersten Projekts.
+// Die Scheibe lässt sich wenden wie eine Münze: jede Seite trägt eine
+// Kategorie, am Rand läuft ihr Name als rote LED-Laufschrift. Ein Klick auf
+// ein Foto der vordersten Kulisse öffnet das Projekt: dieselben Fotos heben von
+// der Scheibe ab und ordnen sich vor der Kamera zum Bildraster wie im
+// gedruckten Portfolio, die übrigen Bilder des Projekts kommen dazu.
 
-const N = PROJEKTE.length
-const SCHRITT = (Math.PI * 2) / N
+const SAMMLUNG = KATEGORIEN.map((k) => byKategorie(k.id))
 const RADIUS = 11.2
+const SCHEIBE_R = 13.4
+const SCHEIBE_H = 0.62
+const FOTO_DICKE = 0.5
+const DETAIL_HASH = '#projekt'
 
 const mod = (a: number, n: number) => ((a % n) + n) % n
+const schrittVon = (kat: number) => (Math.PI * 2) / SAMMLUNG[kat].length
 
 interface DrehCtrl {
   ang: number
   tang: number
 }
 
+// Wenden: flip läuft fziel hinterher, ein Vielfaches von π pro Seite.
+interface WendeCtrl {
+  flip: number
+  fziel: number
+}
+
+// Detailansicht: t läuft 0 → 1, gross ist das Foto, das vor der Kamera steht.
+interface DetailCtrl {
+  offen: boolean
+  t: number
+  gross: number | null
+  grossT: number
+}
+
+// Aufstellung der drei Fotos einer Kulisse.
+const LAGEN = [
+  { x: -0.85, z: 0.07, b: 2.6, ry: 0.05 },
+  { x: 1.18, z: 0.6, b: 1.68, ry: -0.12 },
+  { x: 0.28, z: 1.15, b: 1.35, ry: 0.09 },
+]
+
+const KAMERA_HEIM = new THREE.Vector3(0, 3.1, 28.5)
+const BLICK_HEIM = new THREE.Vector3(0, 2.0, 0)
+const FOV = 34
+// Schmale Fenster (Hochformat, Telefon): der Blick wird weiter, damit die Bühne in
+// der Breite nicht abgeschnitten wird — mindestens 46° waagrecht, höchstens 75° senkrecht.
+const fovFuer = (aspekt: number) =>
+  THREE.MathUtils.clamp(THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(23)) / aspekt)), FOV, 75)
+// Ab hier gilt das schmale Layout — dieselbe Grenze steht in styles.css (.db … @media).
+const istSchmal = (breite: number, hoehe: number) => breite < 900 || breite / hoehe < 1.1
+
 // Normierte Mausposition — führt Verfolger und Blickpunkt.
 const maus = { x: 0, y: 0 }
 
+const weich = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2)
+
+// ---------- Bildraster der Detailansicht ----------
+// Im Kameraraum, RASTER_D vor der Kamera: links das Raster, rechts bleibt Platz
+// für die Beschreibung, unten links für den Titel — wie eine Seite im Portfolio.
+
+const RASTER_D = 12
+const RASTER_LUECKE = 0.09
+
+interface Zelle {
+  x: number // Mitte
+  y: number
+  b: number
+  h: number
+}
+
+const sichtfeld = (aspekt: number, abstand = RASTER_D) => {
+  const h = 2 * abstand * Math.tan(THREE.MathUtils.degToRad(fovFuer(aspekt) / 2))
+  return { b: h * aspekt, h }
+}
+// Schmales Layout: die Seite scrollt, das Bildraster im Kameraraum rollt mit (Pixel).
+const rollen = { px: 0 }
+const rollWelt = (aspekt: number, hoehePx: number) => (rollen.px / hoehePx) * sichtfeld(aspekt).h
+
+// Zeilen im Blocksatz: jede Zeile füllt die Breite, die Bilder behalten ihr Format.
+// Bei höchstens elf Bildern lassen sich alle Zeilenumbrüche durchprobieren — es
+// gewinnt die Aufteilung mit der größten Bildfläche bei möglichst gleich hohen Zeilen.
+const rasterCache = new Map<string, Zelle[]>()
+
+function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
+  const schluessel = `${Math.round(breite)}x${Math.round(hoehe)}|${ars.join()}`
+  const fertig = rasterCache.get(schluessel)
+  if (fertig) return fertig
+  if (rasterCache.size > 400) rasterCache.clear() // beim Ziehen am Fenster sammelt sich sonst jede Größe an
+
+  const sicht = sichtfeld(breite / hoehe)
+  const schmal = istSchmal(breite, hoehe)
+  const links = -0.44 * sicht.b
+  const oben = 0.36 * sicht.h
+  // Breit: rechts bleibt die Spalte der Beschreibung frei (ihre Breite in Pixeln, siehe
+  // .db-beschreibung). Schmal: das Raster nimmt die ganze Breite, der Text steht darunter.
+  const textspalte = Math.min(290, 0.3 * breite) * 1.23 + 76
+  const B = (schmal ? 0.88 : Math.min(0.64, 0.94 - textspalte / breite)) * sicht.b
+  const H = (schmal ? 0.5 : 0.55) * sicht.h // breit: endet über dem großen Titel; schmal scrollt die Seite
+  let beste: { zeilen: number[][]; hoehen: number[]; wert: number } | null = null
+
+  const pruefe = (zeilen: number[][]) => {
+    let hoehen = zeilen.map((z) => (B - RASTER_LUECKE * (z.length - 1)) / z.reduce((a, i) => a + ars[i], 0))
+    const platz = H - RASTER_LUECKE * (zeilen.length - 1)
+    const s = Math.min(1, platz / hoehen.reduce((a, h) => a + h, 0), (H * 0.66) / Math.max(...hoehen))
+    hoehen = hoehen.map((h) => h * s)
+    const flaeche = zeilen.reduce((a, z, k) => a + hoehen[k] ** 2 * z.reduce((b, i) => b + ars[i], 0), 0)
+    const wert = flaeche * Math.sqrt(Math.min(...hoehen) / Math.max(...hoehen))
+    if (!beste || wert > beste.wert) beste = { zeilen, hoehen, wert }
+  }
+  const teile = (ab: number, zeilen: number[][]) => {
+    if (ab === ars.length) return pruefe(zeilen)
+    if (zeilen.length === 4) return
+    for (let bis = ab + 1; bis <= ars.length; bis++)
+      teile(bis, [...zeilen, Array.from({ length: bis - ab }, (_, k) => ab + k)])
+  }
+  teile(0, [])
+
+  const zellen: Zelle[] = []
+  let y = oben
+  beste!.zeilen.forEach((z, k) => {
+    const h = beste!.hoehen[k]
+    let x = links
+    z.forEach((i) => {
+      zellen[i] = { x: x + (h * ars[i]) / 2, y: y - h / 2, b: h * ars[i], h }
+      x += h * ars[i] + RASTER_LUECKE
+    })
+    y -= h + RASTER_LUECKE
+  })
+  rasterCache.set(schluessel, zellen)
+  return zellen
+}
+
 // ---------- Hintergrund: abgeschattetes Hauptmotiv, mit Dithering gegen Banding ----------
+
+const HG_VERT = /* glsl */ `
+uniform float uSchirm;
+uniform vec2 uSchirmY;
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  // Schirm-Modus: die Fläche klebt am Bildschirm statt im Raum zu stehen
+  gl_Position = uSchirm > 0.5
+    ? vec4(position.x * 2.0, mix(uSchirmY.x, uSchirmY.y, uv.y), 0.9999, 1.0)
+    : projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`
 
 const HG_FRAG = /* glsl */ `
 uniform sampler2D uBild;
@@ -39,6 +172,10 @@ uniform float uAltA;
 uniform float uPlaneA;
 uniform float uHell;
 uniform float uFokus;
+uniform float uSpiegel;
+uniform float uKacheln;
+uniform float uBlende;
+uniform vec3 uGrund;
 varying vec2 vUv;
 
 float zufall(vec2 p) {
@@ -56,13 +193,19 @@ vec2 abdecken(vec2 uv, float imgA) {
 }
 
 void main() {
-  vec2 uv = vec2(1.0 - vUv.x, vUv.y); // Innenseite des Zylinders
+  vec2 uv = vec2(uSpiegel > 0.5 ? 1.0 - vUv.x : vUv.x, vUv.y); // Innenseite des Zylinders
+  // Rundum: das Motiv mehrfach nebeneinander, abwechselnd gespiegelt — die Mitte bleibt richtig herum
+  float k = uv.x * uKacheln;
+  float f = fract(k);
+  uv.x = mod(floor(k) - floor(uKacheln * 0.5), 2.0) > 0.5 ? 1.0 - f : f;
   vec3 alt = texture2D(uAlt, abdecken(uv, uAltA)).rgb;
   vec3 neu = texture2D(uBild, abdecken(uv, uBildA)).rgb;
   vec3 farbe = mix(alt, neu, smoothstep(0.0, 1.0, uMix));
   // abgeschattet, zur Mitte hin offen — als Projektion noch heller
   float vig = smoothstep(1.15, 0.3, distance(vUv, vec2(0.5, 0.42)));
   farbe *= (0.24 + 0.42 * vig) * uHell;
+  // Oberer Bildschirmteil: nach unten in den Hintergrund auslaufen
+  farbe = mix(uGrund, farbe, mix(1.0, smoothstep(0.0, 0.3, vUv.y), uBlende));
   // Dithering gegen sichtbare Farbstufen im Dunkeln
   farbe += (zufall(vUv * 917.0 + fract(uZeit)) - 0.5) / 96.0;
   gl_FragColor = vec4(farbe, 1.0);
@@ -87,12 +230,15 @@ const ladeHg = (src: string) => {
   return p
 }
 
-function Hintergrund({ src, hell, video }: { src: string; hell: boolean; video?: string }) {
+const OBEN_ANTEIL = 0.62 // „Oberer Bildschirmteil": so viel der Höhe trägt das Bild
+
+// Ein Material für alle Leinwand-Arten — die Art bestimmt nur, auf welcher Fläche es liegt.
+function useLeinwandMaterial(src: string, hell: boolean, video: string | undefined, art: Leinwand) {
   const material = useMemo(() => {
     const leer = new THREE.DataTexture(new Uint8Array([8, 8, 8, 255]), 1, 1)
     leer.needsUpdate = true
     return new THREE.ShaderMaterial({
-      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      vertexShader: HG_VERT,
       fragmentShader: HG_FRAG,
       uniforms: {
         uBild: { value: leer },
@@ -104,8 +250,13 @@ function Hintergrund({ src, hell, video }: { src: string; hell: boolean; video?:
         uPlaneA: { value: 2.85 },
         uHell: { value: 1 },
         uFokus: { value: 0.5 },
+        uSpiegel: { value: 1 },
+        uKacheln: { value: 1 },
+        uBlende: { value: 0 },
+        uSchirm: { value: 0 },
+        uSchirmY: { value: new THREE.Vector2(-1, 1) },
+        uGrund: { value: new THREE.Color() },
       },
-      side: THREE.BackSide,
     })
   }, [])
 
@@ -152,77 +303,248 @@ function Hintergrund({ src, hell, video }: { src: string; hell: boolean; video?:
     }
   }, [src, video, material])
 
-  useFrame(({ clock }, dt) => {
-    material.uniforms.uZeit.value = clock.elapsedTime
-    material.uniforms.uMix.value = Math.min(1, (material.uniforms.uMix.value as number) + dt * 1.3)
-    const u = material.uniforms.uHell
-    u.value += ((hell || video ? 1.7 : 1) - (u.value as number)) * (1 - Math.exp(-4 * dt))
+  useEffect(() => {
+    const schirm = art === 'vollbild' || art === 'oben'
+    const u = material.uniforms
+    u.uSchirm.value = schirm ? 1 : 0
+    u.uSchirmY.value.set(art === 'oben' ? 1 - 2 * OBEN_ANTEIL : -1, 1)
+    u.uBlende.value = art === 'oben' ? 1 : 0
+    u.uSpiegel.value = art === 'rundhorizont' || art === 'rundum' ? 1 : 0
+    u.uKacheln.value = art === 'rundum' ? 3 : 1
+    material.side = schirm || art === 'boden' || art === 'leinwand' ? THREE.DoubleSide : THREE.BackSide
+    material.depthTest = !schirm
+    material.depthWrite = !schirm
+    material.needsUpdate = true
+  }, [art, material])
+
+  useFrame(({ clock, size }, dt) => {
+    const u = material.uniforms
+    u.uZeit.value = clock.elapsedTime
+    u.uMix.value = Math.min(1, (u.uMix.value as number) + dt * 1.3)
+    u.uHell.value += ((hell || video ? 1.7 : 1) * cfg.leinwandHell - (u.uHell.value as number)) * (1 - Math.exp(-4 * dt))
     // Maus oben → Bildfokus oben, unten → unten
-    const uf = material.uniforms.uFokus
-    uf.value += (0.5 - maus.y * 0.5 - (uf.value as number)) * (1 - Math.exp(-3 * dt))
+    u.uFokus.value += (0.5 - maus.y * 0.5 - (u.uFokus.value as number)) * (1 - Math.exp(-3 * dt))
+    ;(u.uGrund.value as THREE.Color).set(cfg.grund)
+    const bildschirm = size.width / size.height
+    u.uPlaneA.value =
+      art === 'vollbild'
+        ? bildschirm
+        : art === 'oben'
+          ? bildschirm / OBEN_ANTEIL
+          : art === 'rundum'
+            ? (Math.PI * 2 * 19) / 16 / 3
+            : art === 'boden'
+              ? 1
+              : art === 'leinwand'
+                ? u.uBildA.value
+                : 2.85
   })
 
-  const BOGEN = 2.4 // ~140° Rückwand-Segment
-  return (
-    <mesh material={material} position={[0, 6, 0]}>
-      <cylinderGeometry args={[19, 19, 16, 96, 1, true, Math.PI - BOGEN / 2, BOGEN]} />
-    </mesh>
-  )
+  return material
 }
 
-// ---------- Der Verfolger: ein echtes Licht, von der Maus geführt ----------
+// Die Leinwand im Raum oder am Bildschirm. (Die Bodenprojektion liegt auf der Münze selbst.)
+function Leinwandflaeche({ material, art }: { material: THREE.ShaderMaterial; art: Leinwand }) {
+  const flach = useRef<THREE.Mesh>(null)
+  useFrame(() => {
+    // Schwebende Leinwand: zeigt das Motiv unbeschnitten, im eigenen Seitenverhältnis.
+    if (art !== 'leinwand' || !flach.current) return
+    const a = material.uniforms.uBildA.value as number
+    const b = Math.min(26, 12.5 * a)
+    flach.current.scale.set(b, b / a, 1)
+  })
+  if (art === 'rundhorizont' || art === 'rundum') {
+    const bogen = art === 'rundum' ? Math.PI * 2 : 2.4 // ~140° Rückwand-Segment
+    return (
+      <mesh material={material} position={[0, 6, 0]}>
+        <cylinderGeometry args={[19, 19, 16, 128, 1, true, Math.PI - bogen / 2, bogen]} />
+      </mesh>
+    )
+  }
+  if (art === 'vollbild' || art === 'oben')
+    return (
+      <mesh material={material} frustumCulled={false} renderOrder={-10}>
+        <planeGeometry args={[1, 1]} />
+      </mesh>
+    )
+  if (art === 'leinwand')
+    return (
+      <mesh ref={flach} material={material} position={[0, 8, -10]}>
+        <planeGeometry args={[1, 1]} />
+      </mesh>
+    )
+  return null
+}
 
-function Verfolger() {
-  const licht = useRef<THREE.SpotLight>(null)
+// ---------- Licht: sechs Stimmungen ----------
+
+const SCHATTEN = {
+  'shadow-bias': -0.0004,
+  'shadow-radius': 5,
+  'shadow-camera-near': 6,
+  'shadow-camera-far': 60,
+} as const
+
+// Ein Scheinwerfer mit Zielpunkt; `fuehre` bewegt das Ziel pro Frame.
+function Scheinwerfer({
+  von,
+  auf,
+  fuehre,
+  schatten,
+  karte = 2048,
+  ...licht
+}: {
+  von: [number, number, number]
+  auf: [number, number, number]
+  fuehre?: (ziel: THREE.Vector3, zeit: number, dt: number) => void
+  schatten: boolean
+  karte?: number
+} & Omit<ThreeElements['spotLight'], 'position' | 'target'>) {
   const ziel = useMemo(() => {
     const o = new THREE.Object3D()
-    o.position.set(0, 0.8, RADIUS)
+    o.position.set(...auf)
     return o
   }, [])
-
-  useFrame((_, dt) => {
-    ziel.position.x = daempf(maus.x * 10, ziel.position.x, 4, dt)
-    ziel.position.z = daempf(RADIUS - 3.5 + maus.y * 7.5, ziel.position.z, 4, dt)
+  useFrame(({ clock }, dt) => {
+    fuehre?.(ziel.position, clock.elapsedTime, Math.min(dt, 1 / 30))
     ziel.updateMatrixWorld()
   })
-
   return (
     <>
       <primitive object={ziel} />
-      <spotLight
-        ref={licht}
-        position={[0, 13, 21]}
-        target={ziel}
-        angle={0.32}
-        penumbra={0.5}
-        intensity={5.2}
-        color="#fff3e0"
-        decay={0}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-bias={-0.0004}
-        shadow-radius={5}
-        shadow-camera-near={8}
-        shadow-camera-far={45}
-      />
+      <spotLight position={von} target={ziel} decay={0} castShadow={schatten} shadow-mapSize={[karte, karte]} {...SCHATTEN} {...licht} />
     </>
   )
+}
+
+function Beleuchtung({ art, staerke: s, schatten }: { art: Licht; staerke: number; schatten: boolean }) {
+  switch (art) {
+    // 1 — der Verfolger: ein echtes Licht, von der Maus geführt
+    case 'verfolger':
+      return (
+        <>
+          <ambientLight intensity={0.42} color="#f2ecff" />
+          <Scheinwerfer
+            von={[0, 13, 21]}
+            auf={[0, 0.8, RADIUS]}
+            fuehre={(z, _, dt) => {
+              z.x = daempf(maus.x * 10, z.x, 4, dt)
+              z.z = daempf(RADIUS - 3.5 + maus.y * 7.5, z.z, 4, dt)
+            }}
+            angle={0.32}
+            penumbra={0.5}
+            intensity={5.2 * s}
+            color="#fff3e0"
+            schatten={schatten}
+          />
+        </>
+      )
+    // 2 — Fokus: nur das Hauptprojekt steht im Licht, die Nachbarn bekommen den Rand ab
+    case 'fokus':
+      return (
+        <>
+          <ambientLight intensity={0.16} color="#f2ecff" />
+          <Scheinwerfer von={[0, 15, 23]} auf={[0, 1, RADIUS + 0.4]} angle={0.2} penumbra={0.85} intensity={7 * s} color="#fff6ea" schatten={schatten} />
+        </>
+      )
+    // 3 — Arbeitslicht: alles gleich hell, nüchtern wie bei der Probe
+    case 'arbeitslicht':
+      return (
+        <>
+          <ambientLight intensity={2.3 * s} color="#ffffff" />
+          <directionalLight
+            position={[6, 22, 14]}
+            intensity={1.5 * s}
+            castShadow={schatten}
+            shadow-mapSize={[2048, 2048]}
+            shadow-camera-left={-16}
+            shadow-camera-right={16}
+            shadow-camera-top={16}
+            shadow-camera-bottom={-16}
+            shadow-camera-far={60}
+            shadow-bias={-0.0004}
+            shadow-radius={6}
+          />
+        </>
+      )
+    // 4 — Gegenlicht: von hinten oben, lange Schatten zum Publikum
+    case 'gegenlicht':
+      return (
+        <>
+          <ambientLight intensity={1.5 * s} color="#e9e4ff" />
+          <Scheinwerfer von={[0, 11, -17]} auf={[0, 0, 8]} angle={0.62} penumbra={0.6} intensity={8 * s} color="#ffd9a8" schatten={schatten} />
+        </>
+      )
+    // 5 — Farbwechsler: Rot, Grün, Blau aus drei Richtungen — zusammen weiß, die Schatten farbig
+    case 'farben':
+      return (
+        <>
+          <ambientLight intensity={0.3} color="#ffffff" />
+          {(
+            [
+              [[-15, 12, 20], '#ff2a1a'],
+              [[0, 15, 24], '#22ff3c'],
+              [[15, 12, 20], '#2a48ff'],
+            ] as const
+          ).map(([von, farbe]) => (
+            <Scheinwerfer
+              key={farbe}
+              von={[...von]}
+              auf={[0, 0.8, RADIUS - 1.5]}
+              angle={0.4}
+              penumbra={0.6}
+              intensity={4.6 * s}
+              color={farbe}
+              schatten={schatten}
+              karte={1024}
+            />
+          ))}
+        </>
+      )
+    // 6 — Suchscheinwerfer: zwei schmale Kegel wandern von selbst über die Bühne
+    case 'sucher':
+      return (
+        <>
+          <ambientLight intensity={0.34} color="#e6ecff" />
+          {[0, 1].map((i) => (
+            <Scheinwerfer
+              key={i}
+              von={[i ? 12 : -12, 14, 20]}
+              auf={[0, 0.8, RADIUS]}
+              fuehre={(z, zeit) => {
+                const t = zeit * 0.45 + i * 2.4
+                z.x = Math.sin(t * (i ? 1.3 : 1)) * 9
+                z.z = RADIUS - 5 + Math.cos(t * (i ? 0.7 : 1.1)) * 6
+              }}
+              angle={0.17}
+              penumbra={0.35}
+              intensity={6.5 * s}
+              color="#f1f5ff"
+              schatten={schatten}
+              karte={1024}
+            />
+          ))}
+        </>
+      )
+  }
 }
 
 // ---------- Foto als beleuchteter Block, Textur läuft um die Kanten ----------
 
 function FotoObjekt({
   url,
+  nr,
   breite,
   ar,
-  dicke = 0.5,
+  dicke = FOTO_DICKE,
   ...props
 }: {
   url: string
+  nr: number // Platz im Projekt — bestimmt die Zelle im Bildraster
   breite: number
   ar: number
   dicke?: number
-} & ThreeElements['mesh']) {
+} & Omit<ThreeElements['mesh'], 'position' | 'rotation' | 'scale'>) {
   const tex = useLoader(THREE.TextureLoader, url)
   const materialien = useMemo(() => {
     tex.colorSpace = THREE.SRGBColorSpace
@@ -232,38 +554,157 @@ function FotoObjekt({
       t.needsUpdate = true
       t.repeat.set(rx, ry)
       t.offset.set(ox, oy)
-      return new THREE.MeshLambertMaterial({ map: t })
+      return new THREE.MeshLambertMaterial({ map: t, emissiveMap: t, emissive: '#000' })
     }
     return [
       kante(0.94, 0, 0.06, 1), // rechts
       kante(0, 0, 0.06, 1), // links
       kante(0, 0.94, 1, 0.06), // oben
       kante(0, 0, 1, 0.06), // unten
-      new THREE.MeshLambertMaterial({ map: tex }), // vorn
+      // emissiveMap: in der Detailansicht leuchtet das Foto selbst, unabhängig vom Bühnenlicht
+      new THREE.MeshLambertMaterial({ map: tex, emissiveMap: tex, emissive: '#000' }), // vorn
       new THREE.MeshLambertMaterial({ color: '#2a2a2a' }), // hinten
     ]
   }, [tex])
+  // Wo das Foto steht, bestimmt allein die Frame-Schleife der Bühnenseite: aus der
+  // Aufstellung und den Reglern im Stellwerk — und im Flug ins Bildraster.
+  const mesh = useRef<THREE.Mesh>(null)
+  useLayoutEffect(() => {
+    const m = mesh.current
+    if (m) m.userData.foto = { k: 0, g: 0, da: 1, ...m.userData.foto, nr, breite }
+  }, [nr, breite])
   return (
-    <mesh {...props} material={materialien} castShadow receiveShadow>
+    <mesh ref={mesh} {...props} material={materialien} castShadow receiveShadow>
       <boxGeometry args={[breite, breite / ar, dicke]} />
     </mesh>
   )
 }
 
+// ---------- Der Münzrand: rote LED-Laufschrift mit dem Namen der Kategorie ----------
+
+const LED_FRAG = /* glsl */ `
+uniform sampler2D uText;
+uniform float uKachel;
+uniform float uAnzahl;
+uniform float uZeilen;
+uniform float uSchritt;
+uniform float uKopf;
+uniform float uAn;
+uniform vec3 uFarbe;
+varying vec2 vUv;
+varying float vFront;
+
+void main() {
+  // Liegt die Münze auf der Rückseite, steht der Rand kopf — Schrift mitdrehen.
+  vec2 uv = uKopf > 0.5 ? 1.0 - vUv : vUv;
+  vec2 g = vec2(uv.x * uKachel * uAnzahl, uv.y * uZeilen);
+  vec2 zelle = floor(g);
+  float d = length(fract(g) - 0.5);
+  float punkt = smoothstep(0.47, 0.3, d);
+  float spalte = mod(zelle.x + uSchritt, uKachel);
+  float an = uAn * step(0.5, texture2D(uText, vec2((spalte + 0.5) / uKachel, (zelle.y + 0.5) / uZeilen)).r);
+  vec3 farbe = uFarbe * mix(0.12, 1.0, an) * punkt;
+  farbe += an * uFarbe * 0.3 * (1.0 - punkt); // Überstrahlen zwischen den Dioden
+  // Dioden strahlen nach vorn: schräg gesehen — zu den Bildrändern hin — werden sie matter.
+  farbe *= 0.12 + 0.88 * pow(clamp(vFront, 0.0, 1.0), 3.0);
+  gl_FragColor = vec4(farbe + vec3(0.015), 1.0);
+  #include <colorspace_fragment>
+}
+`
+
+function ledTextur(text: string, schrift: string, zeilen: number) {
+  const { daten, breite, hoehe } = ledRaster(text, schrift, zeilen)
+  // DataTexture zählt Zeilen von unten
+  const pixel = new Uint8Array(breite * hoehe * 4)
+  for (let y = 0; y < hoehe; y++)
+    for (let x = 0; x < breite; x++) pixel.fill(daten[y * breite + x] * 255, ((hoehe - 1 - y) * breite + x) * 4, ((hoehe - 1 - y) * breite + x) * 4 + 4)
+  const tex = new THREE.DataTexture(pixel, breite, hoehe)
+  tex.wrapS = THREE.RepeatWrapping
+  tex.needsUpdate = true
+  // so viele Wiederholungen, dass die Dioden rund um den Rand etwa quadratisch bleiben
+  const spaltenRundum = ((Math.PI * 2 * SCHEIBE_R) / SCHEIBE_H) * zeilen
+  return { tex, kachel: breite, anzahl: Math.max(1, Math.round(spaltenRundum / breite)) }
+}
+
+function Scheibe({ wende, config }: { wende: RefObject<WendeCtrl>; config: DrehConfig }) {
+  const { laufText, laufSchrift, laufZeilen } = config
+  const schriften = useMemo(
+    () => KATEGORIEN.map((k) => ledTextur(laufText.trim() || k.name, laufSchrift, laufZeilen)),
+    [laufText, laufSchrift, laufZeilen]
+  )
+  useEffect(() => () => schriften.forEach((s) => s.tex.dispose()), [schriften])
+
+  const materialien = useMemo(() => {
+    const flaeche = new THREE.MeshLambertMaterial()
+    const rand = new THREE.ShaderMaterial({
+      vertexShader: `varying vec2 vUv; varying float vFront; void main(){ vUv = uv; vec4 mv = modelViewMatrix * vec4(position, 1.0); vFront = dot(normalize(normalMatrix * normal), normalize(-mv.xyz)); gl_Position = projectionMatrix * mv; }`,
+      fragmentShader: LED_FRAG,
+      uniforms: {
+        uText: { value: null },
+        uKachel: { value: 1 },
+        uAnzahl: { value: 1 },
+        uZeilen: { value: 11 },
+        uSchritt: { value: 0 },
+        uKopf: { value: 0 },
+        uAn: { value: 1 },
+        uFarbe: { value: new THREE.Color() },
+      },
+    })
+    return [rand, flaeche, flaeche] as const
+  }, [])
+
+  const lauf = useRef(0)
+  useFrame((_, dt) => {
+    // Name und Leserichtung wechseln genau dann, wenn der Rand auf der Kante steht.
+    const seite = Math.round(wende.current.flip / Math.PI)
+    const s = schriften[mod(seite, KATEGORIEN.length)]
+    const u = materialien[0].uniforms
+    u.uText.value = s.tex
+    u.uKachel.value = s.kachel
+    u.uAnzahl.value = s.anzahl
+    u.uZeilen.value = cfg.laufZeilen
+    u.uKopf.value = mod(seite, 2)
+    u.uAn.value = cfg.laufschrift ? 1 : 0
+    ;(u.uFarbe.value as THREE.Color).set(cfg.laufFarbe)
+    // Die Schrift rückt in ganzen Dioden-Spalten weiter.
+    lauf.current += Math.min(dt, 1 / 30) * cfg.laufTempo
+    u.uSchritt.value = Math.floor(lauf.current)
+    materialien[1].color.set(cfg.scheibe)
+  })
+
+  return (
+    <mesh material={materialien as unknown as THREE.Material[]} receiveShadow>
+      <cylinderGeometry args={[SCHEIBE_R, SCHEIBE_R, SCHEIBE_H, 160]} />
+    </mesh>
+  )
+}
+
+// ---------- Kulissen: drei Fotos pro Projekt, im Kreis auf der Scheibe ----------
+
 function Kulisse({
   projekt,
   index,
+  schritt,
   vorn,
+  oben,
+  detail,
+  alleBilder,
   onDrehen,
   onBild,
+  onZeigen,
 }: {
   projekt: Projekt
   index: number
+  schritt: number
   vorn: boolean
+  oben: boolean
+  detail: boolean
+  alleBilder: boolean // Detailansicht: auch die Bilder, die nicht auf der Bühne stehen
   onDrehen: (index: number) => void
   onBild: (bildIndex: number) => void
+  onZeigen: (bildIndex: number | null) => void
 }) {
-  const theta = index * SCHRITT
+  const theta = index * schritt
   const gruppe = useRef<THREE.Group>(null)
 
   useEffect(() => {
@@ -277,43 +718,44 @@ function Kulisse({
     })
   })
 
-  const fotos = projekt.bilder.slice(0, 3)
-  const lagen = [
-    { x: -0.85, z: 0.07, b: 2.6, ry: 0.05 },
-    { x: 1.18, z: 0.6, b: 1.68, ry: -0.12 },
-    { x: 0.28, z: 1.15, b: 1.35, ry: 0.09 },
-  ]
+  // Stabiles Objekt: die Frame-Schleife legt hier ihren Stand ab (Helligkeit, Flugfortschritt).
+  const daten = useMemo(
+    () => ({ kulisse: true, index, ars: projekt.bilder.map((b) => b.ar), farbe: new THREE.Color(projekt.farbe) }),
+    [index, projekt]
+  )
+  const fotos = projekt.bilder.slice(0, alleBilder ? undefined : LAGEN.length)
+  const klick = (i: number) => (e: { stopPropagation: () => void; delta: number }) => {
+    e.stopPropagation()
+    if (e.delta >= 6) return
+    if (vorn) onBild(i)
+    else onDrehen(index)
+  }
 
   return (
     <group position={[Math.sin(theta) * RADIUS, 0, Math.cos(theta) * RADIUS]} rotation={[0, theta, 0]}>
+      {/* Nur die Seite, die oben liegt, reagiert — die Rückseite hängt unsichtbar darunter. */}
       <group
         ref={gruppe}
-        userData={{ kulisse: true, index }}
-        onClick={(e) => {
-          e.stopPropagation()
-          if (e.delta < 6 && !vorn) onDrehen(index)
-        }}
-        onPointerOver={() => (document.body.style.cursor = vorn ? 'zoom-in' : 'pointer')}
-        onPointerOut={() => (document.body.style.cursor = '')}
+        userData={daten}
+        onPointerOver={oben ? () => (document.body.style.cursor = vorn ? 'zoom-in' : 'pointer') : undefined}
+        onPointerOut={oben ? () => (document.body.style.cursor = '') : undefined}
       >
         <Suspense fallback={null}>
           {fotos.map((b, i) => {
-            const l = lagen[i]
-            const h = l.b / b.ar
+            // Auf der Bühne stehen immer nur drei Fotos. Die übrigen stecken klein im
+            // ersten Block und falten sich erst in der Detailansicht heraus.
+            const l = LAGEN[i] ?? { ...LAGEN[0], b: 1.5 }
             return (
               <FotoObjekt
                 key={b.src}
                 url={b.src}
+                nr={i}
                 breite={l.b}
                 ar={b.ar}
-                position={[l.x, h / 2 + 0.02, l.z]}
-                rotation={[0, l.ry, 0]}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (e.delta >= 6) return
-                  if (vorn) onBild(i)
-                  else onDrehen(index)
-                }}
+                visible={false}
+                onPointerOver={oben && vorn && !detail ? () => onZeigen(i) : undefined}
+                onPointerOut={oben && vorn && !detail ? () => onZeigen(null) : undefined}
+                onClick={oben ? klick(i) : undefined}
               />
             )
           })}
@@ -323,47 +765,176 @@ function Kulisse({
   )
 }
 
-function Buehnenraum({
+// Eine Seite der Münze: die Kulissen einer Kategorie, mit eigener Drehung.
+function Flaeche({
+  seite,
+  kat,
   ctrl,
+  wende,
+  detail,
+  oben,
+  aktiv,
+  offen,
+  alleBilder,
   onDrehen,
   onBild,
-  aktiv,
-  projiziert,
+  onZeigen,
 }: {
-  ctrl: RefObject<DrehCtrl>
+  seite: 0 | 1
+  kat: number
+  ctrl: RefObject<DrehCtrl[]>
+  wende: RefObject<WendeCtrl>
+  detail: RefObject<DetailCtrl>
+  oben: boolean
+  aktiv: number
+  offen: boolean
+  alleBilder: boolean
   onDrehen: (index: number) => void
   onBild: (bildIndex: number) => void
-  aktiv: number
-  projiziert: number | null
+  onZeigen: (bildIndex: number | null) => void
 }) {
+  const flaeche = useRef<THREE.Group>(null)
   const scheibe = useRef<THREE.Group>(null)
-  const szene = useThree((s) => s.scene)
-  const cam = useThree((s) => s.camera)
+  const schritt = schrittVon(kat)
+  const vorne = useRef(aktiv)
+  vorne.current = oben ? aktiv : -1
+  const hilf = useMemo(
+    () => ({
+      m: new THREE.Matrix4(),
+      q: new THREE.Quaternion(),
+      v: new THREE.Vector3(),
+      s: new THREE.Vector3(),
+      heim: new THREE.Vector3(),
+      heimQ: new THREE.Quaternion(),
+      blickQ: new THREE.Quaternion(),
+      euler: new THREE.Euler(),
+    }),
+    []
+  )
 
-  useEffect(() => {
-    cam.lookAt(0, 2.0, 0)
-  }, [cam])
-
-  useFrame((_, dt) => {
-    const c = ctrl.current
+  useFrame(({ camera, size, clock }, roheDt) => {
+    const dt = Math.min(roheDt, 1 / 30)
+    const c = ctrl.current[seite]
     c.ang = daempf(c.tang, c.ang, 5, dt)
-    if (scheibe.current) scheibe.current.rotation.y = c.ang
+    if (!flaeche.current || !scheibe.current) return
+    scheibe.current.rotation.y = c.ang
+
+    // Die Rückseite ist nur während des Wendens zu sehen — ihre Kulissen fahren
+    // wie auf Versenkungen aus der Scheibe heraus und wieder hinein.
+    const w = wende.current.flip
+    const liegtOben = mod(Math.round(w / Math.PI), 2) === seite
+    const hub = liegtOben ? 1 : THREE.MathUtils.smoothstep(Math.abs(Math.sin(w)), 0.03, 0.45)
+    flaeche.current.visible = hub > 0
+    if (!flaeche.current.visible) return
+    scheibe.current.scale.y = Math.max(hub, 0.001)
 
     // Vorderstes Projekt aufhellen, alle anderen abdunkeln.
-    szene.traverse((o) => {
+    scheibe.current.traverse((o) => {
       if (!((o as THREE.Group).isGroup && o.userData.kulisse)) return
-      const winkel = mod(c.ang + o.userData.index * SCHRITT + Math.PI, Math.PI * 2) - Math.PI
-      const vorn = Math.abs(winkel) < SCHRITT / 2
-      const ziel = vorn ? 1 : 0.55
-      o.userData.b = daempf(ziel, o.userData.b ?? 0.55, 5, dt)
+      const winkel = mod(c.ang + o.userData.index * schritt + Math.PI, Math.PI * 2) - Math.PI
+      const vorn = Math.abs(winkel) < schritt / 2 + 0.001
+      const wirkung = LICHT_WIRKUNG[cfg.licht]
+      o.userData.b = daempf(vorn ? 1 : wirkung.rest, o.userData.b ?? 0.55, 5, dt)
+      o.scale.setScalar(daempf(vorn ? wirkung.vornSkala : 1, o.scale.x, 5, dt))
+
+      // Detailansicht: die Fotos dieses Projekts heben ab und fliegen in ihr Raster
+      // vor der Kamera — gestaffelt, eins nach dem anderen. Beim Schließen (oder
+      // Weiterblättern) kehren sie auf ihren Platz auf der Scheibe zurück.
+      const d = detail.current
+      const dran = d.offen && o.userData.index === vorne.current
+      const u = (o.userData.u = THREE.MathUtils.clamp(((o.userData.u as number) ?? 0) + ((dran ? 1 : -1) * dt) / cfg.zoomDauer, 0, 1))
+      // Die Kulisse steht auf ihrem Radius; ihre Fotos bekommen jede Frame ihre Lage
+      // aus der Aufstellung und den Reglern im Stellwerk (Ordner „Kulissen").
+      const theta = o.userData.index * schritt
+      o.parent?.position.set(Math.sin(theta) * cfg.objRadius, 0, Math.cos(theta) * cfg.objRadius)
+      const ars = o.userData.ars as number[]
+      const zeit = clock.elapsedTime
+      const schwung = THREE.MathUtils.clamp((c.tang - c.ang) * 0.6, -0.6, 0.6) * cfg.objSchwung
+      const fliegt = u > 0
+      let zellen: Zelle[] = []
+      let elternSkala = 1
+      let roll = 0
+      const aspekt = size.width / size.height
+      if (fliegt) {
+        zellen = bildraster(ars, size.width, size.height)
+        roll = rollWelt(aspekt, size.height)
+        o.updateWorldMatrix(true, false)
+        hilf.m.copy(o.matrixWorld).invert()
+        o.getWorldQuaternion(hilf.q).invert().multiply(camera.quaternion)
+        elternSkala = o.getWorldScale(hilf.s).x
+      }
+      const staffel = 0.45
+      o.children.forEach((kind) => {
+        const f = kind.userData.foto
+        if (!f) return
+        const extra = f.nr >= LAGEN.length // steckt klein im ersten Block, bis die Detailansicht öffnet
+        const lage = LAGEN[extra ? 0 : f.nr]
+        const G = cfg.objGroesse
+        const hoehe = (lage.b / ars[extra ? 0 : f.nr]) * G
+        let turm = 0 // Stapeln: die Höhe aller Fotos darunter
+        for (let j = 0; j < (extra ? 0 : f.nr); j++) turm += (LAGEN[j].b / ars[j]) * G + 0.04
+        const S = cfg.objStapel
+        hilf.heim.set(
+          THREE.MathUtils.lerp(lage.x * cfg.objStreuung, 0, S),
+          hoehe / 2 + 0.02 + turm * S + cfg.objSchweben + Math.sin(zeit * 0.9 + o.userData.index * 1.7 + f.nr * 2.1) * cfg.objAtmen,
+          THREE.MathUtils.lerp(lage.z * cfg.objStreuung, 0.5, S)
+        )
+        // Verdrehung, Neigung und der Schwung aus der Drehung der Scheibe — und auf Wunsch
+        // dreht sich jedes Foto zum Publikum, egal wo die Kulisse gerade steht.
+        hilf.heimQ.setFromEuler(hilf.euler.set(-cfg.objNeigung, lage.ry * cfg.objVerdrehung, schwung * (1 + f.nr * 0.35), 'YXZ'))
+        hilf.blickQ.setFromEuler(hilf.euler.set(-cfg.objNeigung, -winkel, schwung * (1 + f.nr * 0.35), 'YXZ'))
+        hilf.heimQ.slerp(hilf.blickQ, cfg.objZurKamera)
+        f.da = daempf(extra || f.nr < cfg.objAnzahl ? 1 : 0, f.da, 6, dt)
+        const heimSkala = (extra ? 0.12 : 1) * G * f.da
+        const heimTiefe = extra ? heimSkala : (cfg.objDicke / FOTO_DICKE) * f.da
+
+        if (!fliegt) {
+          f.k = 0
+          kind.position.copy(hilf.heim)
+          kind.quaternion.copy(hilf.heimQ)
+          kind.scale.set(heimSkala, heimSkala, heimTiefe)
+          kind.visible = !extra && f.da > 0.002
+          return
+        }
+
+        // Detailansicht: die Fotos dieses Projekts heben ab und fliegen in ihr Raster
+        // vor der Kamera — gestaffelt, eins nach dem anderen. Beim Schließen (oder
+        // Weiterblättern) kehren sie auf ihren Platz auf der Scheibe zurück.
+        const zelle = zellen[f.nr]
+        const k = (f.k = weich(THREE.MathUtils.clamp(u * (1 + staffel) - (staffel * f.nr) / Math.max(1, zellen.length - 1), 0, 1)))
+        f.g += ((dran && d.gross === f.nr ? 1 : 0) - f.g) * (1 - Math.exp(-6.5 * dt))
+        const g = THREE.MathUtils.smoothstep(f.g, 0, 1)
+        // Groß: dasselbe Foto kommt so nah, dass es den Schirm fast füllt.
+        const sicht = sichtfeld(aspekt, 1)
+        const nah = Math.max(zelle.h / (0.84 * sicht.h), zelle.b / (0.9 * sicht.b))
+        const tiefe = 1 + (f.nr % 3) * 0.4 // jedes Foto antwortet etwas anders auf die Maus
+        hilf.v
+          .set(
+            THREE.MathUtils.lerp(zelle.x - maus.x * 0.1 * tiefe, 0, g),
+            THREE.MathUtils.lerp(zelle.y + roll + maus.y * 0.07 * tiefe, 0.01 * sicht.h * nah, g),
+            -THREE.MathUtils.lerp(RASTER_D, nah, g)
+          )
+          .applyMatrix4(camera.matrixWorld)
+          .applyMatrix4(hilf.m)
+        kind.position.lerpVectors(hilf.heim, hilf.v, k)
+        kind.quaternion.slerpQuaternions(hilf.heimQ, hilf.q, k)
+        const skala = THREE.MathUtils.lerp(heimSkala, zelle.b / (f.breite * elternSkala), k)
+        kind.scale.set(skala, skala, THREE.MathUtils.lerp(heimTiefe, 0.05 / (FOTO_DICKE * elternSkala), k))
+        kind.visible = k > 0.002 || (!extra && f.da > 0.002)
+      })
+
       o.traverse((kind) => {
         const m = kind as THREE.Mesh
         if (m.isMesh && m.userData.grundfarben) {
+          // Im Raster leuchtet das Foto selbst — Bühnenlicht und Abdunkeln blenden aus.
+          const k = (m.userData.foto?.k as number) ?? 0
           const mats = Array.isArray(m.material) ? m.material : [m.material]
           mats.forEach((mat, mi) => {
-            ;(mat as THREE.MeshLambertMaterial).color
-              .copy((m.userData.grundfarben as THREE.Color[])[mi])
-              .multiplyScalar(o.userData.b as number)
+            const l = mat as THREE.MeshLambertMaterial
+            // Rückseite (Material 5) auf Wunsch in der Farbe des Projekts
+            const basis = mi === 5 && cfg.objRueckseite ? (o.userData.farbe as THREE.Color) : (m.userData.grundfarben as THREE.Color[])[mi]
+            l.color.copy(basis).multiplyScalar((o.userData.b as number) * (1 - k))
+            if (l.emissiveMap) l.emissive.setScalar(k)
           })
         }
       })
@@ -371,27 +942,182 @@ function Buehnenraum({
   })
 
   return (
-    <>
-      <Hintergrund
-        src={PROJEKTE[aktiv].bilder[Math.min(projiziert ?? 0, PROJEKTE[aktiv].bilder.length - 1)].src}
-        hell={projiziert !== null}
-        video={projiziert === null ? PROJEKTE[aktiv].videoDatei : undefined}
-      />
-      <ambientLight intensity={0.42} color="#f2ecff" />
-      <Verfolger />
+    <group ref={flaeche} rotation={[seite ? Math.PI : 0, 0, 0]}>
+      <group ref={scheibe} position={[0, SCHEIBE_H / 2, 0]}>
+        {SAMMLUNG[kat].map((p, i) => (
+          <Kulisse
+            key={p.slug}
+            projekt={p}
+            index={i}
+            schritt={schritt}
+            vorn={oben && i === aktiv}
+            oben={oben}
+            detail={offen}
+            alleBilder={alleBilder && oben && i === aktiv}
+            onDrehen={onDrehen}
+            onBild={onBild}
+            onZeigen={onZeigen}
+          />
+        ))}
+      </group>
+    </group>
+  )
+}
 
-      <group ref={scheibe}>
-        {/* Drehscheibe */}
-        <mesh position={[0, -0.19, 0]} receiveShadow>
-          <cylinderGeometry args={[13.4, 13.4, 0.38, 128]} />
-          <meshLambertMaterial color="#4a4a4a" />
+function Buehnenraum({
+  ctrl,
+  wende,
+  detail,
+  offen,
+  gross,
+  alleBilder,
+  flaechen,
+  seite,
+  projekt,
+  aktiv,
+  projiziert,
+  config,
+  onDrehen,
+  onBild,
+  onZeigen,
+  onLeer,
+}: {
+  ctrl: RefObject<DrehCtrl[]>
+  wende: RefObject<WendeCtrl>
+  detail: RefObject<DetailCtrl>
+  offen: boolean
+  gross: number | null
+  alleBilder: boolean
+  onLeer: () => void
+  flaechen: [number, number]
+  seite: number
+  projekt: Projekt
+  aktiv: number
+  projiziert: number | null
+  config: DrehConfig
+  onDrehen: (index: number) => void
+  onBild: (bildIndex: number) => void
+  onZeigen: (bildIndex: number | null) => void
+}) {
+  const leinwand = useLeinwandMaterial(
+    config.leinwandBild || projekt.bilder[Math.min(projiziert ?? 0, projekt.bilder.length - 1)].src,
+    projiziert !== null,
+    projiziert === null && !config.leinwandBild ? projekt.videoDatei : undefined,
+    config.leinwand
+  )
+  const muenze = useRef<THREE.Group>(null)
+  const kameraraum = useRef<THREE.Group>(null)
+  const vorhang = useRef<THREE.MeshBasicMaterial>(null)
+  const schleier = useRef<THREE.MeshBasicMaterial>(null)
+  const farbe = useRef<THREE.Mesh>(null)
+  const cam = useThree((s) => s.camera)
+  const groesse = useThree((s) => s.size)
+  const aspekt = groesse.width / groesse.height
+  const ars = useMemo(() => projekt.bilder.map((b) => b.ar), [projekt])
+
+  useEffect(() => {
+    cam.position.copy(KAMERA_HEIM)
+    cam.lookAt(BLICK_HEIM)
+    ;(cam as THREE.PerspectiveCamera).fov = fovFuer(aspekt)
+    cam.updateProjectionMatrix()
+  }, [cam, aspekt])
+
+  useFrame(({ camera }, roheDt) => {
+    const dt = Math.min(roheDt, 1 / 30)
+
+    // Wenden wie eine Münze: über die Querachse, mit etwas Wurf nach hinten oben.
+    const w = wende.current
+    w.flip = daempf(w.fziel, w.flip, cfg.wendeTempo, dt)
+    if (muenze.current) {
+      const wurf = Math.abs(Math.sin(w.flip))
+      muenze.current.rotation.x = w.flip
+      muenze.current.position.set(0, -SCHEIBE_H / 2 + wurf * 1.4, -wurf * 7)
+    }
+
+    // Detailansicht: hinter dem Bildraster schließt sich ein dunkler Vorhang vor der Bühne.
+    const d = detail.current
+    d.t = THREE.MathUtils.clamp(d.t + ((d.offen ? 1 : -1) * dt) / cfg.zoomDauer, 0, 1)
+    d.grossT = daempf(d.offen && d.gross !== null ? 1 : 0, d.grossT, 6.5, dt)
+    const e = weich(d.t)
+    kameraraum.current?.position.copy(camera.position)
+    kameraraum.current?.quaternion.copy(camera.quaternion)
+    if (vorhang.current) {
+      vorhang.current.opacity = e
+      vorhang.current.color.set(cfg.grund)
+    }
+    if (schleier.current) {
+      schleier.current.opacity = 0.9 * d.grossT
+      schleier.current.color.set(cfg.grund)
+    }
+    // Die Farbfläche des Projekts schiebt sich hinter das Raster — wie im gedruckten Portfolio.
+    if (farbe.current) {
+      const zellen = bildraster(ars, groesse.width, groesse.height)
+      const rand = Math.min(0.45, 0.035 * sichtfeld(aspekt).b)
+      const links = Math.min(...zellen.map((z) => z.x - z.b / 2)) - rand
+      const obenKante = Math.max(...zellen.map((z) => z.y + z.h / 2)) + rand * 0.9 + rollWelt(aspekt, groesse.height)
+      const rechts = Math.max(...zellen.map((z) => z.x + z.b / 2))
+      const unten = Math.min(...zellen.map((z) => z.y - z.h / 2))
+      // wächst aus der oberen linken Ecke und verblasst auf dem Rückweg, statt als Streifen stehenzubleiben
+      const b = (rechts - links) * 0.58 * Math.max(e, 0.0001)
+      const h = (obenKante - unten) * 0.62 * Math.max(e, 0.0001)
+      ;(farbe.current.material as THREE.MeshBasicMaterial).opacity = e
+      farbe.current.scale.set(b, h, 1)
+      farbe.current.position.set(links + b / 2 - maus.x * 0.05, obenKante - h / 2 + maus.y * 0.035, -(RASTER_D + 0.5))
+      farbe.current.visible = e > 0.001
+    }
+  })
+
+  const oben = mod(seite, 2)
+  const riesig = sichtfeld(aspekt, 40)
+
+  return (
+    <>
+      <group ref={kameraraum}>
+        <mesh
+          position={[0, 0, -(RASTER_D + 1.4)]}
+          onPointerOver={offen ? (e) => e.stopPropagation() : undefined}
+          onClick={offen ? (e) => (e.stopPropagation(), e.delta < 6 && onLeer()) : undefined}>
+          <planeGeometry args={[riesig.b, riesig.h]} />
+          <meshBasicMaterial ref={vorhang} transparent opacity={0} depthWrite={false} toneMapped={false} fog={false} />
         </mesh>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
-          <ringGeometry args={[13.1, 13.4, 128]} />
-          <meshBasicMaterial color="#4a4a4a" toneMapped={false} />
+        <mesh ref={farbe} visible={false}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial color={projekt.farbe} transparent depthWrite={false} toneMapped={false} fog={false} />
         </mesh>
-        {PROJEKTE.map((p, i) => (
-          <Kulisse key={p.slug} projekt={p} index={i} vorn={i === aktiv} onDrehen={onDrehen} onBild={onBild} />
+        {/* Steht ein Foto groß vor der Kamera, tritt das Raster hinter einen Schleier zurück. */}
+        <mesh position={[0, 0, -(RASTER_D - 1.2)]} onClick={offen && gross !== null ? (e) => (e.stopPropagation(), onLeer()) : undefined}>
+          <planeGeometry args={[riesig.b, riesig.h]} />
+          <meshBasicMaterial ref={schleier} transparent opacity={0} depthWrite={false} toneMapped={false} fog={false} />
+        </mesh>
+      </group>
+      <Leinwandflaeche material={leinwand} art={config.leinwand} />
+      <Beleuchtung key={config.licht} art={config.licht} staerke={config.lichtStaerke} schatten={config.schatten} />
+
+      <group ref={muenze}>
+        <Scheibe wende={wende} config={config} />
+        {/* Bodenprojektion: das Motiv liegt auf beiden Seiten der Münze */}
+        {config.leinwand === 'boden' &&
+          [1, -1].map((s) => (
+            <mesh key={s} material={leinwand} position={[0, s * (SCHEIBE_H / 2 + 0.012), 0]} rotation={[-s * (Math.PI / 2), 0, 0]}>
+              <circleGeometry args={[SCHEIBE_R - 0.25, 96]} />
+            </mesh>
+          ))}
+        {([0, 1] as const).map((s) => (
+          <Flaeche
+            key={s}
+            seite={s}
+            kat={flaechen[s]}
+            ctrl={ctrl}
+            wende={wende}
+            detail={detail}
+            offen={offen}
+            alleBilder={alleBilder}
+            oben={s === oben}
+            aktiv={aktiv}
+            onDrehen={onDrehen}
+            onBild={onBild}
+            onZeigen={onZeigen}
+          />
         ))}
       </group>
     </>
@@ -400,15 +1126,68 @@ function Buehnenraum({
 
 export default function Drehbuehne() {
   const { projekt: linkParam } = useParams()
-  const [aktiv, setAktiv] = useState(() => startIndexAusUrl(linkParam))
-  useProjektUrlSync('/drehbuehne', PROJEKTE[aktiv])
+  const { hash } = useLocation()
+  const navigate = useNavigate()
+  const detail = hash === DETAIL_HASH
+  const config = useDrehConfig()
+
+  const [fenster, setFenster] = useState(() => ({ b: window.innerWidth, h: window.innerHeight }))
+  useEffect(() => {
+    const onResize = () => setFenster({ b: window.innerWidth, h: window.innerHeight })
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  // Start aus der URL: das Projekt bestimmt Kategorie (= Münzseite) und Stellung.
+  const start = useMemo(() => {
+    const pr = findByPermalink(linkParam)
+    const kat = pr ? KATEGORIEN.findIndex((k) => k.id === pr.kategorie) : 0
+    return { kat, index: pr ? SAMMLUNG[kat].indexOf(pr) : 0 }
+  }, [])
+
+  // seite zählt die Wendungen: Kategorie = seite mod 3, Münzseite = seite mod 2.
+  const [seite, setSeite] = useState(start.kat)
+  const [flaechen, setFlaechen] = useState<[number, number]>(() =>
+    start.kat % 2 === 0 ? [start.kat, (start.kat + 1) % 3] : [(start.kat + 1) % 3, start.kat]
+  )
+  const [aktiv, setAktiv] = useState(start.index)
   const [projiziert, setProjiziert] = useState<number | null>(null)
+
+  const kat = mod(seite, KATEGORIEN.length)
+  const projekte = SAMMLUNG[kat]
+  const p = projekte[aktiv]
+  useProjektUrlSync('/drehbuehne', p, detail ? DETAIL_HASH : '')
+
+  // Schmales Layout: die Beschreibung beginnt unter dem Bildraster — dessen Unterkante in Pixeln.
+  const rasterUnten = useMemo(() => {
+    const zellen = bildraster(
+      p.bilder.map((b) => b.ar),
+      fenster.b,
+      fenster.h
+    )
+    const unten = Math.min(...zellen.map((z) => z.y - z.h / 2))
+    return (0.5 - unten / sichtfeld(fenster.b / fenster.h).h) * fenster.h
+  }, [p, fenster])
+
   const wrap = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
-  const zeiger = useRef<{ x: number; roh: number } | null>(null)
+  const zeiger = useRef<{ x: number; y: number; roh: number; achse: 'x' | 'y' | null; richtung: number } | null>(null)
   const radAcc = useRef({ acc: 0, t: 0 })
 
-  const ctrl = useRef<DrehCtrl>({ ang: Math.PI - aktiv * SCHRITT, tang: -aktiv * SCHRITT })
+  const ctrl = useRef<DrehCtrl[]>(
+    [0, 1].map((s) =>
+      s === start.kat % 2
+        ? { ang: Math.PI - start.index * schrittVon(start.kat), tang: -start.index * schrittVon(start.kat) }
+        : { ang: 0, tang: 0 }
+    )
+  )
+  const wende = useRef<WendeCtrl>({ flip: start.kat * Math.PI, fziel: start.kat * Math.PI })
+  const detailCtrl = useRef<DetailCtrl>({ offen: detail, t: detail ? 1 : 0, gross: null, grossT: 0 })
+  const [gross, setGross] = useState<number | null>(null)
+
+  // Aktueller Stand für die Handler, die nur einmal gebunden werden.
+  const stand = useRef({ seite, kat, detail, gross, bilder: p.bilder.length })
+  stand.current = { seite, kat, detail, gross, bilder: p.bilder.length }
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -419,37 +1198,122 @@ export default function Drehbuehne() {
     return () => window.removeEventListener('pointermove', onMove)
   }, [])
 
-  const aktivAusTang = (tang: number) => mod(Math.round(-tang / SCHRITT), N)
+  // ---------- Drehen ----------
 
   const schnappe = (tang: number) => {
-    ctrl.current.tang = tang
-    setAktiv(aktivAusTang(tang))
+    const { seite, kat } = stand.current
+    const c = ctrl.current[mod(seite, 2)]
+    c.tang = tang
+    setAktiv(mod(Math.round(-tang / schrittVon(kat)), SAMMLUNG[kat].length))
     setProjiziert(null)
+  }
+
+  const dreheUm = (schritte: number) => {
+    const { seite, kat } = stand.current
+    schnappe(ctrl.current[mod(seite, 2)].tang - schritte * schrittVon(kat))
   }
 
   const dreheZu = (index: number) => {
     // Kürzester Weg zum Ziel-Index.
-    const c = ctrl.current
-    const ziel = -index * SCHRITT
-    const delta = mod(ziel - c.tang + Math.PI, Math.PI * 2) - Math.PI
+    const { seite, kat } = stand.current
+    const c = ctrl.current[mod(seite, 2)]
+    const delta = mod(-index * schrittVon(kat) - c.tang + Math.PI, Math.PI * 2) - Math.PI
     schnappe(c.tang + delta)
   }
+
+  // ---------- Wenden ----------
+
+  // Die verdeckte Seite bekommt die nächste Kategorie, bevor sie nach oben kommt.
+  const bestuecke = (neueSeite: number) => {
+    const s = mod(neueSeite, 2)
+    const k = mod(neueSeite, KATEGORIEN.length)
+    setFlaechen((f) => (f[s] === k ? f : s === 0 ? [k, f[1]] : [f[0], k]))
+    ctrl.current[s] = { ang: -Math.PI * 0.6, tang: 0 }
+  }
+
+  const wendeZu = (neueSeite: number, bestueckt = false) => {
+    if (!bestueckt) bestuecke(neueSeite)
+    wende.current.fziel = neueSeite * Math.PI
+    setSeite(neueSeite)
+    setAktiv(0)
+    setProjiziert(null)
+  }
+
+  const zeigeKategorie = (k: number) => {
+    const { seite, kat } = stand.current
+    const d = mod(k - kat, KATEGORIEN.length)
+    if (d !== 0) wendeZu(seite + (d === 1 ? 1 : -1))
+  }
+
+  // ---------- Hinein ins Projekt und zurück ----------
+
+  const hierGeoeffnet = useRef(false)
+  const schliesse = () => {
+    if (hierGeoeffnet.current) navigate(-1)
+    else navigate({ hash: '' }, { replace: true })
+    hierGeoeffnet.current = false
+  }
+  // Klick auf ein Foto der vordersten Kulisse: erst ins Projekt, dort dann das Foto groß.
+  const waehleBild = (bildIndex: number) => {
+    if (!stand.current.detail) {
+      hierGeoeffnet.current = true
+      navigate({ hash: DETAIL_HASH })
+    } else setGross((g) => (g === bildIndex ? null : bildIndex))
+  }
+  // Steht ein Foto groß vor der Kamera, blättern Pfeile und Scrollen durch die Bilder
+  // des Projekts — sonst durch die Projekte.
+  const blaettere = (schritte: number) => {
+    const { gross, bilder } = stand.current
+    if (gross === null) dreheUm(schritte)
+    else setGross(mod(gross + schritte, bilder))
+  }
+  // Klick ins Leere: erst das große Foto zurück, dann zurück zur Bühne.
+  const insLeere = () => (stand.current.gross !== null ? setGross(null) : schliesse())
+
+  // Die übrigen Bilder des Projekts gibt es nur in der Detailansicht — und noch so
+  // lange danach, bis sie wieder im ersten Foto verschwunden sind.
+  const [alleBilder, setAlleBilder] = useState(detail)
+  useEffect(() => {
+    if (detail) return setAlleBilder(true)
+    const t = setTimeout(() => setAlleBilder(false), cfg.zoomDauer * 1600 + 200)
+    return () => clearTimeout(t)
+  }, [detail])
+
+  useEffect(() => {
+    detailCtrl.current.offen = detail
+    detailCtrl.current.gross = detail ? gross : null
+    document.body.style.cursor = ''
+  }, [detail, gross])
+  useEffect(() => setGross(null), [detail, p])
+  // Schmal: die Detailseite scrollt — Raster und Farbfläche rollen mit; jedes Projekt beginnt oben.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    rollen.px = 0
+    const onScroll = () => (rollen.px = window.scrollY)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [detail, p])
+
+  // Alle Bilder des vordersten Projekts schon laden, bevor jemand hineinklickt.
+  useEffect(() => p.bilder.forEach((b) => useLoader.preload(THREE.TextureLoader, b.src)), [p])
 
   useEffect(() => {
     const el = wrap.current
     if (!el) return
     const onWheel = (e: WheelEvent) => {
+      // schmal + Detail: das Rad scrollt die Seite, statt zu blättern
+      if (stand.current.detail && istSchmal(window.innerWidth, window.innerHeight)) return
       e.preventDefault()
       if (flags.lightbox) return
       const r = radAcc.current
       const jetzt = performance.now()
-      if (jetzt - r.t < 350) return
+      if (jetzt - r.t < (stand.current.detail ? 650 : 350)) return
       r.acc += e.deltaY
       if (Math.abs(r.acc) > 60) {
         const richtung = Math.sign(r.acc)
         r.acc = 0
         r.t = jetzt
-        schnappe(ctrl.current.tang - richtung * SCHRITT)
+        blaettere(richtung)
       }
     }
     el.addEventListener('wheel', onWheel, { passive: false })
@@ -458,9 +1322,15 @@ export default function Drehbuehne() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (flags.lightbox) return
-      if (e.key === 'ArrowRight') schnappe(ctrl.current.tang - SCHRITT)
-      if (e.key === 'ArrowLeft') schnappe(ctrl.current.tang + SCHRITT)
+      if (flags.lightbox || (e.target as HTMLElement).closest?.('input, select, textarea')) return
+      if (e.key === 'ArrowRight') blaettere(1)
+      if (e.key === 'ArrowLeft') blaettere(-1)
+      if (stand.current.detail) {
+        if (e.key === 'Escape') insLeere()
+        return
+      }
+      if (e.key === 'ArrowDown') wendeZu(stand.current.seite + 1)
+      if (e.key === 'ArrowUp') wendeZu(stand.current.seite - 1)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -473,61 +1343,94 @@ export default function Drehbuehne() {
       if (!el) return
       const nx = (e.clientX / window.innerWidth) * 2 - 1
       const ny = (e.clientY / window.innerHeight) * 2 - 1
-      el.style.transform = `translate(${nx * -8}px, ${ny * -6}px)`
+      el.style.translate = `${nx * -8}px ${ny * -6}px`
     }
     window.addEventListener('pointermove', onMove)
     return () => window.removeEventListener('pointermove', onMove)
   }, [])
 
-  const onPointerDown = (e: React.PointerEvent) => (zeiger.current = { x: e.clientX, roh: ctrl.current.tang })
+  // Ziehen: waagrecht dreht die Scheibe, senkrecht wendet die Münze.
+  const onPointerDown = (e: React.PointerEvent) =>
+    (zeiger.current = { x: e.clientX, y: e.clientY, roh: ctrl.current[mod(seite, 2)].tang, achse: null, richtung: 0 })
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!zeiger.current || e.buttons !== 1) return
-    ctrl.current.tang = zeiger.current.roh + (e.clientX - zeiger.current.x) * 0.0055
+    const z = zeiger.current
+    if (!z || e.buttons !== 1 || detail) return
+    const dx = e.clientX - z.x
+    const dy = e.clientY - z.y
+    if (!z.achse) {
+      if (Math.hypot(dx, dy) < 8) return
+      z.achse = Math.abs(dy) > Math.abs(dx) * 1.4 ? 'y' : 'x'
+      if (z.achse === 'y') {
+        z.richtung = Math.sign(dy)
+        bestuecke(seite + z.richtung)
+      }
+    }
+    if (z.achse === 'x') ctrl.current[mod(seite, 2)].tang = z.roh + dx * 0.0055
+    else wende.current.fziel = seite * Math.PI + z.richtung * THREE.MathUtils.clamp(dy * z.richtung * 0.0075, 0, Math.PI)
   }
   const onPointerUp = () => {
-    if (!zeiger.current) return
+    const z = zeiger.current
+    if (!z) return
     zeiger.current = null
-    schnappe(Math.round(ctrl.current.tang / SCHRITT) * SCHRITT)
+    if (z.achse === 'x') {
+      const s = schrittVon(kat)
+      schnappe(Math.round(ctrl.current[mod(seite, 2)].tang / s) * s)
+    } else if (z.achse === 'y') {
+      const weit = Math.abs(wende.current.fziel - seite * Math.PI) > Math.PI * 0.3
+      if (weit) wendeZu(seite + z.richtung, true)
+      else wende.current.fziel = seite * Math.PI
+    }
   }
 
-  const p = PROJEKTE[aktiv]
-
   return (
-    <>
+    <div className={`db${detail ? ' detail' : ''}${gross !== null ? ' gross' : ''}`} style={{ '--db-text': config.text, '--db-grund': config.grund, '--raster-unten': `${Math.round(rasterUnten)}px` } as React.CSSProperties}>
       <div
         className="buehne"
         ref={wrap}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        style={{ cursor: 'grab', background: '#0c0c0c' }}
+        style={{ cursor: detail ? 'zoom-out' : 'grab', background: config.grund }}
       >
         <Canvas
           dpr={[1, 1.75]}
           flat
           shadows
           gl={{ powerPreference: 'high-performance' }}
-          camera={{ fov: 34, position: [0, 3.1, 28.5], near: 0.1, far: 90 }}
-          style={{ background: '#0c0c0c' }}
+          camera={{ fov: fovFuer(fenster.b / fenster.h), position: KAMERA_HEIM.toArray(), near: 0.1, far: 90 }}
+          style={{ background: config.grund }}
         >
-          <fog attach="fog" args={['#0c0c0c', 32, 60]} />
+          <fog attach="fog" args={[config.grund, 32, 60]} />
           <Buehnenraum
             ctrl={ctrl}
+            wende={wende}
+            detail={detailCtrl}
+            offen={detail}
+            gross={gross}
+            alleBilder={alleBilder}
+            onLeer={insLeere}
+            flaechen={flaechen}
+            seite={seite}
+            projekt={p}
             aktiv={aktiv}
             projiziert={projiziert}
+            config={config}
             onDrehen={dreheZu}
-            onBild={(i) =>
-              PROJEKTE[aktiv].videoDatei && i === 0
-                ? setProjiziert(null)
-                : setProjiziert((v) => (v === i ? null : i))
-            }
+            onBild={waehleBild}
+            onZeigen={(i) => setProjiziert(i === null || (p.videoDatei && i === 0) ? null : i)}
           />
         </Canvas>
       </div>
 
       <Kopf hell />
-      <EntwurfSchalter hell />
-      {p.video && !p.videoDatei && (
+      <nav className="db-kategorien" aria-label="Kategorien">
+        {KATEGORIEN.map((k, i) => (
+          <button key={k.id} className={i === kat ? 'aktiv' : ''} onClick={() => zeigeKategorie(i)}>
+            {k.name}
+          </button>
+        ))}
+      </nav>
+      {p.video && !p.videoDatei && !detail && (
         <div className="db-video-zone">
           <iframe
             src={`${p.video}?background=1&autoplay=1&muted=1&loop=1`}
@@ -536,19 +1439,29 @@ export default function Drehbuehne() {
           />
         </div>
       )}
-      <div className="sb-titel" style={{ color: '#fff' }}>
+      <button className="db-zurueck" onClick={schliesse}>
+        ← zurück zur Bühne
+      </button>
+      <div className="sb-titel">
         <div className="db-pfeile">
-          <button onClick={() => schnappe(ctrl.current.tang + SCHRITT)} aria-label="Vorheriges Projekt">
+          <button onClick={() => dreheUm(-1)} aria-label="Vorheriges Projekt">
             ←
           </button>
-          <button onClick={() => schnappe(ctrl.current.tang - SCHRITT)} aria-label="Nächstes Projekt">
+          <button onClick={() => dreheUm(1)} aria-label="Nächstes Projekt">
             →
+          </button>
+          <button className="db-wenden" onClick={() => wendeZu(seite + 1)} aria-label="Bühne wenden" title="Bühne wenden">
+            ↻
           </button>
         </div>
         <h2>{p.titel}</h2>
+        <div className="sb-meta db-zaehler">
+          {KATEGORIEN[kat].name} · {String(aktiv + 1).padStart(2, '0')} / {String(projekte.length).padStart(2, '0')}
+        </div>
       </div>
 
-      {/* Beschreibung unten rechts — über dunklem Boden, ohne Fläche. */}
+      {/* Beschreibung unten rechts — über dunklem Boden, ohne Fläche. In der
+          Detailansicht rückt sie neben das Bildraster und wird zur Lesegröße. */}
       <div className="db-beschreibung" ref={panel} key={p.slug}>
         <h3 className="db-titel ov-anim-2">{p.titel}</h3>
         <p className="db-meta ov-anim-2">
@@ -571,8 +1484,13 @@ export default function Drehbuehne() {
         )}
       </div>
 
-      <div className="hinweis hell">ziehen oder scrollen: drehen · Maus führt das Licht · Foto anklicken: auf den Rundhorizont</div>
-      <Fuss hell fallback={['', 'Die Drehbühne', 'alle Arbeiten, 2021–2026']} />
-    </>
+      <div className="hinweis hell">
+        {detail
+          ? 'scrollen oder Pfeiltasten: nächstes Projekt · Foto anklicken: groß · Esc: zurück zur Bühne'
+          : 'ziehen ↔ oder scrollen: drehen · ziehen ↕: Bühne wenden · Maus führt das Licht · Foto anklicken: hinein ins Projekt'}
+      </div>
+
+      <Fuss hell projekt={detail ? p : undefined} fallback={['', '', `${KATEGORIEN[kat].name}, 2021–2026`]} />
+    </div>
   )
 }

@@ -1,6 +1,11 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Kopf } from '../ui/Chrome'
+import { PROJEKTE, permalink, type Projekt } from '../data/projects'
+
+// Einträge, zu denen es ein Projekt mit Bildern gibt, finden es über den Titel.
+const schlicht = (t: string) => t.toLowerCase().replace(/[^a-zäöüß0-9]/g, '')
+const projektZu = (titel: string): Projekt | undefined => PROJEKTE.find((p) => schlicht(p.titel) === schlicht(titel))
 
 const AUSBILDUNG = [
   ['2014', 'Bachelor of Arts Kunst und Sonderpädagogik/Inklusion (Uni Leipzig)'],
@@ -56,8 +61,92 @@ const AUSZEICHNUNGEN = [
   ['2023', 'Einladung zum „Heidelberger Stückemarkt“ mit „Die Hundekot-Attacke“'],
 ]
 
+// Eine Zeile der Werkliste. Gibt es das Projekt auf der Seite, führt sie dorthin —
+// und beim Überfahren wächst das Hauptbild an der Maus auf.
+function Werk({
+  jahr,
+  titel,
+  text,
+  onZeigen,
+}: {
+  jahr: string
+  titel: string
+  text: string
+  onZeigen: (p: Projekt | null) => void
+}) {
+  const projekt = projektZu(titel)
+  const inhalt = (
+    <>
+      <span className="jahr">{jahr}</span>
+      <span>
+        <em>{titel}.</em> {text}
+      </span>
+    </>
+  )
+  if (!projekt) return <div className="ll-zeile">{inhalt}</div>
+  return (
+    <Link
+      className="ll-zeile ll-projekt"
+      to={`/drehbuehne/${permalink(projekt)}`}
+      onPointerEnter={(e) => e.pointerType === 'mouse' && onZeigen(projekt)}
+      onPointerLeave={() => onZeigen(null)}
+    >
+      {inhalt}
+    </Link>
+  )
+}
+
 export default function Lebenslauf() {
   const navigate = useNavigate()
+
+  // Vorschau: das Hauptbild folgt der Maus mit etwas Nachlauf, wächst beim Betreten
+  // einer Zeile auf und schrumpft beim Verlassen wieder weg.
+  const [gezeigt, setGezeigt] = useState<Projekt | null>(null) // bleibt stehen, während das Bild schrumpft
+  const [offen, setOffen] = useState(false)
+  const bild = useRef<HTMLImageElement>(null)
+  const zeiger = useRef({ x: 0, y: 0, ix: 0, iy: 0, ruht: true })
+  const zeige = (p: Projekt | null) => {
+    if (p) {
+      setGezeigt(p)
+      if (zeiger.current.ruht) Object.assign(zeiger.current, { ix: zeiger.current.x, iy: zeiger.current.y })
+    }
+    zeiger.current.ruht = !p
+    setOffen(!!p)
+  }
+  // Hauptbilder vorab laden, damit die Vorschau sofort da ist.
+  useEffect(() => {
+    ;[...ARBEITEN, ...AUSSTELLUNGEN].forEach(([, titel]) => {
+      const p = projektZu(titel)
+      if (p) new Image().src = p.bilder[0].src
+    })
+  }, [])
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => Object.assign(zeiger.current, { x: e.clientX, y: e.clientY })
+    window.addEventListener('pointermove', onMove)
+    let bildlauf = 0
+    let zuletzt = performance.now()
+    const lauf = (jetzt: number) => {
+      const z = zeiger.current
+      const k = 1 - Math.exp(-14 * Math.min((jetzt - zuletzt) / 1000, 1 / 30))
+      zuletzt = jetzt
+      z.ix += (z.x - z.ix) * k
+      z.iy += (z.y - z.iy) * k
+      const el = bild.current
+      if (el) {
+        // Rechts im Fenster hängt das Bild links von der Maus — so bleibt es im Blick.
+        const links = z.ix > window.innerWidth * 0.55
+        const y = Math.min(z.iy + 18, window.innerHeight - el.offsetHeight - 12)
+        el.style.translate = `${links ? z.ix - el.offsetWidth - 18 : z.ix + 18}px ${Math.max(12, y)}px`
+        el.style.transformOrigin = links ? 'top right' : 'top left'
+      }
+      bildlauf = requestAnimationFrame(lauf)
+    }
+    bildlauf = requestAnimationFrame(lauf)
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      cancelAnimationFrame(bildlauf)
+    }
+  }, [])
 
   // Esc schließt den Lebenslauf wieder.
   useEffect(() => {
@@ -76,7 +165,12 @@ export default function Lebenslauf() {
       <Kopf />
       <div className="lebenslauf">
         <section>
-          <h2>Lebenslauf</h2>
+          <h2 className="ll-kopf">
+            Lebenslauf
+            <a href={`${import.meta.env.BASE_URL}lebenslauf-carolin-pflueger.pdf`} download>
+              ↓ als PDF
+            </a>
+          </h2>
           <p>
             Freischaffende Bühnen- und Kostümbildnerin, Kunstvermittlerin.
             <br />
@@ -118,22 +212,12 @@ export default function Lebenslauf() {
 
           <h3>Bühne und Kostüm</h3>
           {ARBEITEN.map(([jahr, titel, text], i) => (
-            <div className="ll-zeile" key={i}>
-              <span className="jahr">{jahr}</span>
-              <span>
-                <em>{titel}.</em> {text}
-              </span>
-            </div>
+            <Werk key={i} jahr={jahr} titel={titel} text={text} onZeigen={zeige} />
           ))}
 
           <h3>Ausstellungen</h3>
           {AUSSTELLUNGEN.map(([jahr, titel, text], i) => (
-            <div className="ll-zeile" key={i}>
-              <span className="jahr">{jahr}</span>
-              <span>
-                <em>{titel}.</em> {text}
-              </span>
-            </div>
+            <Werk key={i} jahr={jahr} titel={titel} text={text} onZeigen={zeige} />
           ))}
 
           <h3>Auszeichnungen</h3>
@@ -145,6 +229,8 @@ export default function Lebenslauf() {
           ))}
         </section>
       </div>
+      {/* immer im Dokument — sonst gäbe es beim ersten Überfahren nichts, woraus das Bild wachsen kann */}
+      <img ref={bild} className={offen ? 'll-vorschau offen' : 'll-vorschau'} src={gezeigt?.bilder[0].src} alt="" aria-hidden />
     </>
   )
 }

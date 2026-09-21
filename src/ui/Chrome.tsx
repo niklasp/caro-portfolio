@@ -20,11 +20,14 @@ export function Kopf({ hell = false }: { hell?: boolean }) {
         <span className="unter">{KONTAKT.untertitel}</span>
       </Link>
       <nav>
-        {pathname === '/lebenslauf' && (
+        {(pathname === '/lebenslauf' || pathname === '/about') && (
           <button onClick={zurueck} aria-label="Zurück" style={{ fontSize: 15, lineHeight: 1 }}>
             ←
           </button>
         )}
+        <NavLink to="/about" className={({ isActive }) => (isActive ? 'aktiv' : '')}>
+          About
+        </NavLink>
         <NavLink to="/lebenslauf" className={({ isActive }) => (isActive ? 'aktiv' : '')}>
           Lebenslauf
         </NavLink>

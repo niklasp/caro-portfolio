@@ -63,5 +63,7 @@ seite(
   `${SITE}images/on-repeat-2.jpg`
 )
 anzahl++
+seite('about', 'About — Carolin Pflüger', 'Über Carolin Pflüger: Bühnen- und Kostümbildnerin, Kunstvermittlerin in Berlin.', `${SITE}images/on-repeat-2.jpg`)
+anzahl++
 
 console.log(`Prerender: ${anzahl} Seiten geschrieben.`)
