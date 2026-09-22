@@ -17,6 +17,17 @@ export const LEINWAENDE = {
 } as const
 export type Leinwand = (typeof LEINWAENDE)[keyof typeof LEINWAENDE]
 
+// Wie das Motiv auf die Leinwand kommt: beschnitten (füllend) oder ganz zu sehen.
+export const PASSUNGEN = {
+  'Ausschnitt, Maus führt': 'ausschnitt',
+  'Ausschnitt, fest': 'fest',
+  'Ganzes Bild': 'ganz',
+  'Ganzes Bild, Rand gefüllt': 'ganzRand',
+  'Gekachelt, gespiegelt': 'kacheln',
+  'Gekachelt, gerade': 'kachelnGerade',
+} as const
+export type Passung = (typeof PASSUNGEN)[keyof typeof PASSUNGEN]
+
 export const LICHTER = {
   'Verfolger (Maus)': 'verfolger',
   'Fokus aufs Hauptprojekt': 'fokus',
@@ -27,8 +38,20 @@ export const LICHTER = {
 } as const
 export type Licht = (typeof LICHTER)[keyof typeof LICHTER]
 
+// Wie die drei Fotos eines Projekts auf der Scheibe stehen.
+export const AUFSTELLUNGEN = {
+  'Frei gestellt': 'frei',
+  'Hauptbild hinten, zwei kleine davor': 'hauptbild',
+  Nebeneinander: 'reihe',
+  Fächer: 'faecher',
+  'Treppe nach vorn': 'treppe',
+} as const
+export type Aufstellung = (typeof AUFSTELLUNGEN)[keyof typeof AUFSTELLUNGEN]
+
 export interface DrehConfig {
   leinwand: Leinwand
+  leinwandPassung: Passung
+  leinwandReihen: number // Kacheln: so viele Bildreihen übereinander
   leinwandHell: number
   leinwandBild: string // hochgeladenes Bild (Objekt-URL) — überstimmt das Projektmotiv
   grund: string
@@ -46,6 +69,7 @@ export interface DrehConfig {
   wendeTempo: number
   zoomDauer: number
   // Kulissen: die Foto-Blöcke auf der Scheibe
+  objAufstellung: Aufstellung
   objGroesse: number
   objDicke: number
   objRadius: number
@@ -63,6 +87,8 @@ export interface DrehConfig {
 
 export const STANDARD: DrehConfig = {
   leinwand: 'rundhorizont',
+  leinwandPassung: 'ausschnitt',
+  leinwandReihen: 1,
   leinwandHell: 1,
   leinwandBild: '',
   grund: '#0c0c0c',
@@ -79,6 +105,7 @@ export const STANDARD: DrehConfig = {
   laufZeilen: 9,
   wendeTempo: 3.4,
   zoomDauer: 0.95,
+  objAufstellung: 'frei',
   objGroesse: 1,
   objDicke: 0.5,
   objRadius: 11.2,
@@ -183,10 +210,12 @@ export function useDrehConfig(): DrehConfig {
 
     const leinwand = gui.addFolder('Leinwand')
     leinwand.add(cfg, 'leinwand', LEINWAENDE).name('Art').onChange(melde)
+    leinwand.add(cfg, 'leinwandPassung', PASSUNGEN).name('Motiv').onChange(melde)
+    leinwand.add(cfg, 'leinwandReihen', 1, 4, 1).name('Kachel-Reihen').onChange(melde)
     leinwand.add(cfg, 'leinwandHell', 0.2, 3, 0.05).name('Helligkeit').onChange(melde)
     leinwand.add(aktionen, 'hochladen').name('Bild hochladen …')
     leinwand.add(aktionen, 'bildWeg').name('wieder Projektmotiv')
-    mitStandard(leinwand, ['leinwand', 'leinwandHell'], aktionen.bildWeg)
+    mitStandard(leinwand, ['leinwand', 'leinwandPassung', 'leinwandReihen', 'leinwandHell'], aktionen.bildWeg)
     leinwand.open()
 
     const farben = gui.addFolder('Farben')
@@ -204,6 +233,7 @@ export function useDrehConfig(): DrehConfig {
     licht.open()
 
     const kulissen = gui.addFolder('Kulissen')
+    kulissen.add(cfg, 'objAufstellung', AUFSTELLUNGEN).name('Aufstellung').onChange(melde)
     kulissen.add(cfg, 'objGroesse', 0.4, 2.2, 0.01).name('Größe').onChange(melde)
     kulissen.add(cfg, 'objDicke', 0.02, 3, 0.01).name('Dicke der Blöcke').onChange(melde)
     kulissen.add(cfg, 'objRadius', 4, 12.6, 0.1).name('Abstand zur Mitte').onChange(melde)
@@ -218,6 +248,7 @@ export function useDrehConfig(): DrehConfig {
     kulissen.add(cfg, 'objAnzahl', 1, 3, 1).name('Fotos pro Projekt').onChange(melde)
     kulissen.add(cfg, 'objRueckseite').name('Rückseiten in Projektfarbe').onChange(melde)
     mitStandard(kulissen, [
+      'objAufstellung',
       'objGroesse',
       'objDicke',
       'objRadius',

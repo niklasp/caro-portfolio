@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, Suspense, type RefObject } from 'react'
 import { Canvas, useFrame, useLoader, useThree, type ThreeElements } from '@react-three/fiber'
 import * as THREE from 'three'
-import { KATEGORIEN, byKategorie, findByPermalink, type Projekt } from '../data/projects'
+import { useProgress } from '@react-three/drei'
+import { KATEGORIEN, KONTAKT, byKategorie, findByPermalink, type Projekt } from '../data/projects'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useProjektUrlSync } from '../ui/permalink'
 import { Kopf, Fuss } from '../ui/Chrome'
@@ -55,6 +56,31 @@ const LAGEN = [
   { x: 1.18, z: 0.6, b: 1.68, ry: -0.12 },
   { x: 0.28, z: 1.15, b: 1.35, ry: 0.09 },
 ]
+// Weitere Aufstellungen (Stellwerk → Kulissen). Die Geometrie bleibt die der freien
+// Aufstellung, die Breite hier skaliert sie nur — so wechselt die Aufstellung ohne Neuaufbau.
+const AUFSTELLUNG_LAGEN: Record<string, typeof LAGEN> = {
+  frei: LAGEN,
+  hauptbild: [
+    { x: 0, z: -0.5, b: 4.4, ry: 0 }, // so breit wie der Platz eines Projekts auf der Scheibe
+    { x: -1.3, z: 1.2, b: 1.4, ry: 0.14 },
+    { x: 1.3, z: 1.25, b: 1.4, ry: -0.14 },
+  ],
+  reihe: [
+    { x: -1.75, z: 0.45, b: 1.55, ry: 0.16 },
+    { x: 0, z: 0.2, b: 1.55, ry: 0 },
+    { x: 1.75, z: 0.45, b: 1.55, ry: -0.16 },
+  ],
+  faecher: [
+    { x: -1.35, z: 0.55, b: 2.1, ry: 0.5 },
+    { x: 0, z: 0, b: 2.1, ry: 0 },
+    { x: 1.35, z: 0.55, b: 2.1, ry: -0.5 },
+  ],
+  treppe: [
+    { x: -1.2, z: -0.4, b: 2.9, ry: 0.08 },
+    { x: 0.35, z: 0.5, b: 2.0, ry: -0.05 },
+    { x: 1.55, z: 1.3, b: 1.3, ry: 0.1 },
+  ],
+}
 
 const KAMERA_HEIM = new THREE.Vector3(0, 3.1, 28.5)
 const BLICK_HEIM = new THREE.Vector3(0, 2.0, 0)
@@ -70,6 +96,61 @@ const istSchmal = (breite: number, hoehe: number) => breite < 900 || breite / ho
 const maus = { x: 0, y: 0 }
 
 const weich = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2)
+
+// ---------- Auftakt: Ladeschirm ----------
+// Der Name der Künstlerin füllt sich von links in der Farbe des vordersten Projekts,
+// während die Fotos laden. Erst wenn alles da ist — und der Auftakt kurz zu sehen war —
+// hebt sich der Vorhang. Einmal pro Sitzung; wer vom Lebenslauf zurückkommt, wartet nicht.
+let auftaktGezeigt = false
+const AUFTAKT_MIN = 1.7 // Sekunden, die der Auftakt mindestens steht
+const AUFTAKT_MAX = 9 // danach geht es auch ohne letztes Bild weiter
+
+function Auftakt({ farbe, onFertig }: { farbe: string; onFertig: () => void }) {
+  const { active, progress } = useProgress()
+  const lade = useRef({ active, progress, gesehen: false })
+  lade.current.active = active
+  lade.current.progress = progress
+  if (active) lade.current.gesehen = true
+  const [fuell, setFuell] = useState(0)
+  const [weg, setWeg] = useState(false)
+
+  useEffect(() => {
+    auftaktGezeigt = true
+    const start = performance.now()
+    let ende = 0
+    let f = 0
+    const takt = window.setInterval(() => {
+      const zeit = (performance.now() - start) / 1000
+      const l = lade.current
+      const fertig = zeit >= AUFTAKT_MIN && ((l.gesehen && !l.active && l.progress >= 100) || zeit > AUFTAKT_MAX || (!l.gesehen && zeit > 3))
+      // Der Name läuft stetig zu, immer langsamer, und kommt erst ganz an, wenn die
+      // Bilder da sind. Der echte Ladestand hebt ihn an, wenn er weiter ist.
+      f += ((fertig ? 1 : 0.985) - f) * (fertig ? 0.3 : 0.035)
+      if (l.gesehen) f = Math.max(f, (l.progress / 100) * 0.9)
+      setFuell(f)
+      if (fertig && !ende) {
+        ende = window.setTimeout(() => setWeg(true), 700) // der volle Name darf kurz stehen
+        window.clearInterval(takt)
+      }
+    }, 80)
+    return () => {
+      window.clearInterval(takt)
+      window.clearTimeout(ende)
+    }
+  }, [])
+
+  return (
+    <div
+      className={weg ? 'db-auftakt weg' : 'db-auftakt'}
+      style={{ '--farbe': farbe, '--fuell': fuell } as React.CSSProperties}
+      onTransitionEnd={weg ? onFertig : undefined}
+      aria-hidden
+    >
+      <div className="db-auftakt-name">{KONTAKT.name}</div>
+      <div className="db-auftakt-unter">{KONTAKT.untertitel}</div>
+    </div>
+  )
+}
 
 // ---------- Bildraster der Detailansicht ----------
 // Im Kameraraum, RASTER_D vor der Kamera: links das Raster, rechts bleibt Platz
@@ -121,7 +202,17 @@ function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
     const s = Math.min(1, platz / hoehen.reduce((a, h) => a + h, 0), (H * 0.66) / Math.max(...hoehen))
     hoehen = hoehen.map((h) => h * s)
     const flaeche = zeilen.reduce((a, z, k) => a + hoehen[k] ** 2 * z.reduce((b, i) => b + ars[i], 0), 0)
-    const wert = flaeche * Math.sqrt(Math.min(...hoehen) / Math.max(...hoehen))
+    // Fläche allein reicht nicht: ein Block, der die Höhe ausfüllt, schlägt einen flachen
+    // Streifen (2×2 statt 1×4), und lange Zeilen mit vielen kleinen Fotos wirken gedrängt —
+    // ab vier Fotos pro Zeile kostet jedes weitere 30 %.
+    const genutzt = hoehen.reduce((a, h) => a + h, 0) + RASTER_LUECKE * (zeilen.length - 1)
+    const laengste = Math.max(...zeilen.map((z) => z.length))
+    const wert =
+      flaeche *
+      Math.sqrt(Math.min(...hoehen) / Math.max(...hoehen)) *
+      Math.min(1, genutzt / H) *
+      Math.min(1, Math.min(...hoehen) / (0.3 * H)) *
+      0.7 ** Math.max(0, laengste - 3)
     if (!beste || wert > beste.wert) beste = { zeilen, hoehen, wert }
   }
   const teile = (ab: number, zeilen: number[][]) => {
@@ -175,6 +266,8 @@ uniform float uFokus;
 uniform float uSpiegel;
 uniform float uKacheln;
 uniform float uBlende;
+uniform float uPassung; // 0 Ausschnitt (Maus) · 1 Ausschnitt fest · 2 ganz · 3 ganz, Rand gefüllt · 4 Kacheln gespiegelt · 5 Kacheln gerade
+uniform float uReihen;
 uniform vec3 uGrund;
 varying vec2 vUv;
 
@@ -182,14 +275,45 @@ float zufall(vec2 p) {
   return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-vec2 abdecken(vec2 uv, float imgA) {
+vec2 abdecken(vec2 uv, float imgA, float fokus) {
   // cover-fit: die Fläche wird immer voll gefüllt; der Fokus wandert
-  // mit der Maushöhe durch den abgeschnittenen Bildbereich
+  // durch den abgeschnittenen Bildbereich (mit der Maushöhe oder fest in der Mitte)
   if (imgA < uPlaneA) {
     float band = imgA / uPlaneA;
-    return vec2(uv.x, (uv.y - 0.5) * band + 0.5 + (uFokus - 0.5) * (1.0 - band));
+    return vec2(uv.x, (uv.y - 0.5) * band + 0.5 + (fokus - 0.5) * (1.0 - band));
   }
   return vec2((uv.x - 0.5) * (uPlaneA / imgA) + 0.5, uv.y);
+}
+
+// contain-fit: das ganze Bild, mittig — z sagt, ob der Punkt im Bild liegt
+vec3 einpassen(vec2 uv, float imgA) {
+  vec2 p = imgA > uPlaneA
+    ? vec2(uv.x, (uv.y - 0.5) * (imgA / uPlaneA) + 0.5)
+    : vec2((uv.x - 0.5) * (uPlaneA / imgA) + 0.5, uv.y);
+  float innen = step(0.0, p.x) * step(p.x, 1.0) * step(0.0, p.y) * step(p.y, 1.0);
+  return vec3(p, innen);
+}
+
+// Kacheln: uReihen Bildreihen übereinander, jedes Bild im eigenen Format, nebeneinander wiederholt
+vec2 kacheln(vec2 uv, float imgA, bool spiegeln) {
+  vec2 k = vec2(uv.x * uPlaneA / imgA, uv.y) * uReihen;
+  vec2 f = fract(k);
+  if (!spiegeln) return f;
+  vec2 ungerade = mod(floor(k), 2.0);
+  return mix(f, 1.0 - f, ungerade);
+}
+
+vec3 motiv(sampler2D bild, float imgA, vec2 uv) {
+  if (uPassung < 0.5) return texture2D(bild, abdecken(uv, imgA, uFokus)).rgb;
+  if (uPassung < 1.5) return texture2D(bild, abdecken(uv, imgA, 0.5)).rgb;
+  if (uPassung < 3.5) {
+    vec3 e = einpassen(uv, imgA);
+    vec3 farbe = texture2D(bild, e.xy).rgb;
+    // Rand: Hintergrundfarbe — oder das abgedunkelte, füllende Motiv dahinter
+    vec3 rand = uPassung < 2.5 ? uGrund : texture2D(bild, abdecken(uv, imgA, 0.5)).rgb * 0.3;
+    return mix(rand, farbe, e.z);
+  }
+  return texture2D(bild, kacheln(uv, imgA, uPassung < 4.5)).rgb;
 }
 
 void main() {
@@ -198,8 +322,8 @@ void main() {
   float k = uv.x * uKacheln;
   float f = fract(k);
   uv.x = mod(floor(k) - floor(uKacheln * 0.5), 2.0) > 0.5 ? 1.0 - f : f;
-  vec3 alt = texture2D(uAlt, abdecken(uv, uAltA)).rgb;
-  vec3 neu = texture2D(uBild, abdecken(uv, uBildA)).rgb;
+  vec3 alt = motiv(uAlt, uAltA, uv);
+  vec3 neu = motiv(uBild, uBildA, uv);
   vec3 farbe = mix(alt, neu, smoothstep(0.0, 1.0, uMix));
   // abgeschattet, zur Mitte hin offen — als Projektion noch heller
   float vig = smoothstep(1.15, 0.3, distance(vUv, vec2(0.5, 0.42)));
@@ -230,6 +354,7 @@ const ladeHg = (src: string) => {
   return p
 }
 
+const PASSUNG_NR: Record<string, number> = { ausschnitt: 0, fest: 1, ganz: 2, ganzRand: 3, kacheln: 4, kachelnGerade: 5 }
 const OBEN_ANTEIL = 0.62 // „Oberer Bildschirmteil": so viel der Höhe trägt das Bild
 
 // Ein Material für alle Leinwand-Arten — die Art bestimmt nur, auf welcher Fläche es liegt.
@@ -253,6 +378,8 @@ function useLeinwandMaterial(src: string, hell: boolean, video: string | undefin
         uSpiegel: { value: 1 },
         uKacheln: { value: 1 },
         uBlende: { value: 0 },
+        uPassung: { value: 0 },
+        uReihen: { value: 1 },
         uSchirm: { value: 0 },
         uSchirmY: { value: new THREE.Vector2(-1, 1) },
         uGrund: { value: new THREE.Color() },
@@ -325,6 +452,8 @@ function useLeinwandMaterial(src: string, hell: boolean, video: string | undefin
     // Maus oben → Bildfokus oben, unten → unten
     u.uFokus.value += (0.5 - maus.y * 0.5 - (u.uFokus.value as number)) * (1 - Math.exp(-3 * dt))
     ;(u.uGrund.value as THREE.Color).set(cfg.grund)
+    u.uPassung.value = PASSUNG_NR[cfg.leinwandPassung] ?? 0
+    u.uReihen.value = cfg.leinwandReihen
     const bildschirm = size.width / size.height
     u.uPlaneA.value =
       art === 'vollbild'
@@ -391,7 +520,7 @@ function Scheinwerfer({
   auf,
   fuehre,
   schatten,
-  karte = 2048,
+  karte = 1024,
   ...licht
 }: {
   von: [number, number, number]
@@ -456,7 +585,7 @@ function Beleuchtung({ art, staerke: s, schatten }: { art: Licht; staerke: numbe
             position={[6, 22, 14]}
             intensity={1.5 * s}
             castShadow={schatten}
-            shadow-mapSize={[2048, 2048]}
+            shadow-mapSize={[1024, 1024]}
             shadow-camera-left={-16}
             shadow-camera-right={16}
             shadow-camera-top={16}
@@ -531,6 +660,30 @@ function Beleuchtung({ art, staerke: s, schatten }: { art: Licht; staerke: numbe
 
 // ---------- Foto als beleuchteter Block, Textur läuft um die Kanten ----------
 
+// Box eines Fotos: die vier Kanten zeigen die äußersten 6 % des Bildes (wie ein
+// umgeschlagener Druck), vorn das ganze Bild, hinten eine eigene Fläche. Die
+// Flächen von BoxGeometry liegen in der Reihenfolge +x −x +y −y +z −z, je 4 Ecken.
+const KANTEN: [number, number, number, number][] = [
+  [0.94, 0, 0.06, 1], // rechts: Versatz u/v, Ausschnitt u/v
+  [0, 0, 0.06, 1], // links
+  [0, 0.94, 1, 0.06], // oben
+  [0, 0, 1, 0.06], // unten
+]
+function fotoGeometrie(breite: number, hoehe: number, dicke: number) {
+  const g = new THREE.BoxGeometry(breite, hoehe, dicke)
+  const uv = g.attributes.uv as THREE.BufferAttribute
+  KANTEN.forEach(([ou, ov, ru, rv], seite) => {
+    for (let e = 0; e < 4; e++) {
+      const i = seite * 4 + e
+      uv.setXY(i, ou + uv.getX(i) * ru, ov + uv.getY(i) * rv)
+    }
+  })
+  g.clearGroups()
+  g.addGroup(0, 30, 0) // fünf Flächen mit dem Bild
+  g.addGroup(30, 6, 1) // Rückseite
+  return g
+}
+
 function FotoObjekt({
   url,
   nr,
@@ -546,26 +699,18 @@ function FotoObjekt({
   dicke?: number
 } & Omit<ThreeElements['mesh'], 'position' | 'rotation' | 'scale'>) {
   const tex = useLoader(THREE.TextureLoader, url)
+  // Ein Bild, ein GPU-Upload: die schmalen Kanten holen sich ihren Streifen über die
+  // UVs der Geometrie statt über geklonte Texturen. Zwei Materialien, zwei Draw-Calls.
   const materialien = useMemo(() => {
     tex.colorSpace = THREE.SRGBColorSpace
-    tex.anisotropy = 8
-    const kante = (ox: number, oy: number, rx: number, ry: number) => {
-      const t = tex.clone()
-      t.needsUpdate = true
-      t.repeat.set(rx, ry)
-      t.offset.set(ox, oy)
-      return new THREE.MeshLambertMaterial({ map: t, emissiveMap: t, emissive: '#000' })
-    }
+    tex.anisotropy = 4
     return [
-      kante(0.94, 0, 0.06, 1), // rechts
-      kante(0, 0, 0.06, 1), // links
-      kante(0, 0.94, 1, 0.06), // oben
-      kante(0, 0, 1, 0.06), // unten
       // emissiveMap: in der Detailansicht leuchtet das Foto selbst, unabhängig vom Bühnenlicht
-      new THREE.MeshLambertMaterial({ map: tex, emissiveMap: tex, emissive: '#000' }), // vorn
+      new THREE.MeshLambertMaterial({ map: tex, emissiveMap: tex, emissive: '#000' }), // vorn + Kanten
       new THREE.MeshLambertMaterial({ color: '#2a2a2a' }), // hinten
     ]
   }, [tex])
+  const geometrie = useMemo(() => fotoGeometrie(breite, breite / ar, dicke), [breite, ar, dicke])
   // Wo das Foto steht, bestimmt allein die Frame-Schleife der Bühnenseite: aus der
   // Aufstellung und den Reglern im Stellwerk — und im Flug ins Bildraster.
   const mesh = useRef<THREE.Mesh>(null)
@@ -573,10 +718,18 @@ function FotoObjekt({
     const m = mesh.current
     if (m) m.userData.foto = { k: 0, g: 0, da: 1, ...m.userData.foto, nr, breite }
   }, [nr, breite])
+  useLayoutEffect(() => {
+    // Der Raycaster fragt nicht nach Sichtbarkeit: versteckte Extras und die eingefahrene
+    // Münzseite würden sonst Klicks und Hover abfangen.
+    const m = mesh.current
+    if (!m) return
+    m.raycast = (r, hits) => {
+      for (let o: THREE.Object3D | null = m; o; o = o.parent) if (!o.visible) return
+      THREE.Mesh.prototype.raycast.call(m, r, hits)
+    }
+  }, [])
   return (
-    <mesh ref={mesh} {...props} material={materialien} castShadow receiveShadow>
-      <boxGeometry args={[breite, breite / ar, dicke]} />
-    </mesh>
+    <mesh ref={mesh} {...props} geometry={geometrie} material={materialien} castShadow receiveShadow />
   )
 }
 
@@ -702,7 +855,7 @@ function Kulisse({
   alleBilder: boolean // Detailansicht: auch die Bilder, die nicht auf der Bühne stehen
   onDrehen: (index: number) => void
   onBild: (bildIndex: number) => void
-  onZeigen: (bildIndex: number | null) => void
+  onZeigen: (bildIndex: number | null, verlassen?: number) => void
 }) {
   const theta = index * schritt
   const gruppe = useRef<THREE.Group>(null)
@@ -737,8 +890,6 @@ function Kulisse({
       <group
         ref={gruppe}
         userData={daten}
-        onPointerOver={oben ? () => (document.body.style.cursor = vorn ? 'zoom-in' : 'pointer') : undefined}
-        onPointerOut={oben ? () => (document.body.style.cursor = '') : undefined}
       >
         <Suspense fallback={null}>
           {fotos.map((b, i) => {
@@ -753,8 +904,24 @@ function Kulisse({
                 breite={l.b}
                 ar={b.ar}
                 visible={false}
-                onPointerOver={oben && vorn && !detail ? () => onZeigen(i) : undefined}
-                onPointerOut={oben && vorn && !detail ? () => onZeigen(null) : undefined}
+                // stopPropagation: nur das vorderste Foto zählt — nicht auch die dahinter
+                onPointerOver={
+                  oben
+                    ? (e) => {
+                        e.stopPropagation()
+                        document.body.style.cursor = vorn ? 'zoom-in' : 'pointer'
+                        if (vorn && !detail) onZeigen(i)
+                      }
+                    : undefined
+                }
+                onPointerOut={
+                  oben
+                    ? () => {
+                        document.body.style.cursor = ''
+                        if (vorn && !detail) onZeigen(null, i)
+                      }
+                    : undefined
+                }
                 onClick={oben ? klick(i) : undefined}
               />
             )
@@ -791,7 +958,7 @@ function Flaeche({
   alleBilder: boolean
   onDrehen: (index: number) => void
   onBild: (bildIndex: number) => void
-  onZeigen: (bildIndex: number | null) => void
+  onZeigen: (bildIndex: number | null, verlassen?: number) => void
 }) {
   const flaeche = useRef<THREE.Group>(null)
   const scheibe = useRef<THREE.Group>(null)
@@ -868,11 +1035,12 @@ function Flaeche({
         const f = kind.userData.foto
         if (!f) return
         const extra = f.nr >= LAGEN.length // steckt klein im ersten Block, bis die Detailansicht öffnet
-        const lage = LAGEN[extra ? 0 : f.nr]
-        const G = cfg.objGroesse
-        const hoehe = (lage.b / ars[extra ? 0 : f.nr]) * G
+        const lagen = AUFSTELLUNG_LAGEN[cfg.objAufstellung] ?? LAGEN
+        const lage = lagen[extra ? 0 : f.nr]
+        const G = cfg.objGroesse * (extra ? 1 : lage.b / LAGEN[f.nr].b) // Aufstellung skaliert die Grundgeometrie
+        const hoehe = (lage.b / ars[extra ? 0 : f.nr]) * cfg.objGroesse
         let turm = 0 // Stapeln: die Höhe aller Fotos darunter
-        for (let j = 0; j < (extra ? 0 : f.nr); j++) turm += (LAGEN[j].b / ars[j]) * G + 0.04
+        for (let j = 0; j < (extra ? 0 : f.nr); j++) turm += (lagen[j].b / ars[j]) * cfg.objGroesse + 0.04
         const S = cfg.objStapel
         hilf.heim.set(
           THREE.MathUtils.lerp(lage.x * cfg.objStreuung, 0, S),
@@ -931,8 +1099,8 @@ function Flaeche({
           const mats = Array.isArray(m.material) ? m.material : [m.material]
           mats.forEach((mat, mi) => {
             const l = mat as THREE.MeshLambertMaterial
-            // Rückseite (Material 5) auf Wunsch in der Farbe des Projekts
-            const basis = mi === 5 && cfg.objRueckseite ? (o.userData.farbe as THREE.Color) : (m.userData.grundfarben as THREE.Color[])[mi]
+            // Rückseite (Material 1) auf Wunsch in der Farbe des Projekts
+            const basis = mi === 1 && cfg.objRueckseite ? (o.userData.farbe as THREE.Color) : (m.userData.grundfarben as THREE.Color[])[mi]
             l.color.copy(basis).multiplyScalar((o.userData.b as number) * (1 - k))
             if (l.emissiveMap) l.emissive.setScalar(k)
           })
@@ -997,7 +1165,7 @@ function Buehnenraum({
   config: DrehConfig
   onDrehen: (index: number) => void
   onBild: (bildIndex: number) => void
-  onZeigen: (bildIndex: number | null) => void
+  onZeigen: (bildIndex: number | null, verlassen?: number) => void
 }) {
   const leinwand = useLeinwandMaterial(
     config.leinwandBild || projekt.bilder[Math.min(projiziert ?? 0, projekt.bilder.length - 1)].src,
@@ -1012,6 +1180,12 @@ function Buehnenraum({
   const farbe = useRef<THREE.Mesh>(null)
   const cam = useThree((s) => s.camera)
   const groesse = useThree((s) => s.size)
+  const gl = useThree((s) => s.gl)
+  const szene = useThree((s) => s.scene)
+  // Nur in der Entwicklung: Renderer und Szene für Messungen in der Konsole
+  useEffect(() => {
+    if (import.meta.env.DEV) (window as unknown as Record<string, unknown>).__buehne = { gl, szene, kamera: cam }
+  }, [gl, szene, cam])
   const aspekt = groesse.width / groesse.height
   const ars = useMemo(() => projekt.bilder.map((b) => b.ar), [projekt])
 
@@ -1131,6 +1305,7 @@ export default function Drehbuehne() {
   const detail = hash === DETAIL_HASH
   const config = useDrehConfig()
 
+  const [auftakt, setAuftakt] = useState(() => !auftaktGezeigt)
   const [fenster, setFenster] = useState(() => ({ b: window.innerWidth, h: window.innerHeight }))
   useEffect(() => {
     const onResize = () => setFenster({ b: window.innerWidth, h: window.innerHeight })
@@ -1393,7 +1568,7 @@ export default function Drehbuehne() {
         style={{ cursor: detail ? 'zoom-out' : 'grab', background: config.grund }}
       >
         <Canvas
-          dpr={[1, 1.75]}
+          dpr={[1, 1.5]}
           flat
           shadows
           gl={{ powerPreference: 'high-performance' }}
@@ -1417,11 +1592,15 @@ export default function Drehbuehne() {
             config={config}
             onDrehen={dreheZu}
             onBild={waehleBild}
-            onZeigen={(i) => setProjiziert(i === null || (p.videoDatei && i === 0) ? null : i)}
+            onZeigen={(i, verlassen) =>
+              // Verlassen nimmt nur das eigene Bild zurück — sonst löscht der Wechsel zum Nachbarfoto dessen Bild
+              setProjiziert((z) => (i === null ? (z === verlassen ? null : z) : p.videoDatei && i === 0 ? null : i))
+            }
           />
         </Canvas>
       </div>
 
+      {auftakt && <Auftakt farbe={p.farbe} onFertig={() => setAuftakt(false)} />}
       <Kopf hell />
       <nav className="db-kategorien" aria-label="Kategorien">
         {KATEGORIEN.map((k, i) => (
