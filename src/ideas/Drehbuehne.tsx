@@ -750,12 +750,13 @@ varying float vFront;
 void main() {
   // Liegt die Münze auf der Rückseite, steht der Rand kopf — Schrift mitdrehen.
   vec2 uv = uKopf > 0.5 ? 1.0 - vUv : vUv;
-  vec2 g = vec2(uv.x * uKachel * uAnzahl, uv.y * uZeilen);
+  // Das Punktraster wandert mit der Schrift — kein festes Dioden-Gitter, sondern
+  // eine gepunktete Schrift, die stufenlos über den Rand gleitet.
+  vec2 g = vec2(uv.x * uKachel * uAnzahl + uSchritt, uv.y * uZeilen);
   vec2 zelle = floor(g);
   float d = length(fract(g) - 0.5);
   float punkt = smoothstep(0.47, 0.3, d);
-  float spalte = mod(zelle.x + uSchritt, uKachel);
-  float an = uAn * step(0.5, texture2D(uText, vec2((spalte + 0.5) / uKachel, (zelle.y + 0.5) / uZeilen)).r);
+  float an = uAn * step(0.5, texture2D(uText, vec2((zelle.x + 0.5) / uKachel, (zelle.y + 0.5) / uZeilen)).r);
   vec3 farbe = uFarbe * mix(0.12, 1.0, an) * punkt;
   farbe += an * uFarbe * 0.3 * (1.0 - punkt); // Überstrahlen zwischen den Dioden
   // Dioden strahlen nach vorn: schräg gesehen — zu den Bildrändern hin — werden sie matter.
@@ -819,9 +820,9 @@ function Scheibe({ wende, config }: { wende: RefObject<WendeCtrl>; config: DrehC
     u.uKopf.value = mod(seite, 2)
     u.uAn.value = cfg.laufschrift ? 1 : 0
     ;(u.uFarbe.value as THREE.Color).set(cfg.laufFarbe)
-    // Die Schrift rückt in ganzen Dioden-Spalten weiter.
-    lauf.current += Math.min(dt, 1 / 30) * cfg.laufTempo
-    u.uSchritt.value = Math.floor(lauf.current)
+    // Die Schrift gleitet stufenlos in Dioden-Spalten pro Sekunde.
+    lauf.current = (lauf.current + Math.min(dt, 1 / 30) * cfg.laufTempo) % s.kachel
+    u.uSchritt.value = lauf.current
     materialien[1].color.set(cfg.scheibe)
   })
 
