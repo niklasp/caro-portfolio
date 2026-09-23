@@ -102,7 +102,7 @@ export const STANDARD: DrehConfig = {
   laufSchrift: 'dioden',
   laufFarbe: '#ff1c0d',
   laufTempo: 16,
-  laufZeilen: 9,
+  laufZeilen: 16,
   wendeTempo: 3.4,
   zoomDauer: 0.95,
   objAufstellung: 'frei',
@@ -270,7 +270,7 @@ export function useDrehConfig(): DrehConfig {
     lauf.addColor(cfg, 'laufFarbe').name('Farbe').onChange(melde)
     lauf.add(cfg, 'laufText').name('Text (leer = Kategorie)').onFinishChange(melde)
     lauf.add(cfg, 'laufTempo', 0, 60, 1).name('Tempo').onChange(melde)
-    lauf.add(cfg, 'laufZeilen', 7, 21, 2).name('Dioden-Zeilen').onFinishChange(melde)
+    lauf.add(cfg, 'laufZeilen', 7, 21, 1).name('Dioden-Zeilen').onFinishChange(melde)
     mitStandard(lauf, ['laufschrift', 'laufSchrift', 'laufFarbe', 'laufText', 'laufTempo', 'laufZeilen'])
     lauf.open()
 
