@@ -52,6 +52,7 @@ export type Aufstellung = (typeof AUFSTELLUNGEN)[keyof typeof AUFSTELLUNGEN]
 // Fenster scrollen immer: Fotos in voller Breite, Text darunter.
 export const ANSICHTEN = {
   'Große Bilder untereinander, Text haftet seitlich': 'stapel',
+  'Jedes Bild in voller Spaltenbreite, Text haftet seitlich': 'spalte',
   'Bildraster neben dem Text (ohne Scrollen)': 'raster',
   'Bildraster in voller Breite, Text darunter': 'breit',
 } as const

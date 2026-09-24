@@ -195,16 +195,17 @@ function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
   const oben = 0.36 * sicht.h
   const zellen: Zelle[] = []
 
-  // Stapel: jedes Foto füllt die Spalte links, eins unter dem anderen — die Seite scrollt,
-  // die Beschreibung haftet rechts (Breite in Pixeln, siehe .ansicht-stapel .db-beschreibung).
-  // Zwei Hochformate nebeneinander teilen sich eine Zeile.
-  if (ansicht === 'stapel') {
+  // Stapel und Spalte: jedes Foto füllt die Spalte links, eins unter dem anderen — die Seite
+  // scrollt, die Beschreibung haftet rechts (Breite in Pixeln, siehe .ansicht-stapel .db-beschreibung).
+  // Stapel: zwei Hochformate teilen sich eine Zeile, keins wird höher als der Schirm.
+  // Spalte: jedes Bild ganz in Spaltenbreite, die Höhe folgt seinem Format.
+  if (ansicht === 'stapel' || ansicht === 'spalte') {
     const textspalte = Math.min(400, 0.3 * breite) + 90
     const B = Math.max(0.5, 0.94 - textspalte / breite) * sicht.b
-    const hMax = 0.8 * sicht.h // Hochformate: nicht höher als der Schirm
+    const hMax = ansicht === 'stapel' ? 0.8 * sicht.h : Infinity
     let y = oben
     for (let i = 0; i < ars.length; ) {
-      const paar = ars[i] < 1 && i + 1 < ars.length && ars[i + 1] < 1
+      const paar = ansicht === 'stapel' && ars[i] < 1 && i + 1 < ars.length && ars[i + 1] < 1
       const zeile = paar ? [i, i + 1] : [i]
       const h = Math.min(hMax, (B - RASTER_LUECKE * (zeile.length - 1)) / zeile.reduce((a, k) => a + ars[k], 0))
       let x = links
@@ -941,15 +942,16 @@ function Kulisse({
                   oben
                     ? (e) => {
                         e.stopPropagation()
-                        document.body.style.cursor = vorn ? 'zoom-in' : 'pointer'
+                        // am Canvas selbst — die Bühne darunter hat ihren eigenen Cursor (zoom-out / grab)
+                        ;(e.nativeEvent.target as HTMLElement).style.cursor = vorn ? 'zoom-in' : 'pointer'
                         if (vorn && !detail) onZeigen(i)
                       }
                     : undefined
                 }
                 onPointerOut={
                   oben
-                    ? () => {
-                        document.body.style.cursor = ''
+                    ? (e) => {
+                        ;(e.nativeEvent.target as HTMLElement).style.cursor = ''
                         if (vorn && !detail) onZeigen(null, i)
                       }
                     : undefined
@@ -1104,21 +1106,24 @@ function Flaeche({
         const k = (f.k = weich(THREE.MathUtils.clamp(u * (1 + staffel) - (staffel * f.nr) / Math.max(1, zellen.length - 1), 0, 1)))
         f.g += ((dran && d.gross === f.nr ? 1 : 0) - f.g) * (1 - Math.exp(-6.5 * dt))
         const g = THREE.MathUtils.smoothstep(f.g, 0, 1)
-        // Groß: dasselbe Foto kommt so nah, dass es den Schirm fast füllt.
+        // Groß: dasselbe Foto kommt so nah, dass es den Schirm fast füllt — Kopf und Fuß bleiben frei.
         const sicht = sichtfeld(aspekt, 1)
-        const nah = Math.max(zelle.h / (0.84 * sicht.h), zelle.b / (0.9 * sicht.b))
+        const nah = Math.max(zelle.h / (0.8 * sicht.h), zelle.b / (0.9 * sicht.b))
+        // Große Zellen (Stapel) kämen so hinter den Schleier — dann bleibt das Foto vor ihm
+        // und wird stattdessen kleiner skaliert, was auf dem Schirm dasselbe ergibt.
+        const dist = Math.min(nah, RASTER_D - 3)
         const tiefe = 1 + (f.nr % 3) * 0.4 // jedes Foto antwortet etwas anders auf die Maus
         hilf.v
           .set(
             THREE.MathUtils.lerp(zelle.x - maus.x * 0.1 * tiefe, 0, g),
-            THREE.MathUtils.lerp(zelle.y + roll + maus.y * 0.07 * tiefe, 0.01 * sicht.h * nah, g),
-            -THREE.MathUtils.lerp(RASTER_D, nah, g)
+            THREE.MathUtils.lerp(zelle.y + roll + maus.y * 0.07 * tiefe, 0.01 * sicht.h * dist, g),
+            -THREE.MathUtils.lerp(RASTER_D, dist, g)
           )
           .applyMatrix4(camera.matrixWorld)
           .applyMatrix4(hilf.m)
         kind.position.lerpVectors(hilf.heim, hilf.v, k)
         kind.quaternion.slerpQuaternions(hilf.heimQ, hilf.q, k)
-        const skala = THREE.MathUtils.lerp(heimSkala, zelle.b / (f.breite * elternSkala), k)
+        const skala = THREE.MathUtils.lerp(heimSkala, zelle.b / (f.breite * elternSkala), k) * THREE.MathUtils.lerp(1, dist / nah, g)
         kind.scale.set(skala, skala, THREE.MathUtils.lerp(heimTiefe, 0.05 / (FOTO_DICKE * elternSkala), k))
         kind.visible = k > 0.002 || (!extra && f.da > 0.002)
       })
@@ -1492,7 +1497,8 @@ export default function Drehbuehne() {
   useEffect(() => {
     detailCtrl.current.offen = detail
     detailCtrl.current.gross = detail ? gross : null
-    document.body.style.cursor = ''
+    const canvas = wrap.current?.querySelector('canvas')
+    if (canvas) canvas.style.cursor = ''
   }, [detail, gross])
   useEffect(() => setGross(null), [detail, p])
   // Schmal: die Detailseite scrollt — Raster und Farbfläche rollen mit; jedes Projekt beginnt oben.
