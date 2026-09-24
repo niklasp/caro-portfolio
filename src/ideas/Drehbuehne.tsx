@@ -182,6 +182,21 @@ const rasterCache = new Map<string, Zelle[]>()
 // Scrollt die Projektansicht? Schmal immer; breit je nach Stellwerk (Ordner „Projektansicht").
 const rollt = (breite: number, hoehe: number) => istSchmal(breite, hoehe) || cfg.ansicht !== 'raster'
 
+// Stapel und Spalte, in Pixeln: links die Bildspalte, rechts daneben der Text. Die Bildspalte
+// wächst nicht über SPALTE_MAX hinaus — auf sehr breiten Schirmen rückt das Ganze in die Mitte.
+const SPALTE_MAX = 1100
+function spaltenMasse(breite: number) {
+  const textB = Math.min(400, 0.3 * breite)
+  const spalt = 56 // zwischen Bildspalte und Text
+  let randL = 0.06 * breite
+  let spalteB = breite - randL - spalt - textB - 40
+  if (spalteB > SPALTE_MAX) {
+    spalteB = SPALTE_MAX
+    randL = (breite - spalteB - spalt - textB) / 2
+  }
+  return { randL, spalteB, textL: randL + spalteB + spalt, textB }
+}
+
 function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
   const schmal = istSchmal(breite, hoehe)
   const ansicht = schmal ? 'breit' : cfg.ansicht
@@ -200,15 +215,16 @@ function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
   // Stapel: zwei Hochformate teilen sich eine Zeile, keins wird höher als der Schirm.
   // Spalte: jedes Bild ganz in Spaltenbreite, die Höhe folgt seinem Format.
   if (ansicht === 'stapel' || ansicht === 'spalte') {
-    const textspalte = Math.min(400, 0.3 * breite) + 90
-    const B = Math.max(0.5, 0.94 - textspalte / breite) * sicht.b
+    const masse = spaltenMasse(breite)
+    const B = (masse.spalteB / breite) * sicht.b
+    const linksSpalte = (masse.randL / breite - 0.5) * sicht.b
     const hMax = ansicht === 'stapel' ? 0.8 * sicht.h : Infinity
     let y = oben
     for (let i = 0; i < ars.length; ) {
       const paar = ansicht === 'stapel' && ars[i] < 1 && i + 1 < ars.length && ars[i + 1] < 1
       const zeile = paar ? [i, i + 1] : [i]
       const h = Math.min(hMax, (B - RASTER_LUECKE * (zeile.length - 1)) / zeile.reduce((a, k) => a + ars[k], 0))
-      let x = links
+      let x = linksSpalte
       zeile.forEach((k) => {
         zellen[k] = { x: x + (h * ars[k]) / 2, y: y - h / 2, b: h * ars[k], h }
         x += h * ars[k] + RASTER_LUECKE
@@ -1383,6 +1399,7 @@ export default function Drehbuehne() {
     return (0.5 - unten / sichtfeld(fenster.b / fenster.h).h) * fenster.h
   }, [p, fenster, config.ansicht])
   const scrollt = detail && rollt(fenster.b, fenster.h)
+  const spalte = spaltenMasse(fenster.b)
 
   const wrap = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -1599,7 +1616,7 @@ export default function Drehbuehne() {
   }
 
   return (
-    <div className={`db ansicht-${config.ansicht}${detail ? ' detail' : ''}${scrollt ? ' rollt' : ''}${gross !== null ? ' gross' : ''}`} style={{ '--db-text': config.text, '--db-grund': config.grund, '--raster-unten': `${Math.round(rasterUnten)}px` } as React.CSSProperties}>
+    <div className={`db ansicht-${config.ansicht}${detail ? ' detail' : ''}${scrollt ? ' rollt' : ''}${gross !== null ? ' gross' : ''}`} style={{ '--db-text': config.text, '--db-grund': config.grund, '--raster-unten': `${Math.round(rasterUnten)}px`, '--spalte-text': `${Math.round(spalte.textL)}px`, '--spalte-text-b': `${Math.round(spalte.textB)}px` } as React.CSSProperties}>
       <div
         className="buehne"
         ref={wrap}
