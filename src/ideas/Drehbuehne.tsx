@@ -179,21 +179,53 @@ const rollWelt = (aspekt: number, hoehePx: number) => (rollen.px / hoehePx) * si
 // gewinnt die Aufteilung mit der größten Bildfläche bei möglichst gleich hohen Zeilen.
 const rasterCache = new Map<string, Zelle[]>()
 
+// Scrollt die Projektansicht? Schmal immer; breit je nach Stellwerk (Ordner „Projektansicht").
+const rollt = (breite: number, hoehe: number) => istSchmal(breite, hoehe) || cfg.ansicht !== 'raster'
+
 function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
-  const schluessel = `${Math.round(breite)}x${Math.round(hoehe)}|${ars.join()}`
+  const schmal = istSchmal(breite, hoehe)
+  const ansicht = schmal ? 'breit' : cfg.ansicht
+  const schluessel = `${ansicht}|${Math.round(breite)}x${Math.round(hoehe)}|${ars.join()}`
   const fertig = rasterCache.get(schluessel)
   if (fertig) return fertig
   if (rasterCache.size > 400) rasterCache.clear() // beim Ziehen am Fenster sammelt sich sonst jede Größe an
 
   const sicht = sichtfeld(breite / hoehe)
-  const schmal = istSchmal(breite, hoehe)
   const links = -0.44 * sicht.b
   const oben = 0.36 * sicht.h
-  // Breit: rechts bleibt die Spalte der Beschreibung frei (ihre Breite in Pixeln, siehe
-  // .db-beschreibung). Schmal: das Raster nimmt die ganze Breite, der Text steht darunter.
+  const zellen: Zelle[] = []
+
+  // Stapel: jedes Foto füllt die Spalte links, eins unter dem anderen — die Seite scrollt,
+  // die Beschreibung haftet rechts (Breite in Pixeln, siehe .ansicht-stapel .db-beschreibung).
+  // Zwei Hochformate nebeneinander teilen sich eine Zeile.
+  if (ansicht === 'stapel') {
+    const textspalte = Math.min(400, 0.3 * breite) + 90
+    const B = Math.max(0.5, 0.94 - textspalte / breite) * sicht.b
+    const hMax = 0.8 * sicht.h // Hochformate: nicht höher als der Schirm
+    let y = oben
+    for (let i = 0; i < ars.length; ) {
+      const paar = ars[i] < 1 && i + 1 < ars.length && ars[i + 1] < 1
+      const zeile = paar ? [i, i + 1] : [i]
+      const h = Math.min(hMax, (B - RASTER_LUECKE * (zeile.length - 1)) / zeile.reduce((a, k) => a + ars[k], 0))
+      let x = links
+      zeile.forEach((k) => {
+        zellen[k] = { x: x + (h * ars[k]) / 2, y: y - h / 2, b: h * ars[k], h }
+        x += h * ars[k] + RASTER_LUECKE
+      })
+      y -= h + RASTER_LUECKE
+      i += zeile.length
+    }
+    rasterCache.set(schluessel, zellen)
+    return zellen
+  }
+
+  // Raster: rechts bleibt die Spalte der Beschreibung frei (ihre Breite in Pixeln, siehe
+  // .db-beschreibung). Breit: das Raster nimmt die ganze Breite, der Text steht darunter.
   const textspalte = Math.min(290, 0.3 * breite) * 1.23 + 76
-  const B = (schmal ? 0.88 : Math.min(0.64, 0.94 - textspalte / breite)) * sicht.b
-  const H = (schmal ? 0.5 : 0.55) * sicht.h // breit: endet über dem großen Titel; schmal scrollt die Seite
+  const B = (ansicht === 'breit' ? 0.88 : Math.min(0.64, 0.94 - textspalte / breite)) * sicht.b
+  // Raster: endet über dem großen Titel. Breit scrollt die Seite — am Telefon knapp, im
+  // breiten Fenster darf das Raster fast den ganzen Schirm füllen.
+  const H = (ansicht === 'breit' ? (schmal ? 0.5 : 1.2) : 0.55) * sicht.h
   let beste: { zeilen: number[][]; hoehen: number[]; wert: number } | null = null
 
   const pruefe = (zeilen: number[][]) => {
@@ -223,7 +255,6 @@ function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
   }
   teile(0, [])
 
-  const zellen: Zelle[] = []
   let y = oben
   beste!.zeilen.forEach((z, k) => {
     const h = beste!.hoehen[k]
@@ -1229,15 +1260,17 @@ function Buehnenraum({
       const zellen = bildraster(ars, groesse.width, groesse.height)
       const rand = Math.min(0.45, 0.035 * sichtfeld(aspekt).b)
       const links = Math.min(...zellen.map((z) => z.x - z.b / 2)) - rand
-      const obenKante = Math.max(...zellen.map((z) => z.y + z.h / 2)) + rand * 0.9 + rollWelt(aspekt, groesse.height)
+      const obenKante = Math.max(...zellen.map((z) => z.y + z.h / 2)) + rand * 0.9
       const rechts = Math.max(...zellen.map((z) => z.x + z.b / 2))
-      const unten = Math.min(...zellen.map((z) => z.y - z.h / 2))
+      // Beim Stapel reicht die Fläche hinter die ersten Fotos, nicht die ganze Seite hinunter.
+      const unten = Math.max(Math.min(...zellen.map((z) => z.y - z.h / 2)), obenKante - sichtfeld(aspekt).h)
       // wächst aus der oberen linken Ecke und verblasst auf dem Rückweg, statt als Streifen stehenzubleiben
       const b = (rechts - links) * 0.58 * Math.max(e, 0.0001)
       const h = (obenKante - unten) * 0.62 * Math.max(e, 0.0001)
       ;(farbe.current.material as THREE.MeshBasicMaterial).opacity = e
       farbe.current.scale.set(b, h, 1)
-      farbe.current.position.set(links + b / 2 - maus.x * 0.05, obenKante - h / 2 + maus.y * 0.035, -(RASTER_D + 0.5))
+      // rollt mit der Seite, wie die Fotos
+      farbe.current.position.set(links + b / 2 - maus.x * 0.05, obenKante + rollWelt(aspekt, groesse.height) - h / 2 + maus.y * 0.035, -(RASTER_D + 0.5))
       farbe.current.visible = e > 0.001
     }
   })
@@ -1334,7 +1367,7 @@ export default function Drehbuehne() {
   const p = projekte[aktiv]
   useProjektUrlSync('/drehbuehne', p, detail ? DETAIL_HASH : '')
 
-  // Schmales Layout: die Beschreibung beginnt unter dem Bildraster — dessen Unterkante in Pixeln.
+  // Scrollende Ansichten: die Seite reicht bis unter das letzte Foto — dessen Unterkante in Pixeln.
   const rasterUnten = useMemo(() => {
     const zellen = bildraster(
       p.bilder.map((b) => b.ar),
@@ -1343,7 +1376,8 @@ export default function Drehbuehne() {
     )
     const unten = Math.min(...zellen.map((z) => z.y - z.h / 2))
     return (0.5 - unten / sichtfeld(fenster.b / fenster.h).h) * fenster.h
-  }, [p, fenster])
+  }, [p, fenster, config.ansicht])
+  const scrollt = detail && rollt(fenster.b, fenster.h)
 
   const wrap = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -1477,8 +1511,8 @@ export default function Drehbuehne() {
     const el = wrap.current
     if (!el) return
     const onWheel = (e: WheelEvent) => {
-      // schmal + Detail: das Rad scrollt die Seite, statt zu blättern
-      if (stand.current.detail && istSchmal(window.innerWidth, window.innerHeight)) return
+      // Scrollende Projektansicht: das Rad scrollt die Seite, statt zu blättern — außer ein Foto steht groß
+      if (stand.current.detail && stand.current.gross === null && rollt(window.innerWidth, window.innerHeight)) return
       e.preventDefault()
       if (flags.lightbox) return
       const r = radAcc.current
@@ -1559,7 +1593,7 @@ export default function Drehbuehne() {
   }
 
   return (
-    <div className={`db${detail ? ' detail' : ''}${gross !== null ? ' gross' : ''}`} style={{ '--db-text': config.text, '--db-grund': config.grund, '--raster-unten': `${Math.round(rasterUnten)}px` } as React.CSSProperties}>
+    <div className={`db ansicht-${config.ansicht}${detail ? ' detail' : ''}${scrollt ? ' rollt' : ''}${gross !== null ? ' gross' : ''}`} style={{ '--db-text': config.text, '--db-grund': config.grund, '--raster-unten': `${Math.round(rasterUnten)}px` } as React.CSSProperties}>
       <div
         className="buehne"
         ref={wrap}
@@ -1643,6 +1677,18 @@ export default function Drehbuehne() {
       {/* Beschreibung unten rechts — über dunklem Boden, ohne Fläche. In der
           Detailansicht rückt sie neben das Bildraster und wird zur Lesegröße. */}
       <div className="db-beschreibung" ref={panel} key={p.slug}>
+        {/* Stapel-Ansicht: der große Titel unten links tritt ab — Blättern und Zähler ziehen hierher. */}
+        <div className="db-blaettern ov-anim-2">
+          <button onClick={() => dreheUm(-1)} aria-label="Vorheriges Projekt">
+            ←
+          </button>
+          <button onClick={() => dreheUm(1)} aria-label="Nächstes Projekt">
+            →
+          </button>
+          <span>
+            {KATEGORIEN[kat].name} · {String(aktiv + 1).padStart(2, '0')} / {String(projekte.length).padStart(2, '0')}
+          </span>
+        </div>
         <h3 className="db-titel ov-anim-2">{p.titel}</h3>
         <p className="db-meta ov-anim-2">
           {p.rolle} · {p.jahr} · {p.ort}
@@ -1666,7 +1712,7 @@ export default function Drehbuehne() {
 
       <div className="hinweis hell">
         {detail
-          ? 'scrollen oder Pfeiltasten: nächstes Projekt · Foto anklicken: groß · Esc: zurück zur Bühne'
+          ? `${scrollt ? 'Pfeiltasten' : 'scrollen oder Pfeiltasten'}: nächstes Projekt · Foto anklicken: groß · Esc: zurück zur Bühne`
           : 'ziehen ↔ oder scrollen: drehen · ziehen ↕: Bühne wenden · Maus führt das Licht · Foto anklicken: hinein ins Projekt'}
       </div>
 

@@ -686,6 +686,56 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 /* Steht ein Foto groß vor der Kamera, tritt die Schrift zurück. */
 .db.gross .sb-titel, .db.gross .db-beschreibung, .db.gross .hinweis { opacity: 0; pointer-events: none; }
 
+/* Blättern und Zähler in der Beschreibung — nur in den scrollenden Ansichten, wo der große Titel abtritt. */
+.db-blaettern { display: none; gap: 16px; align-items: baseline; font-size: 20px; margin-bottom: 14px; }
+.db-blaettern button:hover { transform: translateY(-1px); }
+.db-blaettern span { font-size: 12px; color: var(--db-matt); margin-left: 6px; }
+
+/* ---------- Drehbühne: Projektansichten im breiten Fenster (Stellwerk „Projektansicht") ----------
+   „Raster" bleibt wie gehabt: alles auf einem Schirm. „Stapel" und „Breit" scrollen die Seite —
+   die Fotos im Canvas rollen mit, die Beschreibung ist das einzige Element im Fluss. */
+@media (min-width: 900px) and (min-aspect-ratio: 11/10) {
+  .db.detail.rollt { min-height: calc(var(--raster-unten) + 140px); }
+  .db.detail.rollt .buehne canvas { touch-action: pan-y; }
+  /* Beim Scrollen verschwinden die Fotos unter Kopf und Zurück-Knopf, statt sie zu überlagern. */
+  .db.detail.rollt::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 110px;
+    background: linear-gradient(var(--db-grund) 72px, transparent);
+    z-index: 34;
+    pointer-events: none;
+  }
+  .db.detail.rollt .db-beschreibung {
+    inset: auto;
+    transform: none;
+    translate: none !important;
+    font-size: 15px;
+    animation: ov-ein 0.6s 0.45s both;
+  }
+  .db.detail.rollt .db-beschreibung .db-titel { font-size: 28px; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .db.detail.rollt .db-blaettern { display: flex; }
+  .db.detail.rollt .sb-titel { opacity: 0; pointer-events: none; }
+  .db.detail.rollt .sb-titel .db-pfeile { pointer-events: none; }
+
+  /* Stapel: die Beschreibung haftet rechts neben den Fotos, auf Höhe des ersten Bildes. */
+  .db.detail.ansicht-stapel .db-beschreibung {
+    position: sticky;
+    top: 14vh;
+    margin: 14vh 40px 0 auto;
+    width: min(400px, 30vw);
+    max-height: calc(86vh - 70px);
+    overflow-y: auto;
+  }
+  /* Breit: das Raster nimmt die ganze Breite, die Beschreibung steht darunter. */
+  .db.detail.ansicht-breit .db-beschreibung {
+    position: static;
+    width: min(64ch, 60vw);
+    margin: calc(var(--raster-unten) + 28px) 0 0 6vw;
+  }
+}
+
 /* Auftakt: Ladeschirm — der Name füllt sich in der Projektfarbe (--fuell 0…1), dann hebt sich der Vorhang */
 .db-auftakt {
   position: fixed;

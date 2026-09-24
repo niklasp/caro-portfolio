@@ -48,7 +48,17 @@ export const AUFSTELLUNGEN = {
 } as const
 export type Aufstellung = (typeof AUFSTELLUNGEN)[keyof typeof AUFSTELLUNGEN]
 
+// Wie die Projektansicht (breites Fenster) die Fotos und den Text setzt. Schmale
+// Fenster scrollen immer: Fotos in voller Breite, Text darunter.
+export const ANSICHTEN = {
+  'Große Bilder untereinander, Text haftet seitlich': 'stapel',
+  'Bildraster neben dem Text (ohne Scrollen)': 'raster',
+  'Bildraster in voller Breite, Text darunter': 'breit',
+} as const
+export type Ansicht = (typeof ANSICHTEN)[keyof typeof ANSICHTEN]
+
 export interface DrehConfig {
+  ansicht: Ansicht
   leinwand: Leinwand
   leinwandPassung: Passung
   leinwandReihen: number // Kacheln: so viele Bildreihen übereinander
@@ -86,6 +96,7 @@ export interface DrehConfig {
 }
 
 export const STANDARD: DrehConfig = {
+  ansicht: 'stapel',
   leinwand: 'rundhorizont',
   leinwandPassung: 'ausschnitt',
   leinwandReihen: 1,
@@ -207,6 +218,11 @@ export function useDrehConfig(): DrehConfig {
           'standard'
         )
         .name('↺ Standard')
+
+    const ansicht = gui.addFolder('Projektansicht')
+    ansicht.add(cfg, 'ansicht', ANSICHTEN).name('Aufbau').onChange(melde)
+    mitStandard(ansicht, ['ansicht'])
+    ansicht.open()
 
     const leinwand = gui.addFolder('Leinwand')
     leinwand.add(cfg, 'leinwand', LEINWAENDE).name('Art').onChange(melde)
