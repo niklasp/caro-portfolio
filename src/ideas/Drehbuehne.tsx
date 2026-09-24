@@ -1267,15 +1267,15 @@ function Buehnenraum({
       const links = Math.min(...zellen.map((z) => z.x - z.b / 2)) - rand
       const obenKante = Math.max(...zellen.map((z) => z.y + z.h / 2)) + rand * 0.9
       const rechts = Math.max(...zellen.map((z) => z.x + z.b / 2))
-      // Beim Stapel reicht die Fläche hinter die ersten Fotos, nicht die ganze Seite hinunter.
-      const unten = Math.max(Math.min(...zellen.map((z) => z.y - z.h / 2)), obenKante - sichtfeld(aspekt).h)
+      // Nicht höher als ein gutes Drittel des Schirms — auch wenn der Stapel weit hinunterreicht.
+      const unten = Math.max(Math.min(...zellen.map((z) => z.y - z.h / 2)), obenKante - 0.6 * sichtfeld(aspekt).h)
       // wächst aus der oberen linken Ecke und verblasst auf dem Rückweg, statt als Streifen stehenzubleiben
       const b = (rechts - links) * 0.58 * Math.max(e, 0.0001)
       const h = (obenKante - unten) * 0.62 * Math.max(e, 0.0001)
       ;(farbe.current.material as THREE.MeshBasicMaterial).opacity = e
       farbe.current.scale.set(b, h, 1)
-      // rollt mit der Seite, wie die Fotos
-      farbe.current.position.set(links + b / 2 - maus.x * 0.05, obenKante + rollWelt(aspekt, groesse.height) - h / 2 + maus.y * 0.035, -(RASTER_D + 0.5))
+      // rollt langsamer als die Fotos mit der Seite — sie liegt ja hinter ihnen (Parallaxe)
+      farbe.current.position.set(links + b / 2 - maus.x * 0.05, obenKante + rollWelt(aspekt, groesse.height) * 0.55 - h / 2 + maus.y * 0.035, -(RASTER_D + 0.5))
       farbe.current.visible = e > 0.001
     }
   })
