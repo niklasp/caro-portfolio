@@ -97,7 +97,7 @@ export interface DrehConfig {
 }
 
 export const STANDARD: DrehConfig = {
-  ansicht: 'stapel',
+  ansicht: 'spalte',
   leinwand: 'rundhorizont',
   leinwandPassung: 'ausschnitt',
   leinwandReihen: 1,
