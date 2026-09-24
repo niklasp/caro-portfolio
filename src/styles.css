@@ -622,13 +622,16 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
   }
   .db.detail .sb-titel { position: static; order: 2; margin: 32px 24px 0; max-width: none; }
   .db.detail .buehne canvas { touch-action: pan-y; }
-  /* Beim Scrollen verschwinden Raster und Text unter Kopf und Zurück-Knopf, statt sie zu überlagern. */
+  /* Beim Scrollen ziehen Raster und Text unter Kopf und Zurück-Knopf durch — verschwommen wie hinter Milchglas. */
   .db.detail::before {
     content: '';
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 96px;
-    background: linear-gradient(var(--db-grund) 68px, transparent);
+    height: 84px;
+    background: color-mix(in srgb, var(--db-grund) 55%, transparent);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    mask-image: linear-gradient(#000 70%, transparent);
     z-index: 34;
     pointer-events: none;
   }
@@ -697,13 +700,16 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 @media (min-width: 900px) and (min-aspect-ratio: 11/10) {
   .db.detail.rollt { min-height: calc(var(--raster-unten) + 140px); }
   .db.detail.rollt .buehne canvas { touch-action: pan-y; }
-  /* Beim Scrollen verschwinden die Fotos unter Kopf und Zurück-Knopf, statt sie zu überlagern. */
+  /* Beim Scrollen ziehen die Fotos unter Kopf und Zurück-Knopf durch — verschwommen wie hinter Milchglas. */
   .db.detail.rollt::before {
     content: '';
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 110px;
-    background: linear-gradient(var(--db-grund) 72px, transparent);
+    height: 96px;
+    background: color-mix(in srgb, var(--db-grund) 55%, transparent);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    mask-image: linear-gradient(#000 70%, transparent);
     z-index: 34;
     pointer-events: none;
   }
