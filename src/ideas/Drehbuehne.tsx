@@ -1220,10 +1220,12 @@ function Buehnenraum({
   onBild: (bildIndex: number) => void
   onZeigen: (bildIndex: number | null, verlassen?: number) => void
 }) {
+  // Hochgeladenes Bild vor festem Motiv vor dem Foto des Projekts.
+  const festesBild = config.leinwandBild || config.leinwandMotiv
   const leinwand = useLeinwandMaterial(
-    config.leinwandBild || projekt.bilder[Math.min(projiziert ?? 0, projekt.bilder.length - 1)].src,
+    festesBild || projekt.bilder[Math.min(projiziert ?? 0, projekt.bilder.length - 1)].src,
     projiziert !== null,
-    projiziert === null && !config.leinwandBild ? projekt.videoDatei : undefined,
+    projiziert === null && !festesBild ? projekt.videoDatei : undefined,
     config.leinwand
   )
   const muenze = useRef<THREE.Group>(null)

@@ -28,6 +28,15 @@ export const PASSUNGEN = {
 } as const
 export type Passung = (typeof PASSUNGEN)[keyof typeof PASSUNGEN]
 
+// Feste Motive für die Leinwand (von Carolin) — leer heißt: das Foto des vordersten Projekts.
+export const MOTIVE = {
+  'Projektmotiv (wechselt)': '',
+  'Matratze im Grün': '/images/leinwand/matratze.webp',
+  'Containerhof mit Kränen': '/images/leinwand/kraene.webp',
+  'Container in Reihe': '/images/leinwand/container.webp',
+} as const
+export type Motiv = (typeof MOTIVE)[keyof typeof MOTIVE]
+
 export const LICHTER = {
   'Verfolger (Maus)': 'verfolger',
   'Fokus aufs Hauptprojekt': 'fokus',
@@ -64,7 +73,8 @@ export interface DrehConfig {
   leinwandPassung: Passung
   leinwandReihen: number // Kacheln: so viele Bildreihen übereinander
   leinwandHell: number
-  leinwandBild: string // hochgeladenes Bild (Objekt-URL) — überstimmt das Projektmotiv
+  leinwandMotiv: Motiv // festes Motiv statt des Projektfotos
+  leinwandBild: string // hochgeladenes Bild (Objekt-URL) — überstimmt beides
   grund: string
   text: string
   scheibe: string
@@ -102,6 +112,7 @@ export const STANDARD: DrehConfig = {
   leinwandPassung: 'ausschnitt',
   leinwandReihen: 1,
   leinwandHell: 1,
+  leinwandMotiv: '',
   leinwandBild: '',
   grund: '#0c0c0c',
   text: '#ffffff',
@@ -227,12 +238,13 @@ export function useDrehConfig(): DrehConfig {
 
     const leinwand = gui.addFolder('Leinwand')
     leinwand.add(cfg, 'leinwand', LEINWAENDE).name('Art').onChange(melde)
+    leinwand.add(cfg, 'leinwandMotiv', MOTIVE).name('Bild').onChange(melde)
     leinwand.add(cfg, 'leinwandPassung', PASSUNGEN).name('Motiv').onChange(melde)
     leinwand.add(cfg, 'leinwandReihen', 1, 4, 1).name('Kachel-Reihen').onChange(melde)
     leinwand.add(cfg, 'leinwandHell', 0.2, 3, 0.05).name('Helligkeit').onChange(melde)
     leinwand.add(aktionen, 'hochladen').name('Bild hochladen …')
     leinwand.add(aktionen, 'bildWeg').name('wieder Projektmotiv')
-    mitStandard(leinwand, ['leinwand', 'leinwandPassung', 'leinwandReihen', 'leinwandHell'], aktionen.bildWeg)
+    mitStandard(leinwand, ['leinwand', 'leinwandMotiv', 'leinwandPassung', 'leinwandReihen', 'leinwandHell'], aktionen.bildWeg)
     leinwand.open()
 
     const farben = gui.addFolder('Farben')
