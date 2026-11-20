@@ -1,6 +1,7 @@
 import { getEmDashCollection, getEmDashEntry, getSiteSettings, getTaxonomyTerms } from 'emdash'
 import type { MediaValue, PortableTextBlock } from 'emdash'
-import type { Bild, Daten, Projekt, SeitenText } from '../data/projects'
+import type { Bild, Daten, LebenslaufDaten, LlZeile, Projekt, SeitenText } from '../data/projects'
+import type { Lebenslauf } from '../../emdash-env'
 import { KONTAKT_FEST } from '../data/kontakt'
 import {
   ANSICHTEN,
@@ -113,13 +114,39 @@ function alsSeite(titel: string, bloecke: PortableTextBlock[] | undefined, bild:
   return { titel, bild: alsBild(bild), absaetze }
 }
 
+// Die PDF, die schon vor dem CMS da war — sie gilt, solange im Admin keine hochgeladen ist.
+const PDF_FEST = '/lebenslauf-carolin-pflueger.pdf'
+
+const llZeilen = (liste: { jahr?: string | null; titel?: string | null; text?: string | null }[] | undefined): LlZeile[] =>
+  (liste ?? [])
+    .map((z) => ({ jahr: text(z?.jahr), ...(text(z?.titel) ? { titel: text(z?.titel) } : {}), text: text(z?.text) }))
+    .filter((z) => z.jahr || z.titel || z.text)
+
+function alsLebenslauf(d: Lebenslauf): LebenslaufDaten {
+  return {
+    titel: text(d.title) || 'Lebenslauf',
+    einleitung: text(d.einleitung)
+      .split('\n')
+      .map((z) => z.trim())
+      .filter(Boolean),
+    pdf: (d.pdf && (d.pdf.url || bildAdresse(d.pdf))) || PDF_FEST,
+    ausbildung: llZeilen(d.ausbildung),
+    werdegang: llZeilen(d.werdegang),
+    skills: (d.skills ?? []).map((z) => ({ titel: text(z?.titel), text: text(z?.text) })).filter((z) => z.titel || z.text),
+    arbeiten: llZeilen(d.arbeiten),
+    ausstellungen: llZeilen(d.ausstellungen),
+    auszeichnungen: llZeilen(d.auszeichnungen),
+  }
+}
+
 export async function ladeDaten(angemeldet: boolean): Promise<Daten> {
-  const [projekte, begriffe, einstellungen, buehne, about] = await Promise.all([
+  const [projekte, begriffe, einstellungen, buehne, about, lebenslauf] = await Promise.all([
     getEmDashCollection('projekte', { limit: 500 }),
     getTaxonomyTerms('category'),
     getSiteSettings(),
     getEmDashEntry('buehne', 'drehbuehne'),
     getEmDashEntry('seiten', 'about'),
+    getEmDashEntry('lebenslauf', 'lebenslauf'),
   ])
 
   const alleKategorien = begriffe.map((b) => ({ id: b.slug, name: b.label }))
@@ -183,5 +210,6 @@ export async function ladeDaten(angemeldet: boolean): Promise<Daten> {
     buehne: alsBuehne(buehne.entry?.data),
     angemeldet,
     about: aboutDaten ? alsSeite(aboutDaten.title?.trim() || 'About', aboutDaten.content, aboutDaten.bild) : null,
+    lebenslauf: lebenslauf.entry ? alsLebenslauf(lebenslauf.entry.data) : null,
   }
 }

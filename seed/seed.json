@@ -172,11 +172,190 @@
 			]
 		},
 		{
+			"slug": "lebenslauf",
+			"label": "Lebenslauf",
+			"labelSingular": "Lebenslauf",
+			"description": "Die Seite „Lebenslauf\". Es zählt der Eintrag „Lebenslauf\". Die Reihenfolge der Zeilen ist die Reihenfolge auf der Seite — Zeilen lassen sich am Griff verschieben.",
+			"sortOrder": 3,
+			"supports": [
+				"drafts",
+				"revisions"
+			],
+			"urlPattern": "/{slug}",
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Titel",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "einleitung",
+					"label": "Einleitung (eine Zeile pro Zeile auf der Seite)",
+					"type": "text"
+				},
+				{
+					"slug": "pdf",
+					"label": "Lebenslauf als PDF zum Herunterladen",
+					"type": "file",
+					"validation": {
+						"allowedMimeTypes": [
+							"application/pdf"
+						]
+					}
+				},
+				{
+					"slug": "ausbildung",
+					"label": "Ausbildung",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 40,
+						"subFields": [
+							{
+								"slug": "jahr",
+								"label": "Jahr (z. B. 2025 oder seit 2023)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "text",
+								"label": "Text",
+								"type": "text",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "werdegang",
+					"label": "Beruflicher Werdegang",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 60,
+						"subFields": [
+							{
+								"slug": "jahr",
+								"label": "Jahr (z. B. 2025 oder seit 2023)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "text",
+								"label": "Text",
+								"type": "text",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "skills",
+					"label": "Skills",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 12,
+						"subFields": [
+							{
+								"slug": "titel",
+								"label": "Überschrift (z. B. Software Skills)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "text",
+								"label": "Text",
+								"type": "text",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "arbeiten",
+					"label": "Künstlerische Arbeiten: Bühne und Kostüm",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 100,
+						"subFields": [
+							{
+								"slug": "jahr",
+								"label": "Jahr (z. B. 2025 oder seit 2023)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "titel",
+								"label": "Titel",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "text",
+								"label": "Text",
+								"type": "text",
+								"required": false
+							}
+						]
+					}
+				},
+				{
+					"slug": "ausstellungen",
+					"label": "Künstlerische Arbeiten: Ausstellungen",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 100,
+						"subFields": [
+							{
+								"slug": "jahr",
+								"label": "Jahr (z. B. 2025 oder seit 2023)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "titel",
+								"label": "Titel",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "text",
+								"label": "Text",
+								"type": "text",
+								"required": false
+							}
+						]
+					}
+				},
+				{
+					"slug": "auszeichnungen",
+					"label": "Auszeichnungen",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 60,
+						"subFields": [
+							{
+								"slug": "jahr",
+								"label": "Jahr (z. B. 2025 oder seit 2023)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "text",
+								"label": "Text",
+								"type": "text",
+								"required": true
+							}
+						]
+					}
+				}
+			]
+		},
+		{
 			"slug": "buehne",
 			"label": "Bühne",
 			"labelSingular": "Bühne",
 			"description": "Das Stellwerk für alle: Farben, Leinwand, Licht, Kulissen und Laufschrift der Drehbühne. Es zählt der Eintrag „Drehbühne\".",
-			"sortOrder": 3,
+			"sortOrder": 4,
 			"supports": [],
 			"fields": [
 				{
@@ -1512,6 +1691,219 @@
 				"data": {
 					"title": "About",
 					"content": []
+				}
+			}
+		],
+		"lebenslauf": [
+			{
+				"id": "lebenslauf",
+				"slug": "lebenslauf",
+				"status": "published",
+				"data": {
+					"title": "Lebenslauf",
+					"einleitung": "Freischaffende Bühnen- und Kostümbildnerin, Kunstvermittlerin.\nMitbegründerin des Künstlerinnenkollektivs QUO, Teil des Bühnenbildduos strolling_____",
+					"ausbildung": [
+						{
+							"jahr": "2014",
+							"text": "Bachelor of Arts Kunst und Sonderpädagogik/Inklusion (Uni Leipzig)"
+						},
+						{
+							"jahr": "2014",
+							"text": "Auslandsstipendium an der Accademia di Belle Arti di Roma (Rom, Italien)"
+						},
+						{
+							"jahr": "2017",
+							"text": "Master of Education, Bildende Kunst (UdK Berlin), Sonderpädagogik (HU Berlin)"
+						},
+						{
+							"jahr": "2022",
+							"text": "Master of Arts Bühnenbild/Szenischer Raum (TU Berlin)"
+						}
+					],
+					"werdegang": [
+						{
+							"jahr": "seit 2023",
+							"text": "freischaffende Bühnenbild- und Kostümbildnerin"
+						},
+						{
+							"jahr": "2022",
+							"text": "Ausstattungsassistentin am Theater Bremen, Theaterhaus Jena"
+						},
+						{
+							"jahr": "2017–2022",
+							"text": "Kunstlehrerin an der Carl-von-Linné Schule Berlin"
+						},
+						{
+							"jahr": "2018",
+							"text": "Kunstvermittlerin „APPScouts“, Berlin Biennale"
+						},
+						{
+							"jahr": "seit 2018",
+							"text": "freischaffende Künstlerin und Kunstvermittlerin"
+						},
+						{
+							"jahr": "2016–2017",
+							"text": "Lernbegleiterin an der Revik-Veseli Schule Berlin"
+						},
+						{
+							"jahr": "2017",
+							"text": "Mitgründerin des Künstlerinnenkollektivs QUO"
+						},
+						{
+							"jahr": "2016",
+							"text": "Erwachsenenbildung, Deutsch für Geflüchtete bei A&QUA"
+						}
+					],
+					"skills": [
+						{
+							"titel": "Software Skills",
+							"text": "Adobe Creative Suite, Vectorworks, AutoCAD, Blender, 3-D Druck"
+						},
+						{
+							"titel": "Sprachliche Skills",
+							"text": "Englisch, Italienisch, Spanisch"
+						},
+						{
+							"titel": "Sonstige Skills",
+							"text": "Führerschein Klasse B, Genie-/Hebebühnenführerschein, Fortbildung in „graphic recording“ an der Akademie für Illustration und Design Berlin, Teilnahme an Workshopreihen des Szenografiebundes zum Thema Nachhaltigkeit"
+						}
+					],
+					"arbeiten": [
+						{
+							"jahr": "2026",
+							"titel": "Love Western",
+							"text": "Theater Freiburg. Kostüm. Regie: Onur Karaoglu"
+						},
+						{
+							"jahr": "2026",
+							"titel": "Coming Out",
+							"text": "Theater für Niedersachsen. Bühne und Kostüm. Regie: Alexander Hanauer"
+						},
+						{
+							"jahr": "2025",
+							"titel": "Zeitstillstand",
+							"text": "Theater am Kirchplatz Liechtenstein. künstlerische Mitarbeit Bühnen- und Kostümbild. Regie: Katrin Hilbe"
+						},
+						{
+							"jahr": "2025",
+							"titel": "LOST",
+							"text": "Bühne. Tanzperformance beim tanzstark! Festival Staatstheater Braunschweig. Regie/Choreografie: Milena Kaltenbach, Wilma Schapp"
+						},
+						{
+							"jahr": "2025",
+							"titel": "Ein Stück vom Mond",
+							"text": "Das Weite Theater für Puppen und Menschen Berlin. Bühne und Kostüm. Regie: Karoline Hoffmann"
+						},
+						{
+							"jahr": "2025",
+							"titel": "Draußen feiern die Leute",
+							"text": "Theater Bremen. Bühne und Kostüm. Regie: Viktor Lamert"
+						},
+						{
+							"jahr": "2024",
+							"titel": "Spuren",
+							"text": "Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller"
+						},
+						{
+							"jahr": "2024",
+							"titel": "Blut",
+							"text": "Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller"
+						},
+						{
+							"jahr": "2024",
+							"titel": "Bitte! Auto! Komm!",
+							"text": "Theaterhaus Jena. Bühne, Kostüm, Licht. Regie: Nanine Maria Kok"
+						},
+						{
+							"jahr": "2024",
+							"titel": "Die Entführung der Amygdala",
+							"text": "Theaterhaus Jena. Bühne und Kostüm. Regie: Babett Grube/Pina Bergemann"
+						},
+						{
+							"jahr": "2023",
+							"titel": "Die Hundekot-Attacke",
+							"text": "Theaterhaus Jena. Kostüm. Regie: Walter Bart (Wunderbaum). Eingeladen zum Berliner Theatertreffen 2024 und zum Heidelberger Stückemarkt 2024"
+						},
+						{
+							"jahr": "2023",
+							"titel": "Vom Dorf",
+							"text": "Theaterhaus Jena. Kostüm. Regie: Lizzy Timmers"
+						},
+						{
+							"jahr": "2023",
+							"titel": "On Repeat",
+							"text": "Theaterhaus Jena. Kostüm. Regie: Zarah Bracht"
+						},
+						{
+							"jahr": "2023",
+							"titel": "Knast",
+							"text": "Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller"
+						},
+						{
+							"jahr": "2021",
+							"titel": "Alcin*a",
+							"text": "Ensemble Utopera, Berlin. Bühne. Regie: Teresa Reiber"
+						}
+					],
+					"ausstellungen": [
+						{
+							"jahr": "2026",
+							"titel": "Metamorphosen des Abfalls",
+							"text": "Boss Bitch Baby — Projektraum Galerie M, Berlin. Installation"
+						},
+						{
+							"jahr": "2025",
+							"titel": "All About that Waste",
+							"text": "48 Stunden Neukölln. Installation"
+						},
+						{
+							"jahr": "2023",
+							"titel": "ein Traumspiel",
+							"text": "Localize Potsdam / TU Berlin, fix-o-tec. Installation"
+						},
+						{
+							"jahr": "2022",
+							"titel": "parachute(s)",
+							"text": "signals 48 Stunden Neukölln, Berlin. partizipative Installation"
+						},
+						{
+							"jahr": "2022",
+							"titel": "Experimente. Weil wir* euch** feiern***",
+							"text": "Galerie Grolman, Berlin"
+						},
+						{
+							"jahr": "2021",
+							"titel": "QUO-Gallery II",
+							"text": "Rundgang UdK, Berlin. Installation"
+						},
+						{
+							"jahr": "2019",
+							"titel": "QUO-Gallery / QUO II",
+							"text": "48h Neukölln / Plattenvereinigung Tempelhofer Feld. Installation"
+						}
+					],
+					"auszeichnungen": [
+						{
+							"jahr": "2025",
+							"text": "Arbeits- und Recherchestipendium des Berliner Senats, Arbeitstitel „Transforming trash“"
+						},
+						{
+							"jahr": "2025",
+							"text": "Einladung zum Heidelberger Stückemarkt mit „Die Entführung der Amygdala“"
+						},
+						{
+							"jahr": "2024",
+							"text": "Einladung zum Berliner Theatertreffen mit „Die Hundekot-Attacke“"
+						},
+						{
+							"jahr": "2023",
+							"text": "Theaterpreis des Bundes in der Kategorie Stadt- und Landestheater für das Theaterhaus Jena"
+						},
+						{
+							"jahr": "2023",
+							"text": "Einladung zum „Heidelberger Stückemarkt“ mit „Die Hundekot-Attacke“"
+						}
+					]
 				}
 			}
 		],

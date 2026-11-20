@@ -56,6 +56,27 @@ export interface SeitenText {
   absaetze: { art: 'h' | 'p'; text: string }[]
 }
 
+// Eine Zeile im Lebenslauf: Jahr und Text, bei künstlerischen Arbeiten mit Titel.
+export interface LlZeile {
+  jahr: string
+  titel?: string
+  text: string
+}
+
+// Der Lebenslauf aus dem CMS (Sammlung „Lebenslauf", Eintrag `lebenslauf`).
+// Die Reihenfolge der Zeilen ist die im Admin.
+export interface LebenslaufDaten {
+  titel: string
+  einleitung: string[]
+  pdf: string
+  ausbildung: LlZeile[]
+  werdegang: LlZeile[]
+  skills: { titel: string; text: string }[]
+  arbeiten: LlZeile[]
+  ausstellungen: LlZeile[]
+  auszeichnungen: LlZeile[]
+}
+
 // Alles, was die Seite aus dem CMS braucht. Der Server (src/cms/daten.ts) baut
 // es aus EmDash und legt es als JSON in die Seite (src/layouts/Seite.astro).
 export interface Daten {
@@ -64,6 +85,7 @@ export interface Daten {
   kontakt: Kontakt
   buehne: Partial<DrehConfig>
   about: SeitenText | null
+  lebenslauf: LebenslaufDaten | null
   // Im Admin angemeldet: nur dann erscheint das Stellwerk auf der Bühne.
   angemeldet: boolean
 }
@@ -78,6 +100,7 @@ export const KATEGORIEN: KategorieEintrag[] = DATEN.kategorien
 export const PROJEKTE: Projekt[] = DATEN.projekte
 export const KONTAKT: Kontakt = DATEN.kontakt
 export const BUEHNE: Partial<DrehConfig> = DATEN.buehne
+export const LEBENSLAUF: LebenslaufDaten | null = DATEN.lebenslauf
 export const ABOUT: SeitenText | null = DATEN.about
 export const ANGEMELDET: boolean = DATEN.angemeldet
 

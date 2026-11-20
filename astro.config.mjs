@@ -17,6 +17,21 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "auto", coalesce: true }),
 			storage: r2({ binding: "MEDIA" }),
+			// Höchstens 20 MB pro Datei: mehr nimmt Cloudflares Bilddienst zum Verkleinern nicht an.
+			maxUploadSize: 20 * 1024 * 1024,
+			// Der Admin zeigt nur, was diese Seite benutzt. Die Seiten bleiben über ihre Adresse erreichbar.
+			admin: {
+				hiddenNavItems: [
+					"calendar",
+					"comments",
+					"menus",
+					"redirects",
+					"widgets",
+					"sections",
+					"bylines",
+					"import",
+				],
+			},
 		}),
 	],
 	devToolbar: { enabled: false },
