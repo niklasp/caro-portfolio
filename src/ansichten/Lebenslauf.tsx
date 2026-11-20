@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Kopf } from '../ui/Chrome'
 import { LEBENSLAUF, PROJEKTE, permalink, type LlZeile, type Projekt } from '../data/projects'
+import { feld, tipptImFeld, zeigtAuf } from '../data/bearbeiten'
 
 // Einträge, zu denen es ein Projekt mit Bildern gibt, finden es über den Titel.
 const schlicht = (t: string) => t.toLowerCase().replace(/[^a-zäöüß0-9]/g, '')
@@ -17,11 +18,13 @@ function Werk({
   titel,
   text,
   onZeigen,
+  marke,
 }: {
   jahr: string
   titel: string
   text: string
   onZeigen: (p: Projekt | null) => void
+  marke: object
 }) {
   const projekt = projektZu(titel)
   const inhalt = (
@@ -32,9 +35,15 @@ function Werk({
       </span>
     </>
   )
-  if (!projekt) return <div className="ll-zeile">{inhalt}</div>
+  if (!projekt)
+    return (
+      <div className="ll-zeile" {...marke}>
+        {inhalt}
+      </div>
+    )
   return (
     <Link
+      {...marke}
       className="ll-zeile ll-projekt"
       to={`/drehbuehne/${permalink(projekt)}`}
       onPointerEnter={(e) => e.pointerType === 'mouse' && onZeigen(projekt)}
@@ -46,16 +55,18 @@ function Werk({
 }
 
 // Ein Abschnitt mit Überschrift. Zeilen mit Titel sind Werke; ohne Zeilen entfällt der Abschnitt.
-function Abschnitt({ titel, zeilen, onZeigen }: { titel: string; zeilen?: LlZeile[]; onZeigen?: (p: Projekt | null) => void }) {
+// `feldName` ist das CMS-Feld des Abschnitts: im Bearbeitungsmodus öffnet ein Klick auf eine Zeile den Admin dort.
+function Abschnitt({ titel, feldName, zeilen, onZeigen }: { titel: string; feldName: string; zeilen?: LlZeile[]; onZeigen?: (p: Projekt | null) => void }) {
   if (!zeilen?.length) return null
+  const marke = feld(LL?.ref, feldName)
   return (
     <>
       <h3>{titel}</h3>
       {zeilen.map((z, i) =>
         z.titel && onZeigen ? (
-          <Werk key={i} jahr={z.jahr} titel={z.titel} text={z.text} onZeigen={onZeigen} />
+          <Werk key={i} jahr={z.jahr} titel={z.titel} text={z.text} onZeigen={onZeigen} marke={marke} />
         ) : (
-          <div className="ll-zeile" key={i}>
+          <div className="ll-zeile" key={i} {...marke}>
             <span className="jahr">{z.jahr}</span>
             <span>{z.titel ? `${z.titel}. ${z.text}` : z.text}</span>
           </div>
@@ -119,8 +130,9 @@ export default function Lebenslauf() {
 
   // Esc schließt den Lebenslauf wieder.
   useEffect(() => {
+    zeigtAuf(LL?.ref)
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !tipptImFeld()) {
         if (window.history.length > 1) navigate(-1)
         else navigate('/')
       }
@@ -135,7 +147,7 @@ export default function Lebenslauf() {
       <div className="lebenslauf">
         <section>
           <h2 className="ll-kopf">
-            {LL?.titel ?? 'Lebenslauf'}
+            <span {...feld(LL?.ref, 'title')}>{LL?.titel ?? 'Lebenslauf'}</span>
             {LL && (
               <a href={LL.pdf} download>
                 ↓ als PDF
@@ -143,7 +155,7 @@ export default function Lebenslauf() {
             )}
           </h2>
           {LL && LL.einleitung.length > 0 && (
-            <p>
+            <p {...feld(LL.ref, 'einleitung')}>
               {LL.einleitung.map((zeile, i) => (
                 <Fragment key={i}>
                   {i > 0 && <br />}
@@ -153,13 +165,13 @@ export default function Lebenslauf() {
             </p>
           )}
 
-          <Abschnitt titel="Ausbildung" zeilen={LL?.ausbildung} />
-          <Abschnitt titel="Beruflicher Werdegang" zeilen={LL?.werdegang} />
+          <Abschnitt titel="Ausbildung" feldName="ausbildung" zeilen={LL?.ausbildung} />
+          <Abschnitt titel="Beruflicher Werdegang" feldName="werdegang" zeilen={LL?.werdegang} />
 
           {LL?.skills.map((s, i) => (
             <Fragment key={i}>
-              <h3>{s.titel}</h3>
-              <p>{s.text}</p>
+              <h3 {...feld(LL.ref, 'skills')}>{s.titel}</h3>
+              <p {...feld(LL.ref, 'skills')}>{s.text}</p>
             </Fragment>
           ))}
         </section>
@@ -167,9 +179,9 @@ export default function Lebenslauf() {
         {LL && LL.arbeiten.length + LL.ausstellungen.length + LL.auszeichnungen.length > 0 && (
           <section className="werke">
             <h2>künstlerische Arbeiten</h2>
-            <Abschnitt titel="Bühne und Kostüm" zeilen={LL.arbeiten} onZeigen={zeige} />
-            <Abschnitt titel="Ausstellungen" zeilen={LL.ausstellungen} onZeigen={zeige} />
-            <Abschnitt titel="Auszeichnungen" zeilen={LL.auszeichnungen} />
+            <Abschnitt titel="Bühne und Kostüm" feldName="arbeiten" zeilen={LL.arbeiten} onZeigen={zeige} />
+            <Abschnitt titel="Ausstellungen" feldName="ausstellungen" zeilen={LL.ausstellungen} onZeigen={zeige} />
+            <Abschnitt titel="Auszeichnungen" feldName="auszeichnungen" zeilen={LL.auszeichnungen} />
           </section>
         )}
       </div>

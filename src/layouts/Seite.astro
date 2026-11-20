@@ -15,9 +15,11 @@ interface Props {
 	art?: "website" | "article";
 	// Die Bühne braucht mindestens ein Projekt mit Foto.
 	brauchtProjekte?: boolean;
+	// Bearbeitungsmodus: Marke des Eintrags, den diese Adresse zeigt (sonst leer).
+	eintragRef?: string;
 }
 
-const { daten, titel, beschreibung, bild, art = "website", brauchtProjekte = false } = Astro.props;
+const { daten, titel, beschreibung, bild, art = "website", brauchtProjekte = false, eintragRef } = Astro.props;
 
 const vorschau = bild ?? daten.projekte[0]?.bilder[0]?.src;
 const vorschauAbsolut = vorschau ? new URL(vorschau, Astro.url.origin).href : undefined;
@@ -66,6 +68,11 @@ const json = JSON.stringify(daten).replace(/</g, "\\u003c");
 				</main>
 			) : (
 				<>
+					{
+						/* EmDashs Leiste liest den Stand (Entwurf, „Veröffentlichen") beim Laden aus der
+						   Seite — die React-Insel steht dann noch nicht, deshalb liegt die Marke hier. */
+						eintragRef && <span hidden data-emdash-ref={eintragRef} />
+					}
 					<script type="application/json" id="caro-daten" set:html={json} />
 					<Wurzel client:only="react" />
 				</>

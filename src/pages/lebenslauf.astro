@@ -9,4 +9,5 @@ const daten = await ladeDaten(Boolean(Astro.locals.user));
 	daten={daten}
 	titel={`Lebenslauf — ${daten.kontakt.name}`}
 	beschreibung={`Lebenslauf von ${daten.kontakt.name}: Bühnen- und Kostümbildnerin, Kunstvermittlerin. Ausbildung, Werdegang, künstlerische Arbeiten, Auszeichnungen.`}
+	eintragRef={daten.lebenslauf?.ref}
 />

@@ -3,12 +3,13 @@ import { Canvas, useFrame, useLoader, useThree, type ThreeElements } from '@reac
 import * as THREE from 'three'
 import { useProgress } from '@react-three/drei'
 import { KATEGORIEN, KONTAKT, byKategorie, findByPermalink, originalVon, type Projekt } from '../data/projects'
+import { feld, tipptImFeld, useBearbeitet, zeigtAuf } from '../data/bearbeiten'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useProjektUrlSync } from '../ui/permalink'
 import { Kopf, Fuss } from '../ui/Chrome'
 import { flags } from '../ui/flags'
 import { daempf } from './helpers'
-import { cfg, useDrehConfig, LICHT_WIRKUNG, type DrehConfig, type Leinwand, type Licht } from './drehConfig'
+import { cfg, grundCss, useDrehConfig, LICHT_WIRKUNG, type DrehConfig, type Leinwand, type Licht } from './drehConfig'
 import { ledRaster } from './ledSchrift'
 
 // Die Drehbühne.
@@ -1228,14 +1229,30 @@ function Buehnenraum({
   onBild: (bildIndex: number) => void
   onZeigen: (bildIndex: number | null, verlassen?: number) => void
 }) {
-  // Hochgeladenes Bild vor festem Motiv vor dem Foto des Projekts.
-  const festesBild = config.leinwandBild || config.leinwandMotiv
+  // Was liegt auf der Leinwand? Ein Versuch aus dem Stellwerk (hochgeladen, blob:) vor dem Bild
+  // der Kategorie vor dem allgemeinen eigenen Bild vor dem festen Motiv — sonst das Foto des Projekts.
+  const versuch = config.leinwandBild.startsWith('blob:') ? config.leinwandBild : ''
+  const festFuer = (k: number) => versuch || KATEGORIEN[k]?.leinwand || config.leinwandBild || config.leinwandMotiv
+  const projektfoto = projekt.bilder[Math.min(projiziert ?? 0, projekt.bilder.length - 1)].src
+  const festesBild = festFuer(mod(seite, KATEGORIEN.length))
+  // Bodenprojektion mit Bildern je Kategorie: jede Seite der Münze trägt ihr eigenes Bild. Es hängt
+  // an der Münzseite, nicht an der gezeigten Kategorie — sonst wechselte es schon, bevor die Münze sich dreht.
+  const jeSeite = config.leinwand === 'boden' && !versuch && KATEGORIEN.some((k) => k.leinwand)
   const leinwand = useLeinwandMaterial(
-    festesBild || projekt.bilder[Math.min(projiziert ?? 0, projekt.bilder.length - 1)].src,
+    festesBild || projektfoto,
     projiziert !== null,
-    projiziert === null && !festesBild ? projekt.videoDatei : undefined,
+    projiziert === null && !festesBild && !jeSeite ? projekt.videoDatei : undefined,
     config.leinwand
   )
+  // Ohne Bilder je Kategorie bleiben die beiden ungenutzt und teilen sich das schon geladene Bild.
+  const vorn = mod(seite, 2)
+  const fuerSeite = (s: 0 | 1): Parameters<typeof useLeinwandMaterial> => {
+    if (!jeSeite) return [festesBild || projektfoto, false, undefined, config.leinwand]
+    const fest = festFuer(flaechen[s])
+    const zeigt = s === vorn && projiziert === null
+    return [fest || projektfoto, s === vorn && projiziert !== null, zeigt && !fest ? projekt.videoDatei : undefined, config.leinwand]
+  }
+  const seitenLeinwand = [useLeinwandMaterial(...fuerSeite(0)), useLeinwandMaterial(...fuerSeite(1))]
   const muenze = useRef<THREE.Group>(null)
   const kameraraum = useRef<THREE.Group>(null)
   const vorhang = useRef<THREE.MeshBasicMaterial>(null)
@@ -1334,10 +1351,10 @@ function Buehnenraum({
 
       <group ref={muenze}>
         <Scheibe wende={wende} config={config} />
-        {/* Bodenprojektion: das Motiv liegt auf beiden Seiten der Münze */}
+        {/* Bodenprojektion: das Motiv liegt auf beiden Seiten der Münze (s = 1 ist Münzseite 0, oben) */}
         {config.leinwand === 'boden' &&
           [1, -1].map((s) => (
-            <mesh key={s} material={leinwand} position={[0, s * (SCHEIBE_H / 2 + 0.012), 0]} rotation={[-s * (Math.PI / 2), 0, 0]}>
+            <mesh key={s} material={jeSeite ? seitenLeinwand[s === 1 ? 0 : 1] : leinwand} position={[0, s * (SCHEIBE_H / 2 + 0.012), 0]} rotation={[-s * (Math.PI / 2), 0, 0]}>
               <circleGeometry args={[SCHEIBE_R - 0.25, 96]} />
             </mesh>
           ))}
@@ -1397,6 +1414,9 @@ export default function Drehbuehne() {
   const kat = mod(seite, KATEGORIEN.length)
   const projekte = SAMMLUNG[kat]
   const p = projekte[aktiv]
+  // Bearbeitungsmodus: geänderte Texte neu zeichnen, und der Admin-Pfeil der Leiste folgt dem Projekt.
+  useBearbeitet()
+  useEffect(() => zeigtAuf(p.ref), [p.ref])
   useProjektUrlSync('/drehbuehne', p, detail ? DETAIL_HASH : '')
 
   // Scrollende Ansichten: die Seite reicht bis unter das letzte Foto — dessen Unterkante in Pixeln.
@@ -1566,7 +1586,7 @@ export default function Drehbuehne() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (flags.lightbox || (e.target as HTMLElement).closest?.('input, select, textarea')) return
+      if (flags.lightbox || tipptImFeld() || (e.target as HTMLElement).closest?.('input, select, textarea')) return
       if (e.key === 'ArrowRight') blaettere(1)
       if (e.key === 'ArrowLeft') blaettere(-1)
       if (stand.current.detail) {
@@ -1634,15 +1654,30 @@ export default function Drehbuehne() {
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        style={{ cursor: detail ? 'zoom-out' : 'grab', background: config.grund }}
+        style={{ cursor: detail ? 'zoom-out' : 'grab', background: grundCss(config) }}
       >
+        {/* Hintergrundbild: liegt hinter der durchsichtigen Zeichenfläche. Verkleinertes Bild nicht angekommen: einmal das Original. */}
+        {config.grundArt === 'bild' && config.grundBild && (
+          <img
+            className="db-grundbild"
+            src={config.grundBild}
+            alt=""
+            aria-hidden
+            draggable={false}
+            onError={(e) => {
+              const original = originalVon(e.currentTarget.getAttribute('src') ?? '')
+              if (original) e.currentTarget.src = original
+            }}
+          />
+        )}
         <Canvas
           dpr={[1, 1.5]}
           flat
           shadows
           gl={{ powerPreference: 'high-performance' }}
           camera={{ fov: fovFuer(fenster.b / fenster.h), position: KAMERA_HEIM.toArray(), near: 0.1, far: 90 }}
-          style={{ background: config.grund }}
+          // Farbe: wie bisher auf der Zeichenfläche selbst. Verlauf und Bild scheinen von dahinter durch.
+          style={{ background: config.grundArt === 'farbe' ? config.grund : 'transparent' }}
         >
           <fog attach="fog" args={[config.grund, 32, 60]} />
           <Buehnenraum
@@ -1702,7 +1737,7 @@ export default function Drehbuehne() {
             ↻
           </button>
         </div>
-        <h2>{p.titel}</h2>
+        <h2 {...feld(p.ref, 'title')}>{p.titel}</h2>
         <div className="sb-meta db-zaehler">
           {KATEGORIEN[kat].name} · {String(aktiv + 1).padStart(2, '0')} / {String(projekte.length).padStart(2, '0')}
         </div>
@@ -1723,18 +1758,23 @@ export default function Drehbuehne() {
             {KATEGORIEN[kat].name} · {String(aktiv + 1).padStart(2, '0')} / {String(projekte.length).padStart(2, '0')}
           </span>
         </div>
-        <h3 className="db-titel ov-anim-2">{p.titel}</h3>
+        {/* Jedes Feld in einem eigenen Element: der Bearbeitungsmodus speichert dessen ganzen Text. */}
+        <h3 className="db-titel ov-anim-2" {...feld(p.ref, 'title')}>
+          {p.titel}
+        </h3>
         <p className="db-meta ov-anim-2">
-          {p.rolle} · {p.jahr} · {p.ort}
+          <span {...feld(p.ref, 'rolle')}>{p.rolle}</span> · <span {...feld(p.ref, 'jahr')}>{p.jahr}</span> · <span {...feld(p.ref, 'ort')}>{p.ort}</span>
         </p>
-        <p className="db-blurb ov-anim-3">{p.blurb}</p>
-        <div className="db-credits ov-anim-3">
+        <p className="db-blurb ov-anim-3" {...feld(p.ref, 'beschreibung')}>
+          {p.blurb}
+        </p>
+        <div className="db-credits ov-anim-3" {...feld(p.ref, 'credits')}>
           {p.credits.map((c) => (
             <div key={c}>{c}</div>
           ))}
         </div>
         {p.links && (
-          <div className="db-links ov-anim-3">
+          <div className="db-links ov-anim-3" {...feld(p.ref, 'links')}>
             {p.links.map((l) => (
               <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
                 {l.label}

@@ -26,6 +26,7 @@ Local data (D1 database, R2 media) lives in `.wrangler/`. Delete that folder to 
 | `src/layouts/Seite.astro`               | Page shell: SEO tags, EmDash wiring, the data as inline JSON, the React island                |
 | `src/pages/`                            | Astro pages -- all server-rendered                                                            |
 | `src/data/projects.ts`                  | Client side: reads the inline JSON synchronously at module load                               |
+| `src/data/bearbeiten.ts`                | Client side: EmDash's edit mode on the React island (edit marks, key guard, admin link)       |
 | `src/ideas/Drehbuehne.tsx`              | The stage (React + three.js)                                                                  |
 | `src/ideas/drehWerte.ts`, `drehConfig.ts` | Stage settings: value lists and defaults (browser-free), and the "Stellwerk" try-out panel |
 
@@ -67,9 +68,9 @@ The stage builds its project lists when its module loads, before React renders. 
 
 - `projekte` collection: `title`, `rolle`, `jahr` (display text such as "seit 2021"), `ort`, `farbe` (Blau, Orange, Magenta, Pink), `position` (order on the stage: small number in front, empty = very front), `beschreibung`, `credits` (one line per credit), `bilder` (repeater of media-library images), `links` (repeater of label + URL), `video` (Vimeo player URL), `video_datei` (path or URL of an mp4 projected on the stage screen). The slug is the permalink (`lost-2025`).
 - Taxonomy `category`, labelled "Kategorien": each term is one side of the stage, in the order of the term list. A project sits on the side of its first category; without a category it goes to the last one. Categories without projects get no side.
-- `seiten` collection: `title`, `bild`, `content` (Portable Text). Only headings and paragraphs are rendered so far, as plain text.
+- `seiten` collection: `title`, `bild`, `content` (Portable Text). Rendered are headings, paragraphs, quotes and lists, with bold, italic, underline, strike-through and links (`alsSeite` in `src/cms/daten.ts`, `src/ansichten/About.tsx`). Images and embeds inside the text are not shown.
 - `lebenslauf` collection: one entry with the slug `lebenslauf`. `title`, `einleitung` (one line per line on the page), `pdf` (file; while empty, `public/lebenslauf-carolin-pflueger.pdf` is offered), and one repeater per section: `ausbildung`, `werdegang`, `auszeichnungen` (rows of `jahr` + `text`), `skills` (`titel` + `text`), `arbeiten`, `ausstellungen` (`jahr` + `titel` + `text`). Row order in the admin is the order on the page. A work whose `titel` matches a project title links to that project. Section headings are fixed in `src/ansichten/Lebenslauf.tsx`.
-- `buehne` collection: one entry with the slug `drehbuehne` holding the stage settings (background, screen, light, blocks, LED ticker, motion). Field slugs are the snake_case form of the keys in `DrehConfig`; select options are the labels from `src/ideas/drehWerte.ts`. This collection has no drafts: saving applies at once.
+- `buehne` collection: one entry with the slug `drehbuehne` holding the stage settings (background, screen, light, blocks, LED ticker, motion). Field slugs are the snake_case form of the keys in `DrehConfig`; select options are the labels from `src/ideas/drehWerte.ts`. This collection has no drafts: saving applies at once. Two things are not plain values: the images (`leinwand_bild`, `grund_bild`) and `leinwand_kategorien`, a repeater of category name + image that gives each category its own stage picture.
 - Site settings: `title` is the name in the header, `tagline` the line under the name in the opening animation.
 
 A project appears on the stage once it is published and has at least one photo.
@@ -80,8 +81,23 @@ The seed holds the full content: 16 projects with 147 photos. The photos of twel
 
 `admin.hiddenNavItems` in `astro.config.mjs` hides the built-in sections this site does not use (calendar, comments, menus, redirects, widgets, sections, bylines, import). The pages stay reachable by URL. A one-page guide for Carolin is in `docs/kurzanleitung-admin.pdf` (source: the `.html` next to it, printed to PDF with Chrome).
 
+## Edit mode on the site
+
+Signed-in editors see EmDash's toolbar on the site. Its "Bearbeitungsmodus" switch makes everything clickable that carries a `data-emdash-ref` attribute. The pages are a React island, so the server passes each entry's mark through the inline JSON (`ref`, only in edit mode; visitors get none) and `feld(ref, '<cms field>')` from `src/data/bearbeiten.ts` puts it on the element.
+
+- The toolbar saves the element's whole text. An element with a mark must show exactly one stored field, nothing else.
+- One-line texts (project title, role, year, place, page titles) and the project description are edited in place. Everything else (credits, links, Lebenslauf rows, About text) opens the entry in the admin. Photos are WebGL textures and cannot be clicked: the toolbar's arrow opens the current project in the admin.
+- Edits are saved as a draft; "Veröffentlichen" in the toolbar publishes them. Edit mode shows drafts.
+- Key handlers of the pages must skip while a field is being edited (`tipptImFeld()`).
+
 ## Stage settings and the Stellwerk
 
 The Stellwerk panel on the stage is for trying things out; its changes stay in that browser (localStorage). The published state for all visitors is the `buehne` entry. Local try-outs are discarded as soon as the `buehne` entry changes.
+
+The stage picture is chosen in this order: an upload tried out in the Stellwerk, the category's own picture (`leinwand_kategorien`, matched to the category by name or slug, ignoring capitals and punctuation), the general own picture, the fixed motif, the project's photo. With the floor projection each face of the disc carries the picture of its category.
+
+The background (`grund_art`) is a colour, a gradient (`grund` to `grund2`, direction `grund_richtung`) or an image (`grund_bild`). `grund` stays a plain hex colour in every case: fog, curtain and the project view use it, so the project view is always the flat colour.
+
+A field that is new in the seed is missing in a database that is already set up. `~/code/caro-sicherung/felder-nachziehen.mjs` adds missing seed fields to a running site through the API.
 
 The seeded values are Carolin's own Stellwerk settings from her screenshot of 20 Nov 2026 (background `#6266bf`, view "Große Bilder untereinander", floor projection with the "Matratze im Grün" motif, fixed crop). Her "Kulissen" and "Bewegung" folders (second screenshot, same day) are all at the defaults: block depth 0.5, three photos per project, turn speed 3.4.

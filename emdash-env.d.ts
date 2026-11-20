@@ -74,10 +74,15 @@ export interface Buehne {
   leinwand?: "Rundhorizont" | "Vollbild (ganze Seite)" | "Oberer Bildschirmteil" | "Rundum-Panorama" | "Bodenprojektion" | "Schwebende Leinwand" | "Keine Leinwand";
   leinwand_motiv?: "Projektmotiv (wechselt)" | "Matratze im Grün" | "Containerhof mit Kränen" | "Container in Reihe";
   leinwand_bild?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  leinwand_kategorien?: { "kategorie": string; "bild": { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } } }[];
   leinwand_passung?: "Ausschnitt, Maus führt" | "Ausschnitt, fest" | "Ganzes Bild" | "Ganzes Bild, Rand gefüllt" | "Gekachelt, gespiegelt" | "Gekachelt, gerade";
   leinwand_reihen?: number;
   leinwand_hell?: number;
+  grund_art?: "Farbe" | "Farbverlauf" | "Bild";
   grund?: string;
+  grund2?: string;
+  grund_richtung?: "Von oben nach unten" | "Von links nach rechts" | "Diagonal" | "Aus der Mitte";
+  grund_bild?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   text?: string;
   scheibe?: string;
   licht?: "Verfolger (Maus)" | "Fokus aufs Hauptprojekt" | "Arbeitslicht" | "Gegenlicht" | "Farbwechsler (drei Farben)" | "Suchscheinwerfer";

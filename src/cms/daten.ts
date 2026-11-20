@@ -1,11 +1,13 @@
 import { getEmDashCollection, getEmDashEntry, getSiteSettings, getTaxonomyTerms } from 'emdash'
 import type { MediaValue, PortableTextBlock } from 'emdash'
-import type { Bild, Daten, LebenslaufDaten, LlZeile, Projekt, SeitenText } from '../data/projects'
+import type { Absatz, Bild, Daten, KategorieEintrag, LebenslaufDaten, LlZeile, Projekt, SeitenText, TextTeil } from '../data/projects'
 import type { Lebenslauf } from '../../emdash-env'
 import { KONTAKT_FEST } from '../data/kontakt'
 import {
   ANSICHTEN,
   AUFSTELLUNGEN,
+  GRUND_ARTEN,
+  GRUND_RICHTUNGEN,
   LED_STILE,
   LEINWAENDE,
   LICHTER,
@@ -55,6 +57,14 @@ function alsBild(wert: unknown): Bild | undefined {
 }
 
 const text = (wert: unknown): string => (typeof wert === 'string' ? wert.trim() : '')
+const schlicht = (t: string) => t.toLowerCase().replace(/[^a-zäöüß0-9]/g, '')
+
+// EmDashs Bearbeitungsmodus (Schalter in der Leiste unten) findet Inhalte über das Attribut
+// `data-emdash-ref`. Die Marke gibt es nur in diesem Modus — Besucher bekommen keine.
+function marke(eintrag: { edit: object } | null | undefined): { ref?: string } {
+  const ref: unknown = (eintrag?.edit as Record<string, unknown> | undefined)?.['data-emdash-ref']
+  return typeof ref === 'string' ? { ref } : {}
+}
 
 // „seit 2021" → 2021; ohne Jahreszahl zählt das Erscheinungsjahr des Eintrags.
 function jahrZahl(jahr: string, ersatz: Date | null | undefined): number {
@@ -71,7 +81,11 @@ const KARTEN: Partial<Record<keyof DrehConfig, Record<string, string>>> = {
   licht: LICHTER,
   objAufstellung: AUFSTELLUNGEN,
   laufSchrift: LED_STILE,
+  grundArt: GRUND_ARTEN,
+  grundRichtung: GRUND_RICHTUNGEN,
 }
+// Bilder kommen nicht als Text aus dem Eintrag, sondern als Mediathek-Bild.
+const BILDER: Partial<Record<keyof DrehConfig, string>> = { leinwandBild: 'leinwand_bild', grundBild: 'grund_bild' }
 const schlange = (s: string) => s.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`)
 
 // Der Eintrag „Bühne" trägt dieselben Werte wie das Stellwerk, nur mit
@@ -81,7 +95,7 @@ function alsBuehne(daten: object | undefined): Partial<DrehConfig> {
   const eintrag = daten as Record<string, unknown>
   const aus: Record<string, unknown> = {}
   for (const [schluessel, standard] of Object.entries(STANDARD) as [keyof DrehConfig, unknown][]) {
-    if (schluessel === 'leinwandBild') continue
+    if (schluessel in BILDER) continue
     const roh = eintrag[schlange(schluessel)]
     if (roh === undefined || roh === null) continue
     const karte = KARTEN[schluessel]
@@ -96,20 +110,55 @@ function alsBuehne(daten: object | undefined): Partial<DrehConfig> {
       if (!istFarbe || /^#[0-9a-f]{6}$/i.test(roh.trim())) aus[schluessel] = roh.trim()
     }
   }
-  const eigenes = alsBild(eintrag.leinwand_bild)
-  if (eigenes) aus.leinwandBild = eigenes.src
+  for (const [schluessel, feld] of Object.entries(BILDER)) {
+    const bild = alsBild(eintrag[feld])
+    if (bild) aus[schluessel] = bild.src
+  }
   return aus as Partial<DrehConfig>
 }
 
+// Auszeichnungen aus dem Editor (Portable Text) → Schalter am Textstück.
+const MARKEN: Record<string, keyof TextTeil> = { strong: 'fett', em: 'kursiv', underline: 'unter', 'strike-through': 'durch', code: 'code' }
+// Nur Adressen, die ein Link sein dürfen: Web, Mail, Telefon, Seiten dieser Website.
+const LINK_ERLAUBT = /^(https?:\/\/|mailto:|tel:|\/(?!\/)|#)/i
+
+type Block = {
+  style?: string
+  listItem?: string
+  children?: { text?: string; marks?: string[] }[]
+  markDefs?: { _key?: string; _type?: string; href?: string; blank?: boolean }[]
+}
+
+// Der Fließtext einer Seite: Überschriften, Absätze, Zitate und Listen, mit fett, kursiv und Links.
+// Andere Blöcke des Editors (Bilder, Einbettungen) zeigt die Seite nicht.
 function alsSeite(titel: string, bloecke: PortableTextBlock[] | undefined, bild: unknown): SeitenText {
-  const absaetze: SeitenText['absaetze'] = []
-  for (const block of bloecke ?? []) {
-    if (block._type !== 'block') continue
-    const kinder = (block as { children?: { text?: string }[] }).children ?? []
-    const inhalt = kinder.map((k) => k.text ?? '').join('').trim()
+  const absaetze: Absatz[] = []
+  for (const roh of bloecke ?? []) {
+    if (roh._type !== 'block') continue
+    const block = roh as Block
+    const links = new Map((block.markDefs ?? []).filter((m) => m._type === 'link' && m._key).map((m) => [m._key as string, m]))
+    const teile: TextTeil[] = []
+    for (const kind of block.children ?? []) {
+      if (!kind.text) continue
+      const teil: TextTeil = { text: kind.text }
+      for (const marke of kind.marks ?? []) {
+        const schalter = MARKEN[marke]
+        if (schalter) (teil as unknown as Record<string, unknown>)[schalter] = true
+        const link = links.get(marke)
+        const adresse = link?.href?.trim() ?? ''
+        if (LINK_ERLAUBT.test(adresse)) {
+          teil.link = adresse
+          if (link?.blank || /^https?:/i.test(adresse)) teil.neuesFenster = true
+        }
+      }
+      teile.push(teil)
+    }
+    const inhalt = teile.map((t) => t.text).join('').trim()
     if (!inhalt) continue
-    const stil = String((block as { style?: string }).style ?? 'normal')
-    absaetze.push({ art: /^h[1-6]$/.test(stil) ? 'h' : 'p', text: inhalt })
+    const stil = String(block.style ?? 'normal')
+    const art: Absatz['art'] =
+      block.listItem === 'number' ? 'nummer' : block.listItem ? 'punkt' : /^h[1-6]$/.test(stil) ? 'h' : stil === 'blockquote' ? 'zitat' : 'p'
+    absaetze.push({ art, text: inhalt, teile })
   }
   return { titel, bild: alsBild(bild), absaetze }
 }
@@ -149,7 +198,15 @@ export async function ladeDaten(angemeldet: boolean): Promise<Daten> {
     getEmDashEntry('lebenslauf', 'lebenslauf'),
   ])
 
-  const alleKategorien = begriffe.map((b) => ({ id: b.slug, name: b.label }))
+  const alleKategorien: KategorieEintrag[] = begriffe.map((b) => ({ id: b.slug, name: b.label }))
+  // Leinwandbild je Kategorie: die Zeile nennt die Kategorie beim Namen — Groß-/Kleinschreibung
+  // und Satzzeichen zählen nicht. Passt eine Zeile zu keiner Kategorie, bleibt sie ohne Wirkung.
+  const gleich = (a: string, b: string) => schlicht(a) !== '' && schlicht(a) === schlicht(b)
+  for (const zeile of buehne.entry?.data.leinwand_kategorien ?? []) {
+    const kategorie = alleKategorien.find((k) => gleich(k.name, text(zeile?.kategorie)) || gleich(k.id, text(zeile?.kategorie)))
+    const bild = alsBild(zeile?.bild)
+    if (kategorie && bild && !kategorie.leinwand) kategorie.leinwand = bild.src
+  }
   const letzte = alleKategorien.at(-1)?.id ?? ''
 
   // Reihenfolge auf der Bühne: kleine Zahl vorn. Ohne Zahl steht ein Projekt
@@ -191,6 +248,7 @@ export async function ladeDaten(angemeldet: boolean): Promise<Daten> {
       ...(text(d.video) ? { video: text(d.video) } : {}),
       ...(text(d.video_datei) ? { videoDatei: text(d.video_datei) } : {}),
       bilder,
+      ...marke(eintrag),
     })
   }
 
@@ -209,7 +267,9 @@ export async function ladeDaten(angemeldet: boolean): Promise<Daten> {
     },
     buehne: alsBuehne(buehne.entry?.data),
     angemeldet,
-    about: aboutDaten ? alsSeite(aboutDaten.title?.trim() || 'About', aboutDaten.content, aboutDaten.bild) : null,
-    lebenslauf: lebenslauf.entry ? alsLebenslauf(lebenslauf.entry.data) : null,
+    about: aboutDaten
+      ? { ...alsSeite(aboutDaten.title?.trim() || 'About', aboutDaten.content, aboutDaten.bild), ...marke(about.entry) }
+      : null,
+    lebenslauf: lebenslauf.entry ? { ...alsLebenslauf(lebenslauf.entry.data), ...marke(lebenslauf.entry) } : null,
   }
 }

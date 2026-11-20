@@ -412,6 +412,28 @@
 					"type": "image"
 				},
 				{
+					"slug": "leinwand_kategorien",
+					"label": "Leinwand: eigenes Bild je Kategorie (überstimmt beides darüber)",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 12,
+						"subFields": [
+							{
+								"slug": "kategorie",
+								"label": "Kategorie (Name wie unter „Kategorien“)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "bild",
+								"label": "Bild",
+								"type": "image",
+								"required": true
+							}
+						]
+					}
+				},
+				{
 					"slug": "leinwand_passung",
 					"label": "Leinwand: Motiv",
 					"type": "select",
@@ -445,12 +467,50 @@
 					}
 				},
 				{
+					"slug": "grund_art",
+					"label": "Hintergrund: Art",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Farbe",
+							"Farbverlauf",
+							"Bild"
+						]
+					}
+				},
+				{
 					"slug": "grund",
-					"label": "Farbe: Hintergrund (#rrggbb)",
+					"label": "Hintergrund: Farbe (#rrggbb)",
 					"type": "string",
 					"validation": {
 						"pattern": "^#[0-9a-fA-F]{6}$"
 					}
+				},
+				{
+					"slug": "grund2",
+					"label": "Hintergrund: zweite Farbe für den Farbverlauf (#rrggbb)",
+					"type": "string",
+					"validation": {
+						"pattern": "^#[0-9a-fA-F]{6}$"
+					}
+				},
+				{
+					"slug": "grund_richtung",
+					"label": "Hintergrund: Richtung des Farbverlaufs",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Von oben nach unten",
+							"Von links nach rechts",
+							"Diagonal",
+							"Aus der Mitte"
+						]
+					}
+				},
+				{
+					"slug": "grund_bild",
+					"label": "Hintergrund: Bild (für die Art „Bild“)",
+					"type": "image"
 				},
 				{
 					"slug": "text",
@@ -2646,7 +2706,10 @@
 					"leinwand_passung": "Ausschnitt, fest",
 					"leinwand_reihen": 1,
 					"leinwand_hell": 1,
+					"grund_art": "Farbe",
 					"grund": "#6266bf",
+					"grund2": "#000000",
+					"grund_richtung": "Von oben nach unten",
 					"text": "#ffffff",
 					"scheibe": "#4a4a4a",
 					"licht": "Verfolger (Maus)",

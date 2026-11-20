@@ -3,6 +3,8 @@ import type { GUI as Panel } from 'dat.gui'
 import {
   ANSICHTEN,
   AUFSTELLUNGEN,
+  GRUND_ARTEN,
+  GRUND_RICHTUNGEN,
   LEINWAENDE,
   LED_STILE,
   LICHTER,
@@ -36,7 +38,7 @@ const lade = (): DrehConfig => {
   try {
     const roh = JSON.parse(localStorage.getItem(SPEICHER) ?? '{}')
     if (roh.basis !== BASIS) return { ...STANDARD }
-    return { ...STANDARD, ...roh.werte, leinwandBild: STANDARD.leinwandBild } // Objekt-URLs überleben kein Neuladen
+    return { ...STANDARD, ...roh.werte, leinwandBild: STANDARD.leinwandBild, grundBild: STANDARD.grundBild } // Objekt-URLs überleben kein Neuladen
   } catch {
     return { ...STANDARD }
   }
@@ -53,7 +55,7 @@ export function useDrehConfig(): DrehConfig {
     const melde = () => {
       setStand({ ...cfg })
       try {
-        localStorage.setItem(SPEICHER, JSON.stringify({ basis: BASIS, werte: { ...cfg, leinwandBild: '' } }))
+        localStorage.setItem(SPEICHER, JSON.stringify({ basis: BASIS, werte: { ...cfg, leinwandBild: '', grundBild: '' } }))
       } catch {
         /* privates Fenster — dann eben ohne Merken */
       }
@@ -86,22 +88,40 @@ function baue(GUI: typeof Panel, melde: () => void): () => void {
   document.body.appendChild(gui.domElement)
 
   // Bild-Upload: dat.gui kennt nur Knöpfe — der Knopf öffnet einen versteckten Datei-Dialog.
-  const datei = document.createElement('input')
-  datei.type = 'file'
-  datei.accept = 'image/*'
-  datei.onchange = () => {
-    const f = datei.files?.[0]
-    if (!f) return
-    if (cfg.leinwandBild) URL.revokeObjectURL(cfg.leinwandBild)
-    cfg.leinwandBild = URL.createObjectURL(f)
-    datei.value = ''
-    melde()
+  // Das Bild bleibt im Browser (Objekt-URL); für alle Besucher gehört es in den Admin.
+  const waehler = (schluessel: 'leinwandBild' | 'grundBild', danach?: () => void) => {
+    const datei = document.createElement('input')
+    datei.type = 'file'
+    datei.accept = 'image/*'
+    datei.onchange = () => {
+      const f = datei.files?.[0]
+      if (!f) return
+      if (cfg[schluessel].startsWith('blob:')) URL.revokeObjectURL(cfg[schluessel])
+      cfg[schluessel] = URL.createObjectURL(f)
+      datei.value = ''
+      danach?.()
+      melde()
+    }
+    return datei
   }
+  const datei = waehler('leinwandBild')
+  // Ein hochgeladenes Hintergrundbild soll man sofort sehen — die Art springt mit auf „Bild".
+  const grundDatei = waehler('grundBild', () => {
+    cfg.grundArt = 'bild'
+    farben.updateDisplay()
+  })
   const aktionen = {
     hochladen: () => datei.click(),
     bildWeg: () => {
       if (cfg.leinwandBild) URL.revokeObjectURL(cfg.leinwandBild)
       cfg.leinwandBild = ''
+      melde()
+    },
+    grundHochladen: () => grundDatei.click(),
+    // zurück zum Bild aus dem Admin (oder zu keinem)
+    grundBildWeg: () => {
+      if (cfg.grundBild.startsWith('blob:')) URL.revokeObjectURL(cfg.grundBild)
+      cfg.grundBild = STANDARD.grundBild
       melde()
     },
     zuruecksetzen: () => {
@@ -144,11 +164,16 @@ function baue(GUI: typeof Panel, melde: () => void): () => void {
   mitStandard(leinwand, ['leinwand', 'leinwandMotiv', 'leinwandPassung', 'leinwandReihen', 'leinwandHell'], aktionen.bildWeg)
   leinwand.open()
 
-  const farben = gui.addFolder('Farben')
-  farben.addColor(cfg, 'grund').name('Hintergrund').onChange(melde)
+  const farben = gui.addFolder('Farben und Hintergrund')
+  farben.add(cfg, 'grundArt', GRUND_ARTEN).name('Hintergrund').onChange(melde)
+  farben.addColor(cfg, 'grund').name('Farbe').onChange(melde)
+  farben.addColor(cfg, 'grund2').name('Verlauf: zweite Farbe').onChange(melde)
+  farben.add(cfg, 'grundRichtung', GRUND_RICHTUNGEN).name('Verlauf: Richtung').onChange(melde)
+  farben.add(aktionen, 'grundHochladen').name('Hintergrundbild hochladen …')
+  farben.add(aktionen, 'grundBildWeg').name('hochgeladenes Bild entfernen')
   farben.addColor(cfg, 'text').name('Text').onChange(melde)
   farben.addColor(cfg, 'scheibe').name('Scheibe').onChange(melde)
-  mitStandard(farben, ['grund', 'text', 'scheibe'])
+  mitStandard(farben, ['grundArt', 'grund', 'grund2', 'grundRichtung', 'text', 'scheibe'], aktionen.grundBildWeg)
   farben.open()
 
   const licht = gui.addFolder('Licht')

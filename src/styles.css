@@ -189,6 +189,15 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .ll-zeile .jahr { color: var(--tinte); }
 .ll-zeile em { font-style: italic; font-weight: 700; }
 .lebenslauf .werke .ll-zeile { margin-bottom: 12px; }
+/* About: Fließtext im Stil des Lebenslaufs, in einer schmalen Lesespalte */
+.lebenslauf.about { grid-template-columns: minmax(0, 560px); }
+.about p, .about blockquote, .about ul, .about ol { margin-bottom: 12px; white-space: pre-line; }
+.about strong { font-weight: 700; }
+.about a { border-bottom: var(--hairline); }
+.about a:hover { opacity: 0.6; }
+.about blockquote { padding-left: 14px; border-left: var(--hairline); font-style: italic; }
+.about ul, .about ol { padding-left: 18px; }
+.about li { margin-bottom: 4px; }
 /* Werkliste: Zeilen mit Projekt sind Links, ihr Hauptbild folgt der Maus */
 a.ll-projekt { cursor: pointer; }
 a.ll-projekt:hover em { text-decoration: underline; text-underline-offset: 3px; }
@@ -216,6 +225,8 @@ a.ll-projekt:hover em { text-decoration: underline; text-underline-offset: 3px; 
   inset: 0;
   overflow: hidden;
 }
+/* Hintergrundbild der Bühne: füllt die Fläche hinter der Zeichenfläche */
+.db-grundbild { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; user-select: none; }
 .buehne canvas { touch-action: none; }
 
 .lade {
@@ -481,6 +492,8 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
   line-height: 1;
 }
 .sb-titel .sb-meta { margin-top: 8px; font-size: 12px; color: var(--grau); }
+/* Bearbeitungsmodus: der Titel soll anklickbar sein, obwohl die Zone sonst Mausereignisse durchlässt */
+.sb-titel h2[data-emdash-ref] { pointer-events: auto; }
 
 .pfeil-nav {
   position: fixed;

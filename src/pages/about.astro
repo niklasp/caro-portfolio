@@ -11,4 +11,5 @@ const erster = daten.about?.absaetze.find((a) => a.art === "p")?.text;
 	titel={`${daten.about?.titel ?? "About"} — ${daten.kontakt.name}`}
 	beschreibung={erster ?? `Über ${daten.kontakt.name}: Bühnen- und Kostümbildnerin, Kunstvermittlerin in Berlin.`}
 	bild={daten.about?.bild?.src}
+	eintragRef={daten.about?.ref}
 />

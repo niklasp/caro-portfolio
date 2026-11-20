@@ -35,6 +35,22 @@ export const MOTIVE = {
 } as const
 export type Motiv = (typeof MOTIVE)[keyof typeof MOTIVE]
 
+// Hintergrund der Bühne: eine Farbe, ein Verlauf zwischen zwei Farben oder ein Bild.
+export const GRUND_ARTEN = {
+  Farbe: 'farbe',
+  Farbverlauf: 'verlauf',
+  Bild: 'bild',
+} as const
+export type GrundArt = (typeof GRUND_ARTEN)[keyof typeof GRUND_ARTEN]
+
+export const GRUND_RICHTUNGEN = {
+  'Von oben nach unten': 'unten',
+  'Von links nach rechts': 'rechts',
+  Diagonal: 'diagonal',
+  'Aus der Mitte': 'mitte',
+} as const
+export type GrundRichtung = (typeof GRUND_RICHTUNGEN)[keyof typeof GRUND_RICHTUNGEN]
+
 export const LICHTER = {
   'Verfolger (Maus)': 'verfolger',
   'Fokus aufs Hauptprojekt': 'fokus',
@@ -73,7 +89,11 @@ export interface DrehConfig {
   leinwandHell: number
   leinwandMotiv: Motiv // festes Motiv statt des Projektfotos
   leinwandBild: string // hochgeladenes Bild (Objekt-URL) — überstimmt beides
-  grund: string
+  grund: string // Hintergrundfarbe — auch Anfang des Verlaufs und die Farbe der Projektansicht
+  grundArt: GrundArt
+  grund2: string // Verlauf: zweite Farbe
+  grundRichtung: GrundRichtung
+  grundBild: string // Hintergrundbild (Adresse oder im Stellwerk hochgeladen)
   text: string
   scheibe: string
   licht: Licht
@@ -113,6 +133,10 @@ export const STANDARD: DrehConfig = {
   leinwandMotiv: '',
   leinwandBild: '',
   grund: '#0c0c0c',
+  grundArt: 'farbe',
+  grund2: '#000000',
+  grundRichtung: 'unten',
+  grundBild: '',
   text: '#ffffff',
   scheibe: '#4a4a4a',
   licht: 'verfolger',
@@ -153,3 +177,14 @@ export const LICHT_WIRKUNG: Record<Licht, { vornSkala: number; rest: number }> =
 }
 
 export { LED_STILE }
+
+const VERLAUF_WINKEL: Record<GrundRichtung, string> = { unten: '180deg', rechts: '90deg', diagonal: '135deg', mitte: '' }
+
+// Der Hintergrund als CSS: Farbe oder Verlauf. Ein Bild liegt als eigenes Element über der Farbe
+// (Drehbuehne.tsx) — die Farbe füllt, bis es geladen ist.
+export const grundCss = (c: Pick<DrehConfig, 'grundArt' | 'grund' | 'grund2' | 'grundRichtung'>): string => {
+  if (c.grundArt !== 'verlauf') return c.grund
+  return c.grundRichtung === 'mitte'
+    ? `radial-gradient(circle at center, ${c.grund}, ${c.grund2})`
+    : `linear-gradient(${VERLAUF_WINKEL[c.grundRichtung]}, ${c.grund}, ${c.grund2})`
+}

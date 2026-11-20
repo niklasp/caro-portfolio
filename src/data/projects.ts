@@ -21,6 +21,7 @@ export interface ProjektLink {
 export interface KategorieEintrag {
   id: string
   name: string
+  leinwand?: string // eigenes Leinwandbild dieser Kategorie (Admin: Bühne → „Leinwand: Bild je Kategorie")
 }
 export type Kategorie = string
 
@@ -39,6 +40,7 @@ export interface Projekt {
   video?: string
   videoDatei?: string
   bilder: Bild[]
+  ref?: string // nur im Bearbeitungsmodus: EmDashs Marke für diesen Eintrag (src/data/bearbeiten.ts)
 }
 
 export interface Kontakt {
@@ -50,10 +52,30 @@ export interface Kontakt {
   instagram: string
 }
 
+// Ein Stück Fließtext mit seiner Auszeichnung aus dem Editor.
+export interface TextTeil {
+  text: string
+  fett?: true
+  kursiv?: true
+  unter?: true
+  durch?: true
+  code?: true
+  link?: string
+  neuesFenster?: true
+}
+
+// Ein Absatz der Seite: Überschrift, Absatz, Zitat oder Listenpunkt. `text` ist der Inhalt ohne Auszeichnung.
+export interface Absatz {
+  art: 'h' | 'p' | 'zitat' | 'punkt' | 'nummer'
+  text: string
+  teile: TextTeil[]
+}
+
 export interface SeitenText {
   titel: string
   bild?: Bild
-  absaetze: { art: 'h' | 'p'; text: string }[]
+  absaetze: Absatz[]
+  ref?: string
 }
 
 // Eine Zeile im Lebenslauf: Jahr und Text, bei künstlerischen Arbeiten mit Titel.
@@ -75,6 +97,7 @@ export interface LebenslaufDaten {
   arbeiten: LlZeile[]
   ausstellungen: LlZeile[]
   auszeichnungen: LlZeile[]
+  ref?: string
 }
 
 // Alles, was die Seite aus dem CMS braucht. Der Server (src/cms/daten.ts) baut
