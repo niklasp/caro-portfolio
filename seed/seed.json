@@ -810,36 +810,180 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/reden-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-01.jpg",
 									"alt": "Vielleicht können wir mal miteinander reden — Foto 1",
-									"filename": "reden-1.jpg"
+									"filename": "reden-2026-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/reden-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-02.jpg",
 									"alt": "Vielleicht können wir mal miteinander reden — Foto 2",
-									"filename": "reden-2.jpg"
+									"filename": "reden-2026-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/reden-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-03.jpg",
 									"alt": "Vielleicht können wir mal miteinander reden — Foto 3",
-									"filename": "reden-3.jpg"
+									"filename": "reden-2026-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/reden-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-04.jpg",
 									"alt": "Vielleicht können wir mal miteinander reden — Foto 4",
-									"filename": "reden-4.jpg"
+									"filename": "reden-2026-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-05.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 5",
+									"filename": "reden-2026-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-06.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 6",
+									"filename": "reden-2026-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-07.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 7",
+									"filename": "reden-2026-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-08.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 8",
+									"filename": "reden-2026-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-09.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 9",
+									"filename": "reden-2026-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-10.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 10",
+									"filename": "reden-2026-10.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-11.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 11",
+									"filename": "reden-2026-11.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-12.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 12",
+									"filename": "reden-2026-12.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-13.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 13",
+									"filename": "reden-2026-13.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-14.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 14",
+									"filename": "reden-2026-14.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-15.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 15",
+									"filename": "reden-2026-15.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-16.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 16",
+									"filename": "reden-2026-16.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-17.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 17",
+									"filename": "reden-2026-17.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-18.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 18",
+									"filename": "reden-2026-18.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-19.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 19",
+									"filename": "reden-2026-19.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-20.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 20",
+									"filename": "reden-2026-20.jpg"
 								}
 							}
 						}
@@ -868,45 +1012,90 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/lost-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-01.jpg",
 									"alt": "LOST — Foto 1",
-									"filename": "lost-1.jpg"
+									"filename": "lost-2025-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/lost-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-02.jpg",
 									"alt": "LOST — Foto 2",
-									"filename": "lost-2.jpg"
+									"filename": "lost-2025-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/lost-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-03.jpg",
 									"alt": "LOST — Foto 3",
-									"filename": "lost-3.jpg"
+									"filename": "lost-2025-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/lost-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-04.jpg",
 									"alt": "LOST — Foto 4",
-									"filename": "lost-4.jpg"
+									"filename": "lost-2025-04.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/lost-5.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-05.jpg",
 									"alt": "LOST — Foto 5",
-									"filename": "lost-5.jpg"
+									"filename": "lost-2025-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-06.jpg",
+									"alt": "LOST — Foto 6",
+									"filename": "lost-2025-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-07.jpg",
+									"alt": "LOST — Foto 7",
+									"filename": "lost-2025-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-08.jpg",
+									"alt": "LOST — Foto 8",
+									"filename": "lost-2025-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-09.jpg",
+									"alt": "LOST — Foto 9",
+									"filename": "lost-2025-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-10.jpg",
+									"alt": "LOST — Foto 10",
+									"filename": "lost-2025-10.jpg"
 								}
 							}
 						}
@@ -935,36 +1124,99 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/ein-stueck-vom-mond-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-01.jpg",
 									"alt": "Ein Stück vom Mond — Foto 1",
-									"filename": "ein-stueck-vom-mond-1.jpg"
+									"filename": "ein-stueck-vom-mond-2025-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/ein-stueck-vom-mond-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-02.jpg",
 									"alt": "Ein Stück vom Mond — Foto 2",
-									"filename": "ein-stueck-vom-mond-2.jpg"
+									"filename": "ein-stueck-vom-mond-2025-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/ein-stueck-vom-mond-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-03.jpg",
 									"alt": "Ein Stück vom Mond — Foto 3",
-									"filename": "ein-stueck-vom-mond-3.jpg"
+									"filename": "ein-stueck-vom-mond-2025-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/ein-stueck-vom-mond-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-04.jpg",
 									"alt": "Ein Stück vom Mond — Foto 4",
-									"filename": "ein-stueck-vom-mond-4.jpg"
+									"filename": "ein-stueck-vom-mond-2025-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-05.jpg",
+									"alt": "Ein Stück vom Mond — Foto 5",
+									"filename": "ein-stueck-vom-mond-2025-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-06.jpg",
+									"alt": "Ein Stück vom Mond — Foto 6",
+									"filename": "ein-stueck-vom-mond-2025-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-07.jpg",
+									"alt": "Ein Stück vom Mond — Foto 7",
+									"filename": "ein-stueck-vom-mond-2025-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-08.jpg",
+									"alt": "Ein Stück vom Mond — Foto 8",
+									"filename": "ein-stueck-vom-mond-2025-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-09.jpg",
+									"alt": "Ein Stück vom Mond — Foto 9",
+									"filename": "ein-stueck-vom-mond-2025-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-10.jpg",
+									"alt": "Ein Stück vom Mond — Foto 10",
+									"filename": "ein-stueck-vom-mond-2025-10.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-11.jpg",
+									"alt": "Ein Stück vom Mond — Foto 11",
+									"filename": "ein-stueck-vom-mond-2025-11.jpg"
 								}
 							}
 						}
@@ -993,45 +1245,63 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/draussen-feiern-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-01.jpg",
 									"alt": "Draußen feiern die Leute — Foto 1",
-									"filename": "draussen-feiern-1.jpg"
+									"filename": "draussen-feiern-2025-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/draussen-feiern-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-02.jpg",
 									"alt": "Draußen feiern die Leute — Foto 2",
-									"filename": "draussen-feiern-2.jpg"
+									"filename": "draussen-feiern-2025-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/draussen-feiern-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-03.jpg",
 									"alt": "Draußen feiern die Leute — Foto 3",
-									"filename": "draussen-feiern-3.jpg"
+									"filename": "draussen-feiern-2025-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/draussen-feiern-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-04.jpg",
 									"alt": "Draußen feiern die Leute — Foto 4",
-									"filename": "draussen-feiern-4.jpg"
+									"filename": "draussen-feiern-2025-04.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/draussen-feiern-5.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-05.jpg",
 									"alt": "Draußen feiern die Leute — Foto 5",
-									"filename": "draussen-feiern-5.jpg"
+									"filename": "draussen-feiern-2025-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-06.jpg",
+									"alt": "Draußen feiern die Leute — Foto 6",
+									"filename": "draussen-feiern-2025-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-07.jpg",
+									"alt": "Draußen feiern die Leute — Foto 7",
+									"filename": "draussen-feiern-2025-07.jpg"
 								}
 							}
 						}
@@ -1060,36 +1330,147 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/spuren-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-01.jpg",
 									"alt": "Spuren — Foto 1",
-									"filename": "spuren-1.jpg"
+									"filename": "spuren-2024-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/spuren-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-02.jpg",
 									"alt": "Spuren — Foto 2",
-									"filename": "spuren-2.jpg"
+									"filename": "spuren-2024-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/spuren-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-03.jpg",
 									"alt": "Spuren — Foto 3",
-									"filename": "spuren-3.jpg"
+									"filename": "spuren-2024-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/spuren-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-04.jpg",
 									"alt": "Spuren — Foto 4",
-									"filename": "spuren-4.jpg"
+									"filename": "spuren-2024-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-05.jpg",
+									"alt": "Spuren — Foto 5",
+									"filename": "spuren-2024-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-06.jpg",
+									"alt": "Spuren — Foto 6",
+									"filename": "spuren-2024-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-07.jpg",
+									"alt": "Spuren — Foto 7",
+									"filename": "spuren-2024-07.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "blut-2024",
+				"slug": "blut-2024",
+				"status": "published",
+				"data": {
+					"title": "Blut",
+					"rolle": "Kostüm",
+					"jahr": "2024",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Magenta",
+					"position": 65,
+					"credits": "Regie: Leon Pfannenmüller\nKostüm: Carolin Pflüger",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-01.jpg",
+									"alt": "Blut — Foto 1",
+									"filename": "blut-2024-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-02.jpg",
+									"alt": "Blut — Foto 2",
+									"filename": "blut-2024-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-03.jpg",
+									"alt": "Blut — Foto 3",
+									"filename": "blut-2024-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-04.jpg",
+									"alt": "Blut — Foto 4",
+									"filename": "blut-2024-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-05.jpg",
+									"alt": "Blut — Foto 5",
+									"filename": "blut-2024-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-06.jpg",
+									"alt": "Blut — Foto 6",
+									"filename": "blut-2024-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-07.jpg",
+									"alt": "Blut — Foto 7",
+									"filename": "blut-2024-07.jpg"
 								}
 							}
 						}
@@ -1118,36 +1499,90 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/amygdala-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-01.jpg",
 									"alt": "Die Entführung der Amygdala — Foto 1",
-									"filename": "amygdala-1.jpg"
+									"filename": "amygdala-2024-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/amygdala-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-02.jpg",
 									"alt": "Die Entführung der Amygdala — Foto 2",
-									"filename": "amygdala-2.jpg"
+									"filename": "amygdala-2024-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/amygdala-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-03.jpg",
 									"alt": "Die Entführung der Amygdala — Foto 3",
-									"filename": "amygdala-3.jpg"
+									"filename": "amygdala-2024-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/amygdala-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-04.jpg",
 									"alt": "Die Entführung der Amygdala — Foto 4",
-									"filename": "amygdala-4.jpg"
+									"filename": "amygdala-2024-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-05.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 5",
+									"filename": "amygdala-2024-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-06.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 6",
+									"filename": "amygdala-2024-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-07.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 7",
+									"filename": "amygdala-2024-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-08.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 8",
+									"filename": "amygdala-2024-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-09.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 9",
+									"filename": "amygdala-2024-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-10.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 10",
+									"filename": "amygdala-2024-10.jpg"
 								}
 							}
 						}
@@ -1176,36 +1611,90 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/bitte-auto-komm-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-01.jpg",
 									"alt": "Bitte! Auto! Komm! — Foto 1",
-									"filename": "bitte-auto-komm-1.jpg"
+									"filename": "bitte-auto-komm-2024-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/bitte-auto-komm-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-02.jpg",
 									"alt": "Bitte! Auto! Komm! — Foto 2",
-									"filename": "bitte-auto-komm-2.jpg"
+									"filename": "bitte-auto-komm-2024-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/bitte-auto-komm-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-03.jpg",
 									"alt": "Bitte! Auto! Komm! — Foto 3",
-									"filename": "bitte-auto-komm-3.jpg"
+									"filename": "bitte-auto-komm-2024-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/bitte-auto-komm-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-04.jpg",
 									"alt": "Bitte! Auto! Komm! — Foto 4",
-									"filename": "bitte-auto-komm-4.jpg"
+									"filename": "bitte-auto-komm-2024-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-05.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 5",
+									"filename": "bitte-auto-komm-2024-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-06.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 6",
+									"filename": "bitte-auto-komm-2024-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-07.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 7",
+									"filename": "bitte-auto-komm-2024-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-08.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 8",
+									"filename": "bitte-auto-komm-2024-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-09.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 9",
+									"filename": "bitte-auto-komm-2024-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-10.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 10",
+									"filename": "bitte-auto-komm-2024-10.jpg"
 								}
 							}
 						}
@@ -1234,45 +1723,201 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/hundekot-attacke-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-01.jpg",
 									"alt": "Die Hundekot-Attacke — Foto 1",
-									"filename": "hundekot-attacke-1.jpg"
+									"filename": "hundekot-attacke-2023-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/hundekot-attacke-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-02.jpg",
 									"alt": "Die Hundekot-Attacke — Foto 2",
-									"filename": "hundekot-attacke-2.jpg"
+									"filename": "hundekot-attacke-2023-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/hundekot-attacke-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-03.jpg",
 									"alt": "Die Hundekot-Attacke — Foto 3",
-									"filename": "hundekot-attacke-3.jpg"
+									"filename": "hundekot-attacke-2023-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/hundekot-attacke-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-04.jpg",
 									"alt": "Die Hundekot-Attacke — Foto 4",
-									"filename": "hundekot-attacke-4.jpg"
+									"filename": "hundekot-attacke-2023-04.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/hundekot-attacke-5.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-05.jpg",
 									"alt": "Die Hundekot-Attacke — Foto 5",
-									"filename": "hundekot-attacke-5.jpg"
+									"filename": "hundekot-attacke-2023-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-06.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 6",
+									"filename": "hundekot-attacke-2023-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-07.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 7",
+									"filename": "hundekot-attacke-2023-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-08.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 8",
+									"filename": "hundekot-attacke-2023-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-09.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 9",
+									"filename": "hundekot-attacke-2023-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-10.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 10",
+									"filename": "hundekot-attacke-2023-10.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "vom-dorf-2023",
+				"slug": "vom-dorf-2023",
+				"status": "published",
+				"data": {
+					"title": "Vom Dorf",
+					"rolle": "Kostüm",
+					"jahr": "2023",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Orange",
+					"position": 95,
+					"credits": "Regie: Lizzy Timmers\nKostüm: Carolin Pflüger",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-01.jpg",
+									"alt": "Vom Dorf — Foto 1",
+									"filename": "vom-dorf-2023-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-02.jpg",
+									"alt": "Vom Dorf — Foto 2",
+									"filename": "vom-dorf-2023-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-03.jpg",
+									"alt": "Vom Dorf — Foto 3",
+									"filename": "vom-dorf-2023-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-04.jpg",
+									"alt": "Vom Dorf — Foto 4",
+									"filename": "vom-dorf-2023-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-05.jpg",
+									"alt": "Vom Dorf — Foto 5",
+									"filename": "vom-dorf-2023-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-06.jpg",
+									"alt": "Vom Dorf — Foto 6",
+									"filename": "vom-dorf-2023-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-07.jpg",
+									"alt": "Vom Dorf — Foto 7",
+									"filename": "vom-dorf-2023-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-08.jpg",
+									"alt": "Vom Dorf — Foto 8",
+									"filename": "vom-dorf-2023-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-09.jpg",
+									"alt": "Vom Dorf — Foto 9",
+									"filename": "vom-dorf-2023-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-10.jpg",
+									"alt": "Vom Dorf — Foto 10",
+									"filename": "vom-dorf-2023-10.jpg"
 								}
 							}
 						}
@@ -1301,54 +1946,144 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/on-repeat-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-01.jpg",
 									"alt": "On Repeat — Foto 1",
-									"filename": "on-repeat-1.jpg"
+									"filename": "on-repeat-2023-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/on-repeat-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-02.jpg",
 									"alt": "On Repeat — Foto 2",
-									"filename": "on-repeat-2.jpg"
+									"filename": "on-repeat-2023-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/on-repeat-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-03.jpg",
 									"alt": "On Repeat — Foto 3",
-									"filename": "on-repeat-3.jpg"
+									"filename": "on-repeat-2023-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/on-repeat-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-04.jpg",
 									"alt": "On Repeat — Foto 4",
-									"filename": "on-repeat-4.jpg"
+									"filename": "on-repeat-2023-04.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/on-repeat-5.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-05.jpg",
 									"alt": "On Repeat — Foto 5",
-									"filename": "on-repeat-5.jpg"
+									"filename": "on-repeat-2023-05.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/on-repeat-6.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-06.jpg",
 									"alt": "On Repeat — Foto 6",
-									"filename": "on-repeat-6.jpg"
+									"filename": "on-repeat-2023-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-07.jpg",
+									"alt": "On Repeat — Foto 7",
+									"filename": "on-repeat-2023-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-08.jpg",
+									"alt": "On Repeat — Foto 8",
+									"filename": "on-repeat-2023-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-09.jpg",
+									"alt": "On Repeat — Foto 9",
+									"filename": "on-repeat-2023-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-10.jpg",
+									"alt": "On Repeat — Foto 10",
+									"filename": "on-repeat-2023-10.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-11.jpg",
+									"alt": "On Repeat — Foto 11",
+									"filename": "on-repeat-2023-11.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-12.jpg",
+									"alt": "On Repeat — Foto 12",
+									"filename": "on-repeat-2023-12.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-13.jpg",
+									"alt": "On Repeat — Foto 13",
+									"filename": "on-repeat-2023-13.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-14.jpg",
+									"alt": "On Repeat — Foto 14",
+									"filename": "on-repeat-2023-14.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-15.jpg",
+									"alt": "On Repeat — Foto 15",
+									"filename": "on-repeat-2023-15.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-16.jpg",
+									"alt": "On Repeat — Foto 16",
+									"filename": "on-repeat-2023-16.jpg"
 								}
 							}
 						}
@@ -1377,99 +2112,90 @@
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-1.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-01.jpg",
 									"alt": "Knast — Foto 1",
-									"filename": "knast-1.jpg"
+									"filename": "knast-2023-01.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-2.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-02.jpg",
 									"alt": "Knast — Foto 2",
-									"filename": "knast-2.jpg"
+									"filename": "knast-2023-02.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-3.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-03.jpg",
 									"alt": "Knast — Foto 3",
-									"filename": "knast-3.jpg"
+									"filename": "knast-2023-03.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-4.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-04.jpg",
 									"alt": "Knast — Foto 4",
-									"filename": "knast-4.jpg"
+									"filename": "knast-2023-04.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-5.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-05.jpg",
 									"alt": "Knast — Foto 5",
-									"filename": "knast-5.jpg"
+									"filename": "knast-2023-05.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-6.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-06.jpg",
 									"alt": "Knast — Foto 6",
-									"filename": "knast-6.jpg"
+									"filename": "knast-2023-06.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-7.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-07.jpg",
 									"alt": "Knast — Foto 7",
-									"filename": "knast-7.jpg"
+									"filename": "knast-2023-07.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-8.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-08.jpg",
 									"alt": "Knast — Foto 8",
-									"filename": "knast-8.jpg"
+									"filename": "knast-2023-08.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-9.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-09.jpg",
 									"alt": "Knast — Foto 9",
-									"filename": "knast-9.jpg"
+									"filename": "knast-2023-09.jpg"
 								}
 							}
 						},
 						{
 							"bild": {
 								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-10.jpg",
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-10.jpg",
 									"alt": "Knast — Foto 10",
-									"filename": "knast-10.jpg"
-								}
-							}
-						},
-						{
-							"bild": {
-								"$media": {
-									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/knast-11.jpg",
-									"alt": "Knast — Foto 11",
-									"filename": "knast-11.jpg"
+									"filename": "knast-2023-10.jpg"
 								}
 							}
 						}

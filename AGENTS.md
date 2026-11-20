@@ -74,7 +74,7 @@ The stage builds its project lists when its module loads, before React renders. 
 
 A project appears on the stage once it is published and has at least one photo.
 
-The seed still carries the first photo set (71 photos, fetched from the old repository). The local database holds Carolin's newer set (web-sized copies, at most 1600 px wide) and two more projects, `blut-2024` and `vom-dorf-2023`. Move content to another install with `emdash site export` / `site import`, not with the seed.
+The seed holds the full content: 16 projects with 147 photos. The photos of twelve projects are Carolin's delivery of 20 Nov 2026 as web-sized copies (at most 1600 px wide) in `seed/fotos/`; the seed fetches them, and the 19 older photos, from GitHub by commit. A photo whose download fails during seeding is left out without an error, so count the photos afterwards (147).
 
 ## Admin
 
