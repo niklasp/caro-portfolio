@@ -1,165 +1,42 @@
 import { useEffect, useState } from 'react'
-import { GUI } from 'dat.gui'
-import { LED_STILE } from './ledSchrift'
+import type { GUI as Panel } from 'dat.gui'
+import {
+  ANSICHTEN,
+  AUFSTELLUNGEN,
+  LEINWAENDE,
+  LED_STILE,
+  LICHTER,
+  MOTIVE,
+  PASSUNGEN,
+  STANDARD as WERK_STANDARD,
+  type DrehConfig,
+} from './drehWerte'
+import { ANGEMELDET, BUEHNE } from '../data/projects'
+
+export * from './drehWerte'
 
 // Stellwerk der Drehbühne: ein dat.gui-Panel zum Ausprobieren von Leinwand,
 // Farben, Licht und Laufschrift. `cfg` ist der lebende Stand für die
 // Frame-Schleife, der Hook liefert denselben Stand als React-State.
 
-export const LEINWAENDE = {
-  Rundhorizont: 'rundhorizont',
-  'Vollbild (ganze Seite)': 'vollbild',
-  'Oberer Bildschirmteil': 'oben',
-  'Rundum-Panorama': 'rundum',
-  Bodenprojektion: 'boden',
-  'Schwebende Leinwand': 'leinwand',
-  'Keine Leinwand': 'aus',
-} as const
-export type Leinwand = (typeof LEINWAENDE)[keyof typeof LEINWAENDE]
-
-// Wie das Motiv auf die Leinwand kommt: beschnitten (füllend) oder ganz zu sehen.
-export const PASSUNGEN = {
-  'Ausschnitt, Maus führt': 'ausschnitt',
-  'Ausschnitt, fest': 'fest',
-  'Ganzes Bild': 'ganz',
-  'Ganzes Bild, Rand gefüllt': 'ganzRand',
-  'Gekachelt, gespiegelt': 'kacheln',
-  'Gekachelt, gerade': 'kachelnGerade',
-} as const
-export type Passung = (typeof PASSUNGEN)[keyof typeof PASSUNGEN]
-
-// Feste Motive für die Leinwand (von Carolin) — leer heißt: das Foto des vordersten Projekts.
-export const MOTIVE = {
-  'Projektmotiv (wechselt)': '',
-  'Matratze im Grün': '/images/leinwand/matratze.webp',
-  'Containerhof mit Kränen': '/images/leinwand/kraene.webp',
-  'Container in Reihe': '/images/leinwand/container.webp',
-} as const
-export type Motiv = (typeof MOTIVE)[keyof typeof MOTIVE]
-
-export const LICHTER = {
-  'Verfolger (Maus)': 'verfolger',
-  'Fokus aufs Hauptprojekt': 'fokus',
-  Arbeitslicht: 'arbeitslicht',
-  Gegenlicht: 'gegenlicht',
-  'Farbwechsler (drei Farben)': 'farben',
-  Suchscheinwerfer: 'sucher',
-} as const
-export type Licht = (typeof LICHTER)[keyof typeof LICHTER]
-
-// Wie die drei Fotos eines Projekts auf der Scheibe stehen.
-export const AUFSTELLUNGEN = {
-  'Frei gestellt': 'frei',
-  'Hauptbild hinten, zwei kleine davor': 'hauptbild',
-  Nebeneinander: 'reihe',
-  Fächer: 'faecher',
-  'Treppe nach vorn': 'treppe',
-} as const
-export type Aufstellung = (typeof AUFSTELLUNGEN)[keyof typeof AUFSTELLUNGEN]
-
-// Wie die Projektansicht (breites Fenster) die Fotos und den Text setzt. Schmale
-// Fenster scrollen immer: Fotos in voller Breite, Text darunter.
-export const ANSICHTEN = {
-  'Große Bilder untereinander, Text haftet seitlich': 'stapel',
-  'Jedes Bild in voller Spaltenbreite, Text haftet seitlich': 'spalte',
-  'Bildraster neben dem Text (ohne Scrollen)': 'raster',
-  'Bildraster in voller Breite, Text darunter': 'breit',
-} as const
-export type Ansicht = (typeof ANSICHTEN)[keyof typeof ANSICHTEN]
-
-export interface DrehConfig {
-  ansicht: Ansicht
-  leinwand: Leinwand
-  leinwandPassung: Passung
-  leinwandReihen: number // Kacheln: so viele Bildreihen übereinander
-  leinwandHell: number
-  leinwandMotiv: Motiv // festes Motiv statt des Projektfotos
-  leinwandBild: string // hochgeladenes Bild (Objekt-URL) — überstimmt beides
-  grund: string
-  text: string
-  scheibe: string
-  licht: Licht
-  lichtStaerke: number
-  schatten: boolean
-  laufschrift: boolean
-  laufText: string // leer = Name der Kategorie
-  laufSchrift: string
-  laufFarbe: string
-  laufTempo: number
-  laufZeilen: number
-  wendeTempo: number
-  zoomDauer: number
-  // Kulissen: die Foto-Blöcke auf der Scheibe
-  objAufstellung: Aufstellung
-  objGroesse: number
-  objDicke: number
-  objRadius: number
-  objStreuung: number
-  objVerdrehung: number
-  objNeigung: number
-  objSchweben: number
-  objAtmen: number
-  objZurKamera: number
-  objSchwung: number
-  objStapel: number
-  objAnzahl: number
-  objRueckseite: boolean
-}
-
-export const STANDARD: DrehConfig = {
-  ansicht: 'spalte',
-  leinwand: 'rundhorizont',
-  leinwandPassung: 'ausschnitt',
-  leinwandReihen: 1,
-  leinwandHell: 1,
-  leinwandMotiv: '',
-  leinwandBild: '',
-  grund: '#0c0c0c',
-  text: '#ffffff',
-  scheibe: '#4a4a4a',
-  licht: 'verfolger',
-  lichtStaerke: 1,
-  schatten: true,
-  laufschrift: true,
-  laufText: '',
-  laufSchrift: 'dioden',
-  laufFarbe: '#ff1c0d',
-  laufTempo: 16,
-  laufZeilen: 16,
-  wendeTempo: 3.4,
-  zoomDauer: 0.95,
-  objAufstellung: 'frei',
-  objGroesse: 1,
-  objDicke: 0.5,
-  objRadius: 11.2,
-  objStreuung: 1,
-  objVerdrehung: 1,
-  objNeigung: 0,
-  objSchweben: 0,
-  objAtmen: 0,
-  objZurKamera: 0,
-  objSchwung: 0,
-  objStapel: 0,
-  objAnzahl: 3,
-  objRueckseite: false,
-}
-
-// Was das Licht mit der vordersten Kulisse und ihren Nachbarn macht.
-export const LICHT_WIRKUNG: Record<Licht, { vornSkala: number; rest: number }> = {
-  verfolger: { vornSkala: 1, rest: 0.55 },
-  fokus: { vornSkala: 1.18, rest: 0.4 },
-  arbeitslicht: { vornSkala: 1, rest: 1 },
-  gegenlicht: { vornSkala: 1, rest: 0.7 },
-  farben: { vornSkala: 1, rest: 0.8 },
-  sucher: { vornSkala: 1, rest: 0.75 },
-}
+// Standard = Werkseinstellung, überschrieben vom CMS-Eintrag „Bühne" — das ist
+// der Stand, den alle Besucher sehen.
+export const STANDARD: DrehConfig = { ...WERK_STANDARD, ...BUEHNE }
 
 const SPEICHER = 'drehbuehne-stellwerk'
 
+// Eigene Versuche im Stellwerk bleiben im Browser — aber nur, solange der
+// CMS-Stand derselbe ist, auf dem sie entstanden sind. Ändert sich der Eintrag
+// „Bühne" im Admin, gilt wieder er.
+const BASIS = JSON.stringify(STANDARD)
+
 const lade = (): DrehConfig => {
+  // Besucher sehen immer den CMS-Stand — eigene Versuche gibt es nur mit Stellwerk.
+  if (!ANGEMELDET) return { ...STANDARD }
   try {
     const roh = JSON.parse(localStorage.getItem(SPEICHER) ?? '{}')
-    return { ...STANDARD, ...roh, leinwandBild: '' } // Objekt-URLs überleben kein Neuladen
+    if (roh.basis !== BASIS) return { ...STANDARD }
+    return { ...STANDARD, ...roh.werte, leinwandBild: STANDARD.leinwandBild } // Objekt-URLs überleben kein Neuladen
   } catch {
     return { ...STANDARD }
   }
@@ -171,151 +48,168 @@ export function useDrehConfig(): DrehConfig {
   const [stand, setStand] = useState<DrehConfig>(() => ({ ...cfg }))
 
   useEffect(() => {
+    // Das Panel ist ein Werkzeug für Angemeldete, kein Teil der Seite.
+    if (!ANGEMELDET) return
     const melde = () => {
       setStand({ ...cfg })
       try {
-        localStorage.setItem(SPEICHER, JSON.stringify({ ...cfg, leinwandBild: '' }))
+        localStorage.setItem(SPEICHER, JSON.stringify({ basis: BASIS, werte: { ...cfg, leinwandBild: '' } }))
       } catch {
         /* privates Fenster — dann eben ohne Merken */
       }
     }
 
-    const Texte = GUI as unknown as { TEXT_OPEN: string; TEXT_CLOSED: string }
-    // dat.gui benennt die Texte nach der Aktion: TEXT_OPEN steht auf dem zugeklappten Panel
-    Texte.TEXT_OPEN = 'Stellwerk öffnen'
-    Texte.TEXT_CLOSED = 'Stellwerk schließen'
-    const gui = new GUI({ autoPlace: false, width: 300 })
-    gui.domElement.classList.add('db-stellwerk')
-    document.body.appendChild(gui.domElement)
-
-    // Bild-Upload: dat.gui kennt nur Knöpfe — der Knopf öffnet einen versteckten Datei-Dialog.
-    const datei = document.createElement('input')
-    datei.type = 'file'
-    datei.accept = 'image/*'
-    datei.onchange = () => {
-      const f = datei.files?.[0]
-      if (!f) return
-      if (cfg.leinwandBild) URL.revokeObjectURL(cfg.leinwandBild)
-      cfg.leinwandBild = URL.createObjectURL(f)
-      datei.value = ''
-      melde()
-    }
-    const aktionen = {
-      hochladen: () => datei.click(),
-      bildWeg: () => {
-        if (cfg.leinwandBild) URL.revokeObjectURL(cfg.leinwandBild)
-        cfg.leinwandBild = ''
-        melde()
-      },
-      zuruecksetzen: () => {
-        Object.assign(cfg, STANDARD, { leinwandBild: cfg.leinwandBild })
-        gui.updateDisplay()
-        Object.values(gui.__folders).forEach((o) => o.updateDisplay())
-        melde()
-      },
-    }
-
-    // Jeder Ordner bekommt am Ende seinen eigenen Knopf, der nur seine Werte zurückstellt.
-    const mitStandard = (ordner: GUI, schluessel: (keyof DrehConfig)[], danach?: () => void) =>
-      ordner
-        .add(
-          {
-            standard: () => {
-              schluessel.forEach((k) => ((cfg as unknown as Record<string, unknown>)[k] = STANDARD[k]))
-              danach?.()
-              ordner.updateDisplay()
-              melde()
-            },
-          },
-          'standard'
-        )
-        .name('↺ Standard')
-
-    const ansicht = gui.addFolder('Projektansicht')
-    ansicht.add(cfg, 'ansicht', ANSICHTEN).name('Aufbau').onChange(melde)
-    mitStandard(ansicht, ['ansicht'])
-    ansicht.open()
-
-    const leinwand = gui.addFolder('Leinwand')
-    leinwand.add(cfg, 'leinwand', LEINWAENDE).name('Art').onChange(melde)
-    leinwand.add(cfg, 'leinwandMotiv', MOTIVE).name('Bild').onChange(melde)
-    leinwand.add(cfg, 'leinwandPassung', PASSUNGEN).name('Motiv').onChange(melde)
-    leinwand.add(cfg, 'leinwandReihen', 1, 4, 1).name('Kachel-Reihen').onChange(melde)
-    leinwand.add(cfg, 'leinwandHell', 0.2, 3, 0.05).name('Helligkeit').onChange(melde)
-    leinwand.add(aktionen, 'hochladen').name('Bild hochladen …')
-    leinwand.add(aktionen, 'bildWeg').name('wieder Projektmotiv')
-    mitStandard(leinwand, ['leinwand', 'leinwandMotiv', 'leinwandPassung', 'leinwandReihen', 'leinwandHell'], aktionen.bildWeg)
-    leinwand.open()
-
-    const farben = gui.addFolder('Farben')
-    farben.addColor(cfg, 'grund').name('Hintergrund').onChange(melde)
-    farben.addColor(cfg, 'text').name('Text').onChange(melde)
-    farben.addColor(cfg, 'scheibe').name('Scheibe').onChange(melde)
-    mitStandard(farben, ['grund', 'text', 'scheibe'])
-    farben.open()
-
-    const licht = gui.addFolder('Licht')
-    licht.add(cfg, 'licht', LICHTER).name('Stimmung').onChange(melde)
-    licht.add(cfg, 'lichtStaerke', 0.2, 2.5, 0.05).name('Stärke').onChange(melde)
-    licht.add(cfg, 'schatten').name('Schatten').onChange(melde)
-    mitStandard(licht, ['licht', 'lichtStaerke', 'schatten'])
-    licht.open()
-
-    const kulissen = gui.addFolder('Kulissen')
-    kulissen.add(cfg, 'objAufstellung', AUFSTELLUNGEN).name('Aufstellung').onChange(melde)
-    kulissen.add(cfg, 'objGroesse', 0.4, 2.2, 0.01).name('Größe').onChange(melde)
-    kulissen.add(cfg, 'objDicke', 0.02, 3, 0.01).name('Dicke der Blöcke').onChange(melde)
-    kulissen.add(cfg, 'objRadius', 4, 12.6, 0.1).name('Abstand zur Mitte').onChange(melde)
-    kulissen.add(cfg, 'objStreuung', 0, 3, 0.01).name('Streuung').onChange(melde)
-    kulissen.add(cfg, 'objVerdrehung', 0, 8, 0.05).name('Verdrehung').onChange(melde)
-    kulissen.add(cfg, 'objNeigung', -0.6, 0.6, 0.01).name('Neigung nach hinten').onChange(melde)
-    kulissen.add(cfg, 'objSchweben', 0, 5, 0.05).name('Schweben').onChange(melde)
-    kulissen.add(cfg, 'objAtmen', 0, 1, 0.01).name('Atmen (auf und ab)').onChange(melde)
-    kulissen.add(cfg, 'objZurKamera', 0, 1, 0.01).name('Blick zum Publikum').onChange(melde)
-    kulissen.add(cfg, 'objSchwung', 0, 1.5, 0.01).name('Schwung beim Drehen').onChange(melde)
-    kulissen.add(cfg, 'objStapel', 0, 1, 0.01).name('Stapeln zum Turm').onChange(melde)
-    kulissen.add(cfg, 'objAnzahl', 1, 3, 1).name('Fotos pro Projekt').onChange(melde)
-    kulissen.add(cfg, 'objRueckseite').name('Rückseiten in Projektfarbe').onChange(melde)
-    mitStandard(kulissen, [
-      'objAufstellung',
-      'objGroesse',
-      'objDicke',
-      'objRadius',
-      'objStreuung',
-      'objVerdrehung',
-      'objNeigung',
-      'objSchweben',
-      'objAtmen',
-      'objZurKamera',
-      'objSchwung',
-      'objStapel',
-      'objAnzahl',
-      'objRueckseite',
-    ])
-
-    const lauf = gui.addFolder('Laufschrift')
-    lauf.add(cfg, 'laufschrift').name('an').onChange(melde)
-    lauf.add(cfg, 'laufSchrift', LED_STILE).name('Schrift').onChange(melde)
-    lauf.addColor(cfg, 'laufFarbe').name('Farbe').onChange(melde)
-    lauf.add(cfg, 'laufText').name('Text (leer = Kategorie)').onFinishChange(melde)
-    lauf.add(cfg, 'laufTempo', 0, 60, 1).name('Tempo').onChange(melde)
-    lauf.add(cfg, 'laufZeilen', 7, 21, 1).name('Dioden-Zeilen').onFinishChange(melde)
-    mitStandard(lauf, ['laufschrift', 'laufSchrift', 'laufFarbe', 'laufText', 'laufTempo', 'laufZeilen'])
-    lauf.open()
-
-    const bewegung = gui.addFolder('Bewegung')
-    bewegung.add(cfg, 'wendeTempo', 1, 8, 0.1).name('Wenden').onChange(melde)
-    bewegung.add(cfg, 'zoomDauer', 0.3, 2.5, 0.05).name('Ins Projekt (Sek.)').onChange(melde)
-    mitStandard(bewegung, ['wendeTempo', 'zoomDauer'])
-
-    gui.add(aktionen, 'zuruecksetzen').name('alles zurücksetzen')
-    gui.close() // startet zugeklappt — der Balken oben rechts öffnet es
-
+    // dat.gui lädt erst hier und nur für Angemeldete — Besucher bekommen das Paket nie.
+    let raeume: (() => void) | undefined
+    let weg = false
+    void import('dat.gui').then(({ GUI }) => {
+      if (weg) return
+      raeume = baue(GUI, melde)
+    })
     return () => {
-      gui.destroy()
-      gui.domElement.remove()
+      weg = true
+      raeume?.()
     }
   }, [])
 
   return stand
+}
+
+// Baut das Panel auf und gibt zurück, wie man es wieder abräumt.
+function baue(GUI: typeof Panel, melde: () => void): () => void {
+  const Texte = GUI as unknown as { TEXT_OPEN: string; TEXT_CLOSED: string }
+  // dat.gui benennt die Texte nach der Aktion: TEXT_OPEN steht auf dem zugeklappten Panel
+  Texte.TEXT_OPEN = 'Stellwerk öffnen'
+  Texte.TEXT_CLOSED = 'Stellwerk schließen'
+  const gui = new GUI({ autoPlace: false, width: 300 })
+  gui.domElement.classList.add('db-stellwerk')
+  document.body.appendChild(gui.domElement)
+
+  // Bild-Upload: dat.gui kennt nur Knöpfe — der Knopf öffnet einen versteckten Datei-Dialog.
+  const datei = document.createElement('input')
+  datei.type = 'file'
+  datei.accept = 'image/*'
+  datei.onchange = () => {
+    const f = datei.files?.[0]
+    if (!f) return
+    if (cfg.leinwandBild) URL.revokeObjectURL(cfg.leinwandBild)
+    cfg.leinwandBild = URL.createObjectURL(f)
+    datei.value = ''
+    melde()
+  }
+  const aktionen = {
+    hochladen: () => datei.click(),
+    bildWeg: () => {
+      if (cfg.leinwandBild) URL.revokeObjectURL(cfg.leinwandBild)
+      cfg.leinwandBild = ''
+      melde()
+    },
+    zuruecksetzen: () => {
+      Object.assign(cfg, STANDARD, { leinwandBild: cfg.leinwandBild })
+      gui.updateDisplay()
+      Object.values(gui.__folders).forEach((o) => o.updateDisplay())
+      melde()
+    },
+  }
+
+  // Jeder Ordner bekommt am Ende seinen eigenen Knopf, der nur seine Werte zurückstellt.
+  const mitStandard = (ordner: Panel, schluessel: (keyof DrehConfig)[], danach?: () => void) =>
+    ordner
+      .add(
+        {
+          standard: () => {
+            schluessel.forEach((k) => ((cfg as unknown as Record<string, unknown>)[k] = STANDARD[k]))
+            danach?.()
+            ordner.updateDisplay()
+            melde()
+          },
+        },
+        'standard'
+      )
+      .name('↺ Standard')
+
+  const ansicht = gui.addFolder('Projektansicht')
+  ansicht.add(cfg, 'ansicht', ANSICHTEN).name('Aufbau').onChange(melde)
+  mitStandard(ansicht, ['ansicht'])
+  ansicht.open()
+
+  const leinwand = gui.addFolder('Leinwand')
+  leinwand.add(cfg, 'leinwand', LEINWAENDE).name('Art').onChange(melde)
+  leinwand.add(cfg, 'leinwandMotiv', MOTIVE).name('Bild').onChange(melde)
+  leinwand.add(cfg, 'leinwandPassung', PASSUNGEN).name('Motiv').onChange(melde)
+  leinwand.add(cfg, 'leinwandReihen', 1, 4, 1).name('Kachel-Reihen').onChange(melde)
+  leinwand.add(cfg, 'leinwandHell', 0.2, 3, 0.05).name('Helligkeit').onChange(melde)
+  leinwand.add(aktionen, 'hochladen').name('Bild hochladen …')
+  leinwand.add(aktionen, 'bildWeg').name('wieder Projektmotiv')
+  mitStandard(leinwand, ['leinwand', 'leinwandMotiv', 'leinwandPassung', 'leinwandReihen', 'leinwandHell'], aktionen.bildWeg)
+  leinwand.open()
+
+  const farben = gui.addFolder('Farben')
+  farben.addColor(cfg, 'grund').name('Hintergrund').onChange(melde)
+  farben.addColor(cfg, 'text').name('Text').onChange(melde)
+  farben.addColor(cfg, 'scheibe').name('Scheibe').onChange(melde)
+  mitStandard(farben, ['grund', 'text', 'scheibe'])
+  farben.open()
+
+  const licht = gui.addFolder('Licht')
+  licht.add(cfg, 'licht', LICHTER).name('Stimmung').onChange(melde)
+  licht.add(cfg, 'lichtStaerke', 0.2, 2.5, 0.05).name('Stärke').onChange(melde)
+  licht.add(cfg, 'schatten').name('Schatten').onChange(melde)
+  mitStandard(licht, ['licht', 'lichtStaerke', 'schatten'])
+  licht.open()
+
+  const kulissen = gui.addFolder('Kulissen')
+  kulissen.add(cfg, 'objAufstellung', AUFSTELLUNGEN).name('Aufstellung').onChange(melde)
+  kulissen.add(cfg, 'objGroesse', 0.4, 2.2, 0.01).name('Größe').onChange(melde)
+  kulissen.add(cfg, 'objDicke', 0.02, 3, 0.01).name('Dicke der Blöcke').onChange(melde)
+  kulissen.add(cfg, 'objRadius', 4, 12.6, 0.1).name('Abstand zur Mitte').onChange(melde)
+  kulissen.add(cfg, 'objStreuung', 0, 3, 0.01).name('Streuung').onChange(melde)
+  kulissen.add(cfg, 'objVerdrehung', 0, 8, 0.05).name('Verdrehung').onChange(melde)
+  kulissen.add(cfg, 'objNeigung', -0.6, 0.6, 0.01).name('Neigung nach hinten').onChange(melde)
+  kulissen.add(cfg, 'objSchweben', 0, 5, 0.05).name('Schweben').onChange(melde)
+  kulissen.add(cfg, 'objAtmen', 0, 1, 0.01).name('Atmen (auf und ab)').onChange(melde)
+  kulissen.add(cfg, 'objZurKamera', 0, 1, 0.01).name('Blick zum Publikum').onChange(melde)
+  kulissen.add(cfg, 'objSchwung', 0, 1.5, 0.01).name('Schwung beim Drehen').onChange(melde)
+  kulissen.add(cfg, 'objStapel', 0, 1, 0.01).name('Stapeln zum Turm').onChange(melde)
+  kulissen.add(cfg, 'objAnzahl', 1, 3, 1).name('Fotos pro Projekt').onChange(melde)
+  kulissen.add(cfg, 'objRueckseite').name('Rückseiten in Projektfarbe').onChange(melde)
+  mitStandard(kulissen, [
+    'objAufstellung',
+    'objGroesse',
+    'objDicke',
+    'objRadius',
+    'objStreuung',
+    'objVerdrehung',
+    'objNeigung',
+    'objSchweben',
+    'objAtmen',
+    'objZurKamera',
+    'objSchwung',
+    'objStapel',
+    'objAnzahl',
+    'objRueckseite',
+  ])
+
+  const lauf = gui.addFolder('Laufschrift')
+  lauf.add(cfg, 'laufschrift').name('an').onChange(melde)
+  lauf.add(cfg, 'laufSchrift', LED_STILE).name('Schrift').onChange(melde)
+  lauf.addColor(cfg, 'laufFarbe').name('Farbe').onChange(melde)
+  lauf.add(cfg, 'laufText').name('Text (leer = Kategorie)').onFinishChange(melde)
+  lauf.add(cfg, 'laufTempo', 0, 60, 1).name('Tempo').onChange(melde)
+  lauf.add(cfg, 'laufZeilen', 7, 21, 1).name('Dioden-Zeilen').onFinishChange(melde)
+  mitStandard(lauf, ['laufschrift', 'laufSchrift', 'laufFarbe', 'laufText', 'laufTempo', 'laufZeilen'])
+  lauf.open()
+
+  const bewegung = gui.addFolder('Bewegung')
+  bewegung.add(cfg, 'wendeTempo', 1, 8, 0.1).name('Wenden').onChange(melde)
+  bewegung.add(cfg, 'zoomDauer', 0.3, 2.5, 0.05).name('Ins Projekt (Sek.)').onChange(melde)
+  mitStandard(bewegung, ['wendeTempo', 'zoomDauer'])
+
+  gui.add(aktionen, 'zuruecksetzen').name('alles zurücksetzen')
+  gui.close() // startet zugeklappt — der Balken oben rechts öffnet es
+
+  return () => {
+    gui.destroy()
+    gui.domElement.remove()
+  }
 }

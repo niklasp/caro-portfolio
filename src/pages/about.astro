@@ -1,0 +1,14 @@
+---
+import Seite from "../layouts/Seite.astro";
+import { ladeDaten } from "../cms/daten";
+
+const daten = await ladeDaten(Boolean(Astro.locals.user));
+const erster = daten.about?.absaetze.find((a) => a.art === "p")?.text;
+---
+
+<Seite
+	daten={daten}
+	titel={`${daten.about?.titel ?? "About"} — ${daten.kontakt.name}`}
+	beschreibung={erster ?? `Über ${daten.kontakt.name}: Bühnen- und Kostümbildnerin, Kunstvermittlerin in Berlin.`}
+	bild={daten.about?.bild?.src}
+/>

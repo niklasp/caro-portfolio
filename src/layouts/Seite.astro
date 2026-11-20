@@ -1,0 +1,90 @@
+---
+import { EmDashBodyEnd, EmDashBodyStart, EmDashHead } from "emdash/ui";
+import { createPublicPageContext } from "emdash/page";
+import type { Daten } from "../data/projects";
+import Wurzel from "../Wurzel";
+import "../styles.css";
+
+// Rahmen jeder Seite: Kopfdaten für Suchmaschinen und Link-Vorschauen, die
+// CMS-Daten als JSON und darin die React-Insel (Drehbühne, About, Lebenslauf).
+interface Props {
+	daten: Daten;
+	titel: string;
+	beschreibung: string;
+	bild?: string;
+	art?: "website" | "article";
+	// Die Bühne braucht mindestens ein Projekt mit Foto.
+	brauchtProjekte?: boolean;
+}
+
+const { daten, titel, beschreibung, bild, art = "website", brauchtProjekte = false } = Astro.props;
+
+const vorschau = bild ?? daten.projekte[0]?.bilder[0]?.src;
+const vorschauAbsolut = vorschau ? new URL(vorschau, Astro.url.origin).href : undefined;
+const kanonisch = new URL(Astro.url.pathname, Astro.url.origin).href;
+const leer = brauchtProjekte && daten.projekte.length === 0;
+const angemeldet = Boolean(Astro.locals.user);
+
+const seite = createPublicPageContext({
+	Astro,
+	kind: "custom",
+	pageType: art,
+	title: titel,
+	pageTitle: titel,
+	description: beschreibung,
+	canonical: kanonisch,
+	image: vorschauAbsolut,
+	seo: { ogImage: vorschauAbsolut },
+	siteName: daten.kontakt.name,
+});
+
+// `<` maskieren, damit kein Text aus dem CMS das Skript-Element beenden kann.
+const json = JSON.stringify(daten).replace(/</g, "\\u003c");
+---
+
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{titel}</title>
+		<EmDashHead page={seite} />
+	</head>
+	<body>
+		<EmDashBodyStart page={seite} />
+		{
+			leer ? (
+				<main class="leer">
+					<h1>{daten.kontakt.name}</h1>
+					<p>Noch keine Projekte veröffentlicht.</p>
+					{angemeldet && (
+						<p>
+							<a href="/_emdash/admin/content/projekte/new">Erstes Projekt anlegen</a> — ein Projekt
+							erscheint, sobald es veröffentlicht ist und mindestens ein Foto hat.
+						</p>
+					)}
+				</main>
+			) : (
+				<>
+					<script type="application/json" id="caro-daten" set:html={json} />
+					<Wurzel client:only="react" />
+				</>
+			)
+		}
+		<EmDashBodyEnd page={seite} />
+	</body>
+</html>
+
+<style>
+	.leer {
+		min-height: 100vh;
+		display: grid;
+		place-content: center;
+		gap: 12px;
+		padding: 24px;
+		text-align: center;
+	}
+	.leer a {
+		border-bottom: 1px solid;
+	}
+</style>

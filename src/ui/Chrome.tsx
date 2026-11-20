@@ -1,14 +1,7 @@
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { KONTAKT, type Projekt } from '../data/projects'
 
-const ENTWUERFE = [
-  { pfad: '/boden', nr: '1', name: 'Der Boden' },
-  { pfad: '/drehbuehne', nr: '2', name: 'Die Drehbühne' },
-  { pfad: '/schnuerboden', nr: '3', name: 'Der Schnürboden' },
-  { pfad: '/spielplan', nr: '4', name: 'Der Spielplan' },
-]
-
-// Kopfzeile wie im gedruckten Portfolio: Name links, Navigation rechts.
+// Kopfzeile: links nur der Name (Carolins Wunsch — der Untertitel doppelte die Kategorien), Navigation rechts.
 export function Kopf({ hell = false }: { hell?: boolean }) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
@@ -17,7 +10,6 @@ export function Kopf({ hell = false }: { hell?: boolean }) {
     <header className={hell ? 'kopf hell' : 'kopf'}>
       <Link to="/" className="name">
         {KONTAKT.name}
-        <span className="unter">{KONTAKT.untertitel}</span>
       </Link>
       <nav>
         {(pathname === '/lebenslauf' || pathname === '/about') && (
@@ -32,25 +24,10 @@ export function Kopf({ hell = false }: { hell?: boolean }) {
           Lebenslauf
         </NavLink>
         <a href={KONTAKT.instagram} target="_blank" rel="noreferrer">
-          insta
+          insta <span aria-hidden="true">↗</span>
         </a>
       </nav>
     </header>
-  )
-}
-
-// Schalter zwischen den drei Entwürfen, nur auf den Entwurfsseiten sichtbar.
-export function EntwurfSchalter({ hell = false }: { hell?: boolean }) {
-  const { pathname } = useLocation()
-  return (
-    <div className={hell ? 'entwurf-schalter hell' : 'entwurf-schalter'}>
-      <span>Entwurf</span>
-      {ENTWUERFE.map((e) => (
-        <Link key={e.pfad} to={e.pfad} className={pathname === e.pfad ? 'aktiv' : ''} title={e.name}>
-          {e.nr}
-        </Link>
-      ))}
-    </div>
   )
 }
 

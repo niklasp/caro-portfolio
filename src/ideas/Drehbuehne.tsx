@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, Suspense, type R
 import { Canvas, useFrame, useLoader, useThree, type ThreeElements } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useProgress } from '@react-three/drei'
-import { KATEGORIEN, KONTAKT, byKategorie, findByPermalink, type Projekt } from '../data/projects'
+import { KATEGORIEN, KONTAKT, byKategorie, findByPermalink, originalVon, type Projekt } from '../data/projects'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useProjektUrlSync } from '../ui/permalink'
 import { Kopf, Fuss } from '../ui/Chrome'
@@ -11,7 +11,7 @@ import { daempf } from './helpers'
 import { cfg, useDrehConfig, LICHT_WIRKUNG, type DrehConfig, type Leinwand, type Licht } from './drehConfig'
 import { ledRaster } from './ledSchrift'
 
-// Entwurf 2 — Die Drehbühne.
+// Die Drehbühne.
 // Ein schwarzer Bühnenraum mit einem echten Verfolger: Die Maus führt das
 // Licht, die Fotos stehen als beleuchtete Blöcke auf der Drehscheibe, und
 // hinten hängt — stark abgedunkelt — das Hauptmotiv des vordersten Projekts.
@@ -388,7 +388,15 @@ void main() {
 // Abspielposition pro Videodatei merken — Pause statt Neustart
 const videoZeiten = new Map<string, number>()
 
-const hgLader = new THREE.TextureLoader()
+// Lädt ein Foto als Textur. Kommt ein verkleinertes Foto nicht an, lädt das Original.
+class FotoLader extends THREE.TextureLoader {
+  load(...[url, onLoad, onProgress, onError]: Parameters<THREE.TextureLoader['load']>) {
+    const original = originalVon(url)
+    return super.load(url, onLoad, onProgress, original ? () => super.load(original, onLoad, onProgress, onError) : onError)
+  }
+}
+
+const hgLader = new FotoLader()
 const hgCache = new Map<string, Promise<THREE.Texture>>()
 const ladeHg = (src: string) => {
   let p = hgCache.get(src)
@@ -746,7 +754,7 @@ function FotoObjekt({
   ar: number
   dicke?: number
 } & Omit<ThreeElements['mesh'], 'position' | 'rotation' | 'scale'>) {
-  const tex = useLoader(THREE.TextureLoader, url)
+  const tex = useLoader(FotoLader, url)
   // Ein Bild, ein GPU-Upload: die schmalen Kanten holen sich ihren Streifen über die
   // UVs der Geometrie statt über geklonte Texturen. Zwei Materialien, zwei Draw-Calls.
   const materialien = useMemo(() => {
@@ -1377,11 +1385,12 @@ export default function Drehbuehne() {
     return { kat, index: pr ? SAMMLUNG[kat].indexOf(pr) : 0 }
   }, [])
 
-  // seite zählt die Wendungen: Kategorie = seite mod 3, Münzseite = seite mod 2.
+  // seite zählt die Wendungen: Kategorie = seite mod Anzahl der Kategorien, Münzseite = seite mod 2.
   const [seite, setSeite] = useState(start.kat)
-  const [flaechen, setFlaechen] = useState<[number, number]>(() =>
-    start.kat % 2 === 0 ? [start.kat, (start.kat + 1) % 3] : [(start.kat + 1) % 3, start.kat]
-  )
+  const [flaechen, setFlaechen] = useState<[number, number]>(() => {
+    const naechste = (start.kat + 1) % KATEGORIEN.length
+    return start.kat % 2 === 0 ? [start.kat, naechste] : [naechste, start.kat]
+  })
   const [aktiv, setAktiv] = useState(start.index)
   const [projiziert, setProjiziert] = useState<number | null>(null)
 
@@ -1530,7 +1539,7 @@ export default function Drehbuehne() {
   }, [detail, p])
 
   // Alle Bilder des vordersten Projekts schon laden, bevor jemand hineinklickt.
-  useEffect(() => p.bilder.forEach((b) => useLoader.preload(THREE.TextureLoader, b.src)), [p])
+  useEffect(() => p.bilder.forEach((b) => useLoader.preload(FotoLader, b.src)), [p])
 
   useEffect(() => {
     const el = wrap.current

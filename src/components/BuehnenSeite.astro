@@ -1,0 +1,33 @@
+---
+import Seite from "../layouts/Seite.astro";
+import type { Daten, Projekt } from "../data/projects";
+
+// Die Drehbühne, mit oder ohne Projekt in der Adresse. Die Seite (src/pages/…)
+// sucht das Projekt heraus; hier entstehen Titel und Vorschau dazu — die
+// Darstellung selbst übernimmt die React-Insel.
+interface Props {
+	daten: Daten;
+	projekt?: Projekt;
+}
+
+const { daten, projekt } = Astro.props;
+
+const kuerze = (text: string, max = 158) =>
+	text.length <= max ? text : `${text.slice(0, max - 1).replace(/\s+\S*$/, "")}…`;
+
+const wer = daten.kontakt.name;
+const untertitel = daten.kontakt.untertitel;
+const titel = projekt ? `${projekt.titel} (${projekt.jahr}) — ${wer}` : `${wer} — Bühne und Kostüm`;
+const beschreibung = projekt
+	? kuerze([[projekt.rolle, projekt.jahr, projekt.ort].filter(Boolean).join(" · "), projekt.blurb].filter(Boolean).join(". "))
+	: `${wer}${untertitel ? `, ${untertitel}` : ""}, Berlin. Räumliches Portfolio auf einer Drehbühne: ${daten.kategorien.map((k) => k.name).join(", ")}.`;
+---
+
+<Seite
+	daten={daten}
+	titel={titel}
+	beschreibung={beschreibung}
+	bild={projekt?.bilder[0]?.src}
+	art={projekt ? "article" : "website"}
+	brauchtProjekte
+/>

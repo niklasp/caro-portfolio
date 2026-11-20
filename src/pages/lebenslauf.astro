@@ -1,0 +1,12 @@
+---
+import Seite from "../layouts/Seite.astro";
+import { ladeDaten } from "../cms/daten";
+
+const daten = await ladeDaten(Boolean(Astro.locals.user));
+---
+
+<Seite
+	daten={daten}
+	titel={`Lebenslauf — ${daten.kontakt.name}`}
+	beschreibung={`Lebenslauf von ${daten.kontakt.name}: Bühnen- und Kostümbildnerin, Kunstvermittlerin. Ausbildung, Werdegang, künstlerische Arbeiten, Auszeichnungen.`}
+/>

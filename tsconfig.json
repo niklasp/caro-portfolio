@@ -1,18 +1,11 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": false,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
-    "types": ["vite/client"]
-  },
-  "include": ["src"]
+	"extends": "astro/tsconfigs/strict",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"jsxImportSource": "react",
+		"noUnusedLocals": false,
+		"allowImportingTsExtensions": true
+	},
+	"include": [".astro/types.d.ts", "**/*"],
+	"exclude": ["dist", "node_modules"]
 }
