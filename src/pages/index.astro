@@ -1,0 +1,9 @@
+---
+import BuehnenSeite from "../components/BuehnenSeite.astro";
+import { ladeDaten } from "../cms/daten";
+
+// Startseite: die Drehbühne.
+const daten = await ladeDaten(Boolean(Astro.locals.user));
+---
+
+<BuehnenSeite daten={daten} />

@@ -86,19 +86,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .entwurf-schalter.hell a { color: rgba(255,255,255,0.55); }
 .entwurf-schalter.hell a.aktiv, .entwurf-schalter.hell a:hover { color: #fff; }
 
-/* ---------- Hinweis (Bedienung) ---------- */
-
-.hinweis {
-  position: fixed;
-  bottom: 44px;
-  left: 24px;
-  font-size: 11px;
-  color: var(--grau);
-  z-index: 30;
-  pointer-events: none;
-}
-.hinweis.hell { color: rgba(255, 255, 255, 0.55); }
-
 /* ---------- Landing ---------- */
 
 .landing {
@@ -166,32 +153,57 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   top: 50%; left: 50%;
 }
 
-/* ---------- Lebenslauf ---------- */
+/* ---------- About: Porträt und Kurzvorstellung, darunter der Lebenslauf ---------- */
 
-.lebenslauf {
+.about-seite {
   padding: 110px 24px 80px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 64px;
-  max-width: 1400px;
+  max-width: 908px; /* 860 px Satzbreite */
 }
-.lebenslauf h2 {
+.about-seite h2 {
   font-size: 13px;
   font-weight: 400;
   border-bottom: var(--hairline);
   padding-bottom: 6px;
-  margin-bottom: 28px;
+  margin: 48px 0 28px;
 }
-.lebenslauf h2.ll-kopf { display: flex; justify-content: space-between; align-items: baseline; }
-.lebenslauf h2.ll-kopf a:hover { border-bottom: var(--hairline); }
-.lebenslauf h3 { font-size: 13px; font-style: italic; font-weight: 400; margin: 26px 0 8px; }
-.ll-zeile { display: grid; grid-template-columns: 84px 1fr; gap: 12px; margin-bottom: 8px; }
+.about-seite h2:first-child { margin-top: 0; }
+.about-seite h2.ll-kopf { display: flex; justify-content: space-between; align-items: baseline; }
+.about-seite h2.ll-kopf a:hover { border-bottom: var(--hairline); }
+.about-seite h3 { font-size: 13px; font-style: italic; font-weight: 400; margin: 26px 0 8px; }
+.about-seite p, .about-seite blockquote, .about-seite ul, .about-seite ol { margin-bottom: 12px; white-space: pre-line; }
+.about-seite strong { font-weight: 700; }
+.about-seite a { border-bottom: var(--hairline); }
+.about-seite a:hover { opacity: 0.6; }
+.about-seite blockquote { padding-left: 14px; border-left: var(--hairline); font-style: italic; }
+.about-seite ul, .about-seite ol { padding-left: 18px; }
+.about-seite li { margin-bottom: 4px; }
+/* Kurzvorstellung: links das Porträt, rechts der Text */
+.about-intro { display: grid; grid-template-columns: minmax(0, 620px); margin-bottom: 24px; }
+.about-intro.mit-bild { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 48px; align-items: start; }
+.about-portraet { display: block; width: 100%; height: auto; }
+.about-portraet.leer {
+  aspect-ratio: 3 / 4;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  border: 1px dashed currentColor;
+  color: var(--grau);
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+}
+.about-text > :first-child { margin-top: 0; }
+/* Lebenslauf: Tabellen aus dem Editor als Zeilen mit fester Jahresspalte */
+.about-ll { margin-top: 64px; scroll-margin-top: 84px; } /* /lebenslauf springt hierher: unter die Kopfzeile */
+.ll-tabelle { margin-bottom: 12px; }
+.ll-zeile { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 12px; margin-bottom: 8px; white-space: pre-line; }
 .ll-zeile .jahr { color: var(--tinte); }
-.ll-zeile em { font-style: italic; font-weight: 700; }
-.lebenslauf .werke .ll-zeile { margin-bottom: 12px; }
-/* Werkliste: Zeilen mit Projekt sind Links, ihr Hauptbild folgt der Maus */
+@media (max-width: 800px) {
+  .about-intro.mit-bild { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .about-portraet { max-width: 320px; }
+}
+/* Links auf ein Projekt: sein Hauptbild folgt der Maus */
 a.ll-projekt { cursor: pointer; }
-a.ll-projekt:hover em { text-decoration: underline; text-underline-offset: 3px; }
 .ll-vorschau {
   position: fixed;
   left: 0;
@@ -205,9 +217,6 @@ a.ll-projekt:hover em { text-decoration: underline; text-underline-offset: 3px; 
   will-change: translate, scale;
 }
 .ll-vorschau.offen { scale: 1; transition: scale 0.38s cubic-bezier(0.2, 1.3, 0.4, 1); }
-@media (max-width: 800px) {
-  .lebenslauf { grid-template-columns: 1fr; gap: 40px; }
-}
 
 /* ---------- Bühnen-Container (3D) ---------- */
 
@@ -216,6 +225,8 @@ a.ll-projekt:hover em { text-decoration: underline; text-underline-offset: 3px; 
   inset: 0;
   overflow: hidden;
 }
+/* Hintergrundbild der Bühne: füllt die Fläche hinter der Zeichenfläche */
+.db-grundbild { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; user-select: none; }
 .buehne canvas { touch-action: none; }
 
 .lade {
@@ -377,7 +388,6 @@ a.ll-projekt:hover em { text-decoration: underline; text-underline-offset: 3px; 
 
 /* Dunkle Lichtstimmungen: Beschriftung aufhellen. */
 body.boden-dunkel .achse { color: rgba(255, 255, 255, 0.6); }
-body.boden-dunkel .hinweis { color: rgba(255, 255, 255, 0.55); }
 body.boden-dunkel .zoom-regler,
 body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 
@@ -475,12 +485,17 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
   max-width: 62vw;
 }
 .sb-titel h2 {
-  font-size: clamp(30px, 5.4vw, 68px);
+  /* Eine Zeile: höchstens 3,2 vw (52 px); lange Titel so viel kleiner, dass sie in die
+     62 vw passen — ein Zeichen dieser Schrift ist im Mittel knapp 0,5 em breit, 0,52 lässt Luft. */
+  font-size: clamp(16px, min(3.2vw, calc(62vw / (var(--zeichen, 20) * 0.52))), 52px);
+  white-space: nowrap;
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
 }
 .sb-titel .sb-meta { margin-top: 8px; font-size: 12px; color: var(--grau); }
+/* Bearbeitungsmodus: der Titel soll anklickbar sein, obwohl die Zone sonst Mausereignisse durchlässt */
+.sb-titel h2[data-emdash-ref] { pointer-events: auto; }
 
 .pfeil-nav {
   position: fixed;
@@ -586,8 +601,38 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
   display: flex;
   gap: 16px;
   font-size: 20px;
-  margin-bottom: 10px;
+  margin-top: 10px;
   pointer-events: auto;
+}
+/* Auf der Bühne stehen die Pfeile unten links in der Ecke — so weit vom unteren Rand wie der Name
+   oben links vom oberen. In der Projektansicht stehen sie unten rechts (.db-ecke). */
+.db:not(.detail) .sb-titel .db-pfeile {
+  position: fixed;
+  left: 24px;
+  bottom: 13px; /* gemessen: Unterkante der Pfeile 22 px vom Rand, wie die Oberkante des Namens */
+  margin: 0;
+}
+/* Der Titel steht dicht über den Pfeilen. */
+.db:not(.detail) .sb-titel { bottom: 60px; }
+.db.detail .sb-titel .db-pfeile { display: none; }
+/* Projektansicht: Blättern unten rechts, dort wo auf der Bühne die Kategorie steht — so weit vom
+   Rand wie die Pfeile links auf der Bühne. Die Grundfarbe dahinter hält es lesbar, wenn Fotos darunter durchrollen. */
+.db-ecke {
+  position: fixed;
+  right: 24px;
+  bottom: 13px;
+  margin: 0;
+  z-index: 41;
+  color: var(--db-text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.db.detail .db-ecke {
+  opacity: 1;
+  pointer-events: auto;
+  background: var(--db-grund);
+  box-shadow: 0 0 0 6px var(--db-grund);
 }
 .db-pfeile button:hover { transform: translateY(-1px); }
 .db-beschreibung .db-titel {
@@ -611,36 +656,34 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
     transform: none !important;
     translate: none !important;
   }
-  /* Detail: die ganze Seite scrollt — Bildraster (im Canvas, rollt mit), darunter Text, dann der Titel. */
-  .db.detail { display: flex; flex-direction: column; min-height: 100%; padding-bottom: 48px; }
+  /* Detail: die ganze Seite scrollt — oben der Titel, darunter der Text, dann die Fotos in voller Breite
+     (im Canvas, rollen mit; sie beginnen dort, wo der Text endet — siehe bildraster() in Drehbuehne.tsx).
+     --raster-unten ist die Unterkante des letzten Fotos: bis dorthin reicht die Seite. */
+  .db.detail { display: flex; flex-direction: column; min-height: max(100%, calc(var(--raster-unten) + 56px)); }
+  .db.detail .sb-titel {
+    position: static;
+    order: 1;
+    margin: 92px 24px 0; /* unter Name und „zurück zur Bühne" */
+    max-width: none;
+    animation: ov-ein 0.6s 0.3s both;
+  }
   .db.detail .db-beschreibung {
     display: block;
     position: static;
-    order: 1;
-    margin: calc(var(--raster-unten) + 20px) 24px 0;
+    order: 2;
+    margin: 22px 24px 0;
     animation: ov-ein 0.6s 0.45s both;
   }
-  .db.detail .sb-titel { position: static; order: 2; margin: 32px 24px 0; max-width: none; }
+  /* Steht ein Foto groß: die Einblend-Animation darf die Schrift nicht wieder hervorholen. */
+  .db.detail.gross .sb-titel, .db.detail.gross .db-beschreibung { animation: none; }
   .db.detail .buehne canvas { touch-action: pan-y; }
-  /* Beim Scrollen ziehen Raster und Text unter Kopf und Zurück-Knopf durch — verschwommen wie hinter Milchglas. */
-  .db.detail::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 84px;
-    background: color-mix(in srgb, var(--db-grund) 55%, transparent);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
-    mask-image: linear-gradient(#000 70%, transparent);
-    z-index: 34;
-    pointer-events: none;
-  }
   .db .db-beschreibung .db-titel { display: none; } /* der große Titel steht schon unten */
-  .db .hinweis, .db-stellwerk { display: none; }
-  .db .sb-titel { bottom: 56px; max-width: calc(100vw - 48px); }
-  .db .sb-titel h2 { font-size: clamp(26px, 8vw, 44px); }
+  .db-stellwerk { display: none; }
+  .db .sb-titel { max-width: calc(100vw - 48px); }
+  .db .sb-titel h2 { font-size: clamp(26px, 8vw, 44px); white-space: normal; } /* schmal: lieber umbrechen als winzig */
   .db .db-kategorien { top: 44px; gap: 14px; }
-  .db .db-zurueck { top: 44px; }
+  /* Schmal ist in der Kopfzeile kein Platz: Zurück steht in einer zweiten Zeile darunter. */
+  .db .db-zurueck { top: 44px; left: 24px; transform: none; }
   .db.detail .kopf .name .unter { display: none; }
   .db.detail .fuss { display: none; } /* steht schon über der Beschreibung */
 }
@@ -649,7 +692,7 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 /* Kategorien — die drei Seiten der Münze */
 .db-kategorien {
   position: fixed;
-  top: 18px;
+  top: 19px; /* 12 px Schrift neben 13 px in der Kopfzeile: 1 px tiefer, dann stehen alle auf einer Grundlinie */
   left: 50%;
   transform: translateX(-50%);
   z-index: 35;
@@ -664,10 +707,15 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 
 /* Detailansicht: dieselbe Seite, nur umgeräumt — die Bühnen-Bedienung tritt zurück,
    die Beschreibung rückt neben das Bildraster und wächst auf Lesegröße. */
+/* Zurück-Knopf: steht fest in der Kopfzeile, mittig — dort, wo auf der Bühne die Kategorien
+   stehen (die treten in der Projektansicht ab). Die Kopfzeile hat keinen Grund: beim Scrollen
+   ziehen die Fotos frei darunter durch. */
 .db-zurueck {
   position: fixed;
-  left: 24px;
-  top: 46px;
+  left: 50%;
+  top: 19px; /* wie .db-kategorien: auf der Grundlinie von Name und Navigation */
+  transform: translateX(-50%);
+  white-space: nowrap;
   z-index: 35;
   font-size: 12px;
   border-bottom: 1px solid transparent;
@@ -677,9 +725,16 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 }
 .db-zurueck:hover { border-bottom-color: currentColor; }
 .db.detail .db-zurueck { opacity: 1; pointer-events: auto; }
-.db .db-kategorien, .db .db-wenden, .db .db-zaehler, .db .sb-titel, .db .hinweis { transition: opacity 0.4s; }
-.db .db-zaehler { opacity: 0; }
-.db.detail .db-zaehler { opacity: 1; }
+/* Ohne Leiste muss die Schrift selbst lesbar bleiben, wenn ein helles Foto darunter durchzieht:
+   nur hinter Name, Zurück und Navigation liegt die Grundfarbe. Auf dem Grund sieht man davon
+   nichts. Der Schatten verbreitert die Fläche, ohne etwas zu verschieben. */
+.db.detail .kopf .name,
+.db.detail .kopf nav,
+.db.detail .db-zurueck {
+  background: var(--db-grund);
+  box-shadow: 0 0 0 6px var(--db-grund);
+}
+.db .db-kategorien, .db .db-wenden, .db .sb-titel { transition: opacity 0.4s; }
 .db.detail .db-kategorien, .db.detail .db-wenden { opacity: 0; pointer-events: none; }
 .db .db-beschreibung {
   transform-origin: bottom right;
@@ -687,12 +742,8 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 }
 .db.detail .db-beschreibung { transform: translateY(-20vh) scale(1.23); }
 /* Steht ein Foto groß vor der Kamera, tritt die Schrift zurück. */
-.db.gross .sb-titel, .db.gross .db-beschreibung, .db.gross .hinweis { opacity: 0; pointer-events: none; }
+.db.gross .sb-titel, .db.gross .db-beschreibung { opacity: 0; pointer-events: none; }
 
-/* Blättern und Zähler in der Beschreibung — nur in den scrollenden Ansichten, wo der große Titel abtritt. */
-.db-blaettern { display: none; gap: 16px; align-items: baseline; font-size: 20px; margin-bottom: 14px; }
-.db-blaettern button:hover { transform: translateY(-1px); }
-.db-blaettern span { font-size: 12px; color: var(--db-matt); margin-left: 6px; }
 
 /* ---------- Drehbühne: Projektansichten im breiten Fenster (Stellwerk „Projektansicht") ----------
    „Raster" bleibt wie gehabt: alles auf einem Schirm. „Stapel" und „Breit" scrollen die Seite —
@@ -700,19 +751,6 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 @media (min-width: 900px) and (min-aspect-ratio: 11/10) {
   .db.detail.rollt { min-height: calc(var(--raster-unten) + 140px); }
   .db.detail.rollt .buehne canvas { touch-action: pan-y; }
-  /* Beim Scrollen ziehen die Fotos unter Kopf und Zurück-Knopf durch — verschwommen wie hinter Milchglas. */
-  .db.detail.rollt::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 96px;
-    background: color-mix(in srgb, var(--db-grund) 55%, transparent);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
-    mask-image: linear-gradient(#000 70%, transparent);
-    z-index: 34;
-    pointer-events: none;
-  }
   .db.detail.rollt .db-beschreibung {
     inset: auto;
     transform: none;
@@ -721,9 +759,8 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
     animation: ov-ein 0.6s 0.45s both;
   }
   .db.detail.rollt .db-beschreibung .db-titel { font-size: 28px; letter-spacing: -0.02em; margin-bottom: 8px; }
-  .db.detail.rollt .db-blaettern { display: flex; }
-  .db.detail.rollt .sb-titel { opacity: 0; pointer-events: none; }
-  .db.detail.rollt .sb-titel .db-pfeile { pointer-events: none; }
+  /* Der Titel blendet aus und bleibt dabei stehen, wo er auf der Bühne stand (Maße wie .db:not(.detail) oben). */
+  .db.detail.rollt .sb-titel { opacity: 0; pointer-events: none; bottom: 60px; }
 
   /* Steht ein Foto groß: die Einblend-Animation darf die Schrift nicht wieder hervorholen. */
   .db.detail.rollt.gross .db-beschreibung { animation: none; }
@@ -787,7 +824,7 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 }
 .db .kopf.hell, .db .fuss.hell, .db .kopf.hell .name .unter { color: var(--db-text); }
 .db .kopf.hell nav a.aktiv, .db .kopf.hell nav a:hover { border-color: var(--db-text); }
-.db .entwurf-schalter.hell, .db .entwurf-schalter.hell a, .db .hinweis.hell, .db .sb-titel .sb-meta { color: var(--db-matt); }
+.db .entwurf-schalter.hell, .db .entwurf-schalter.hell a, .db .sb-titel .sb-meta { color: var(--db-matt); }
 .db .entwurf-schalter.hell a.aktiv, .db .entwurf-schalter.hell a:hover { color: var(--db-text); }
 .db .db-beschreibung { color: var(--db-text); }
 .db .db-beschreibung .db-meta { color: var(--db-matt); }
@@ -795,8 +832,10 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 .db .db-beschreibung .db-credits { color: color-mix(in srgb, var(--db-text) 70%, transparent); }
 .db .db-beschreibung .db-links a { border-bottom-color: color-mix(in srgb, var(--db-text) 60%, transparent); }
 
+/* Das Stellwerk ist ein Werkzeug für Angemeldete, kein Teil der Seite: es liegt oben auf
+   und rollt mit weg. */
 .db-stellwerk {
-  position: fixed;
+  position: absolute;
   top: 44px;
   right: 16px;
   z-index: 60;

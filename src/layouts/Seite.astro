@@ -1,0 +1,158 @@
+---
+import { EmDashBodyEnd, EmDashBodyStart, EmDashHead } from "emdash/ui";
+import { createPublicPageContext } from "emdash/page";
+import { getSiteSettings } from "emdash";
+import type { Daten } from "../data/projects";
+import { STANDARD } from "../ideas/drehWerte";
+import { vorschauVon, type Vorschau } from "../cms/vorschau";
+import { basisAdresse, PERSON_ID } from "../cms/adresse";
+import Wurzel from "../Wurzel";
+import "../styles.css";
+
+// Rahmen jeder Seite: Kopfdaten für Suchmaschinen und Link-Vorschauen, die
+// CMS-Daten als JSON und darin die React-Insel (Drehbühne, About). Der Inhalt
+// zwischen den Tags (Slot) ist dieselbe Seite als schlichtes HTML für alle, die
+// kein JavaScript ausführen (Suchmaschinen, Link-Vorschauen); im Browser bleibt er
+// unsichtbar.
+interface Props {
+	daten: Daten;
+	titel: string;
+	beschreibung: string;
+	// Bild für Link-Vorschauen. Ohne: das Vorschaubild aus Einstellungen → SEO,
+	// sonst public/og-carolin-pflueger.jpg (die Bühne mit Carolins Namen).
+	vorschau?: Vorschau;
+	// Kanonische Adresse, falls nicht die eigene (/drehbuehne zeigt dasselbe wie /).
+	pfad?: string;
+	// Weitere strukturierte Daten (schema.org) neben EmDashs WebSite-Eintrag.
+	strukturiert?: Record<string, unknown>[];
+	// Die Bühne braucht mindestens ein Projekt mit Foto.
+	brauchtProjekte?: boolean;
+	// Bearbeitungsmodus: Marke des Eintrags, den diese Adresse zeigt (sonst leer).
+	eintragRef?: string;
+}
+
+const { daten, titel, beschreibung, vorschau, pfad, strukturiert = [], brauchtProjekte = false, eintragRef } = Astro.props;
+
+const einstellungen = await getSiteSettings();
+const basis = await basisAdresse(Astro.url);
+const absolut = (adresse: string) => new URL(adresse, `${basis}/`).href;
+
+const standard = einstellungen.seo?.defaultOgImage;
+const bild: Vorschau = vorschau
+	?? (standard?.url
+		? standard.width && standard.height
+			? vorschauVon({ src: standard.url, w: standard.width, h: standard.height, ar: standard.width / standard.height }, standard.alt || daten.kontakt.name)
+			: { src: standard.url, alt: standard.alt || daten.kontakt.name }
+		: { src: "/og-carolin-pflueger.jpg", w: 1200, h: 630, alt: `${daten.kontakt.name} — die Drehbühne mit ihren Arbeiten` });
+const bildAbsolut = absolut(bild.src);
+const kanonisch = absolut(pfad ?? Astro.url.pathname);
+const leer = brauchtProjekte && daten.projekte.length === 0;
+const angemeldet = Boolean(Astro.locals.user);
+
+const seite = createPublicPageContext({
+	Astro,
+	kind: "custom",
+	pageType: "website",
+	title: titel,
+	pageTitle: titel,
+	description: beschreibung,
+	canonical: kanonisch,
+	image: bildAbsolut,
+	seo: { ogImage: bildAbsolut },
+	siteName: daten.kontakt.name,
+	siteUrl: basis,
+});
+
+// `<` maskieren, damit kein Text aus dem CMS ein Skript-Element beenden kann.
+const alsSkript = (wert: unknown) => JSON.stringify(wert).replace(/</g, "\\u003c");
+const json = alsSkript(daten);
+
+// Carolin als Person — auf jeder Seite, damit Suchmaschinen Name, Beruf und Instagram verbinden.
+const person = {
+	"@context": "https://schema.org",
+	"@type": "Person",
+	"@id": PERSON_ID(basis),
+	name: daten.kontakt.name,
+	jobTitle: daten.kontakt.untertitel || "Bühnen- und Kostümbildnerin",
+	url: `${basis}/`,
+	...(daten.about.bild ? { image: absolut(daten.about.bild.src) } : {}),
+	sameAs: [daten.kontakt.instagram].filter(Boolean),
+	address: { "@type": "PostalAddress", addressLocality: "Berlin", addressCountry: "DE" },
+};
+---
+
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{titel}</title>
+		<EmDashHead page={seite} />
+		<meta property="og:locale" content="de_DE" />
+		{bild.w && bild.h && <meta property="og:image:width" content={String(bild.w)} />}
+		{bild.w && bild.h && <meta property="og:image:height" content={String(bild.h)} />}
+		<meta property="og:image:alt" content={bild.alt} />
+		<meta name="twitter:image:alt" content={bild.alt} />
+		<meta name="theme-color" content={daten.buehne.grund ?? STANDARD.grund} />
+		{/* Ein Favicon aus Einstellungen → Website-Identität setzt EmDash selbst; sonst gilt das feste. */}
+		{!einstellungen.favicon?.url && <link rel="icon" href="/favicon.svg" type="image/svg+xml" />}
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<script type="application/ld+json" set:html={alsSkript(person)} />
+		{strukturiert.map((eintrag) => <script type="application/ld+json" set:html={alsSkript({ "@context": "https://schema.org", ...eintrag })} />)}
+	</head>
+	<body>
+		<EmDashBodyStart page={seite} />
+		{
+			leer ? (
+				<main class="leer">
+					<h1>{daten.kontakt.name}</h1>
+					<p>Noch keine Projekte veröffentlicht.</p>
+					{angemeldet && (
+						<p>
+							<a href="/_emdash/admin/content/projekte/new">Erstes Projekt anlegen</a> — ein Projekt
+							erscheint, sobald es veröffentlicht ist und mindestens ein Foto hat.
+						</p>
+					)}
+				</main>
+			) : (
+				<>
+					{
+						/* EmDashs Leiste liest den Stand (Entwurf, „Veröffentlichen") beim Laden aus der
+						   Seite — die React-Insel steht dann noch nicht, deshalb liegt die Marke hier. */
+						eintragRef && <span hidden data-emdash-ref={eintragRef} />
+					}
+					<div class="ohne-skript"><slot /></div>
+					<noscript><style is:inline>.ohne-skript { display: block !important; }</style></noscript>
+					<script type="application/json" id="caro-daten" set:html={json} />
+					<Wurzel client:only="react" />
+				</>
+			)
+		}
+		<EmDashBodyEnd page={seite} />
+	</body>
+</html>
+
+<style>
+	/* Für Suchmaschinen und Browser ohne JavaScript; im Browser zeigt die Insel dasselbe. */
+	.ohne-skript {
+		display: none;
+		max-width: 720px;
+		padding: 24px;
+		line-height: 1.5;
+	}
+	.ohne-skript :global(img) {
+		max-width: 100%;
+		height: auto;
+	}
+	.leer {
+		min-height: 100vh;
+		display: grid;
+		place-content: center;
+		gap: 12px;
+		padding: 24px;
+		text-align: center;
+	}
+	.leer a {
+		border-bottom: 1px solid;
+	}
+</style>

@@ -1,0 +1,13 @@
+---
+import BuehnenSeite from "../../components/BuehnenSeite.astro";
+import { ladeDaten } from "../../cms/daten";
+
+// /drehbuehne/<projekt>: die Bühne, auf dieses Projekt gedreht.
+const daten = await ladeDaten(Boolean(Astro.locals.user));
+const link = Astro.params.projekt;
+const projekt = link ? daten.projekte.find((p) => p.slug === link) : undefined;
+// Unbekannte Projektadresse: echte 404 statt einer leeren Bühne.
+if (link && !projekt) return Astro.rewrite("/404");
+---
+
+<BuehnenSeite daten={daten} projekt={projekt} />

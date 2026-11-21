@@ -1,0 +1,4053 @@
+{
+	"$schema": "https://emdashcms.com/seed.schema.json",
+	"version": "1",
+	"meta": {
+		"name": "Carolin Pflüger",
+		"description": "Portfolio von Carolin Pflüger: Projekte, Kategorien der Drehbühne, Seiten und Bühneneinstellungen.",
+		"author": "Carolin Pflüger"
+	},
+	"settings": {
+		"title": "Carolin Pflüger",
+		"tagline": "Bühnen-, Kostümbildnerin, Kunstvermittlerin",
+		"seo": {
+			"titleSeparator": "—"
+		}
+	},
+	"collections": [
+		{
+			"slug": "projekte",
+			"label": "Projekte",
+			"labelSingular": "Projekt",
+			"description": "Jedes Projekt steht mit seinen Fotos auf der Drehbühne. Die Kategorie (rechts im Editor) bestimmt die Seite der Bühne, „Reihenfolge\" den Platz darauf.",
+			"icon": "briefcase",
+			"sortOrder": 1,
+			"admin": {
+				"listColumns": [
+					"jahr",
+					"ort",
+					"position"
+				]
+			},
+			"supports": [
+				"drafts",
+				"revisions",
+				"search"
+			],
+			"urlPattern": "/drehbuehne/{slug}",
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Titel",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "rolle",
+					"label": "Rolle (z. B. Bühne und Kostüm)",
+					"type": "string"
+				},
+				{
+					"slug": "jahr",
+					"label": "Jahr (z. B. 2025 oder seit 2021)",
+					"type": "string"
+				},
+				{
+					"slug": "ort",
+					"label": "Ort / Haus",
+					"type": "string",
+					"searchable": true
+				},
+				{
+					"slug": "farbe",
+					"label": "Farbe",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Blau",
+							"Orange",
+							"Magenta",
+							"Pink"
+						]
+					},
+					"defaultValue": "Blau"
+				},
+				{
+					"slug": "position",
+					"label": "Reihenfolge auf der Bühne (kleine Zahl = weiter vorn, leer = ganz vorn)",
+					"type": "integer"
+				},
+				{
+					"slug": "beschreibung",
+					"label": "Beschreibung",
+					"type": "text",
+					"searchable": true
+				},
+				{
+					"slug": "credits",
+					"label": "Credits (eine Zeile pro Eintrag)",
+					"type": "text"
+				},
+				{
+					"slug": "bilder",
+					"label": "Fotos",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 40,
+						"subFields": [
+							{
+								"slug": "bild",
+								"label": "Foto",
+								"type": "image",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "links",
+					"label": "Links",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 8,
+						"subFields": [
+							{
+								"slug": "label",
+								"label": "Beschriftung",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "url",
+								"label": "Adresse",
+								"type": "url",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "video",
+					"label": "Video (Vimeo-Player-Adresse)",
+					"type": "url"
+				},
+				{
+					"slug": "video_datei",
+					"label": "Video-Datei für die Leinwand (Pfad oder Adresse einer mp4)",
+					"type": "string"
+				}
+			]
+		},
+		{
+			"slug": "seiten",
+			"label": "Seiten",
+			"labelSingular": "Seite",
+			"description": "About: Porträt, Kurzvorstellung und Lebenslauf.",
+			"sortOrder": 2,
+			"supports": [
+				"drafts",
+				"revisions",
+				"search"
+			],
+			"urlPattern": "/{slug}",
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Titel",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "bild",
+					"label": "Porträt (links neben der Kurzvorstellung)",
+					"type": "image"
+				},
+				{
+					"slug": "content",
+					"label": "Kurzvorstellung (rechts neben dem Porträt)",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "lebenslauf",
+					"label": "Lebenslauf (Tabellen: links das Jahr, rechts der Text; Tab in der letzten Zelle fügt eine Zeile an)",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "lebenslauf_pdf",
+					"label": "Lebenslauf als PDF zum Herunterladen",
+					"type": "file",
+					"validation": {
+						"allowedMimeTypes": [
+							"application/pdf"
+						]
+					}
+				}
+			]
+		},
+		{
+			"slug": "buehne",
+			"label": "Bühne",
+			"labelSingular": "Bühne",
+			"description": "Das Stellwerk für alle: Farben, Leinwand, Licht, Kulissen und Laufschrift der Drehbühne. Es zählt der Eintrag „Drehbühne\".",
+			"sortOrder": 4,
+			"supports": [],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Name",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "ansicht",
+					"label": "Projektansicht: Aufbau",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Große Bilder untereinander, Text haftet seitlich",
+							"Jedes Bild in voller Spaltenbreite, Text haftet seitlich",
+							"Bildraster neben dem Text (ohne Scrollen)",
+							"Bildraster in voller Breite, Text darunter"
+						]
+					}
+				},
+				{
+					"slug": "leinwand",
+					"label": "Leinwand: Art",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Rundhorizont",
+							"Vollbild (ganze Seite)",
+							"Oberer Bildschirmteil",
+							"Rundum-Panorama",
+							"Bodenprojektion",
+							"Schwebende Leinwand",
+							"Keine Leinwand"
+						]
+					}
+				},
+				{
+					"slug": "leinwand_motiv",
+					"label": "Leinwand: Bild",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Projektmotiv (wechselt)",
+							"Matratze im Grün",
+							"Containerhof mit Kränen",
+							"Container in Reihe"
+						]
+					}
+				},
+				{
+					"slug": "leinwand_bild",
+					"label": "Leinwand: eigenes Bild (überstimmt die Auswahl darüber)",
+					"type": "image"
+				},
+				{
+					"slug": "leinwand_kategorien",
+					"label": "Leinwand: eigenes Bild je Kategorie (überstimmt beides darüber)",
+					"type": "repeater",
+					"validation": {
+						"maxItems": 12,
+						"subFields": [
+							{
+								"slug": "kategorie",
+								"label": "Kategorie (Name wie unter „Kategorien“)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "bild",
+								"label": "Bild",
+								"type": "image",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "leinwand_passung",
+					"label": "Leinwand: Motiv",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Ausschnitt, Maus führt",
+							"Ausschnitt, fest",
+							"Ganzes Bild",
+							"Ganzes Bild, Rand gefüllt",
+							"Gekachelt, gespiegelt",
+							"Gekachelt, gerade"
+						]
+					}
+				},
+				{
+					"slug": "leinwand_reihen",
+					"label": "Leinwand: Kachel-Reihen",
+					"type": "integer",
+					"validation": {
+						"min": 1,
+						"max": 4
+					}
+				},
+				{
+					"slug": "leinwand_hell",
+					"label": "Leinwand: Helligkeit",
+					"type": "number",
+					"validation": {
+						"min": 0.2,
+						"max": 3
+					}
+				},
+				{
+					"slug": "grund_art",
+					"label": "Hintergrund: Art",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Farbe",
+							"Farbverlauf",
+							"Bild"
+						]
+					}
+				},
+				{
+					"slug": "grund",
+					"label": "Hintergrund: Farbe (#rrggbb)",
+					"type": "string",
+					"validation": {
+						"pattern": "^#[0-9a-fA-F]{6}$"
+					}
+				},
+				{
+					"slug": "grund2",
+					"label": "Hintergrund: zweite Farbe für den Farbverlauf (#rrggbb)",
+					"type": "string",
+					"validation": {
+						"pattern": "^#[0-9a-fA-F]{6}$"
+					}
+				},
+				{
+					"slug": "grund_richtung",
+					"label": "Hintergrund: Richtung des Farbverlaufs",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Von oben nach unten",
+							"Von links nach rechts",
+							"Diagonal",
+							"Aus der Mitte"
+						]
+					}
+				},
+				{
+					"slug": "grund_bild",
+					"label": "Hintergrund: Bild (für die Art „Bild“)",
+					"type": "image"
+				},
+				{
+					"slug": "text",
+					"label": "Farbe: Text (#rrggbb)",
+					"type": "string",
+					"validation": {
+						"pattern": "^#[0-9a-fA-F]{6}$"
+					}
+				},
+				{
+					"slug": "scheibe",
+					"label": "Farbe: Scheibe (#rrggbb)",
+					"type": "string",
+					"validation": {
+						"pattern": "^#[0-9a-fA-F]{6}$"
+					}
+				},
+				{
+					"slug": "licht",
+					"label": "Licht: Stimmung",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Verfolger (Maus)",
+							"Fokus aufs Hauptprojekt",
+							"Arbeitslicht",
+							"Gegenlicht",
+							"Farbwechsler (drei Farben)",
+							"Suchscheinwerfer"
+						]
+					}
+				},
+				{
+					"slug": "licht_staerke",
+					"label": "Licht: Stärke",
+					"type": "number",
+					"validation": {
+						"min": 0.2,
+						"max": 2.5
+					}
+				},
+				{
+					"slug": "schatten",
+					"label": "Licht: Schatten",
+					"type": "boolean"
+				},
+				{
+					"slug": "obj_aufstellung",
+					"label": "Kulissen: Aufstellung",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Frei gestellt",
+							"Hauptbild hinten, zwei kleine davor",
+							"Nebeneinander",
+							"Fächer",
+							"Treppe nach vorn"
+						]
+					}
+				},
+				{
+					"slug": "obj_anzahl",
+					"label": "Kulissen: Fotos pro Projekt auf der Scheibe",
+					"type": "integer",
+					"validation": {
+						"min": 1,
+						"max": 3
+					}
+				},
+				{
+					"slug": "obj_groesse",
+					"label": "Kulissen: Größe",
+					"type": "number",
+					"validation": {
+						"min": 0.4,
+						"max": 2.2
+					}
+				},
+				{
+					"slug": "obj_dicke",
+					"label": "Kulissen: Dicke der Blöcke",
+					"type": "number",
+					"validation": {
+						"min": 0.02,
+						"max": 3
+					}
+				},
+				{
+					"slug": "obj_radius",
+					"label": "Kulissen: Abstand zur Mitte",
+					"type": "number",
+					"validation": {
+						"min": 4,
+						"max": 12.6
+					}
+				},
+				{
+					"slug": "obj_streuung",
+					"label": "Kulissen: Streuung",
+					"type": "number",
+					"validation": {
+						"min": 0,
+						"max": 3
+					}
+				},
+				{
+					"slug": "obj_verdrehung",
+					"label": "Kulissen: Verdrehung",
+					"type": "number",
+					"validation": {
+						"min": 0,
+						"max": 8
+					}
+				},
+				{
+					"slug": "obj_neigung",
+					"label": "Kulissen: Neigung nach hinten",
+					"type": "number",
+					"validation": {
+						"min": -0.6,
+						"max": 0.6
+					}
+				},
+				{
+					"slug": "obj_schweben",
+					"label": "Kulissen: Schweben",
+					"type": "number",
+					"validation": {
+						"min": 0,
+						"max": 5
+					}
+				},
+				{
+					"slug": "obj_atmen",
+					"label": "Kulissen: Atmen (auf und ab)",
+					"type": "number",
+					"validation": {
+						"min": 0,
+						"max": 1
+					}
+				},
+				{
+					"slug": "obj_zur_kamera",
+					"label": "Kulissen: Blick zum Publikum",
+					"type": "number",
+					"validation": {
+						"min": 0,
+						"max": 1
+					}
+				},
+				{
+					"slug": "obj_schwung",
+					"label": "Kulissen: Schwung beim Drehen",
+					"type": "number",
+					"validation": {
+						"min": 0,
+						"max": 1.5
+					}
+				},
+				{
+					"slug": "obj_stapel",
+					"label": "Kulissen: Stapeln zum Turm",
+					"type": "number",
+					"validation": {
+						"min": 0,
+						"max": 1
+					}
+				},
+				{
+					"slug": "obj_rueckseite",
+					"label": "Kulissen: Rückseiten in Projektfarbe",
+					"type": "boolean"
+				},
+				{
+					"slug": "laufschrift",
+					"label": "Laufschrift: an",
+					"type": "boolean"
+				},
+				{
+					"slug": "lauf_schrift",
+					"label": "Laufschrift: Schrift",
+					"type": "select",
+					"validation": {
+						"options": [
+							"Punktschrift 5×7",
+							"Kursiv",
+							"Gesperrt",
+							"Breit (jede zweite Diode)"
+						]
+					}
+				},
+				{
+					"slug": "lauf_farbe",
+					"label": "Laufschrift: Farbe (#rrggbb)",
+					"type": "string",
+					"validation": {
+						"pattern": "^#[0-9a-fA-F]{6}$"
+					}
+				},
+				{
+					"slug": "lauf_text",
+					"label": "Laufschrift: Text (leer = Name der Kategorie)",
+					"type": "string"
+				},
+				{
+					"slug": "lauf_tempo",
+					"label": "Laufschrift: Tempo",
+					"type": "number",
+					"validation": {
+						"min": 0,
+						"max": 60
+					}
+				},
+				{
+					"slug": "lauf_zeilen",
+					"label": "Laufschrift: Dioden-Zeilen",
+					"type": "integer",
+					"validation": {
+						"min": 7,
+						"max": 21
+					}
+				},
+				{
+					"slug": "wende_tempo",
+					"label": "Bewegung: Wenden",
+					"type": "number",
+					"validation": {
+						"min": 1,
+						"max": 8
+					}
+				},
+				{
+					"slug": "zoom_dauer",
+					"label": "Bewegung: ins Projekt (Sekunden)",
+					"type": "number",
+					"validation": {
+						"min": 0.3,
+						"max": 2.5
+					}
+				}
+			]
+		}
+	],
+	"taxonomies": [
+		{
+			"name": "category",
+			"label": "Kategorien",
+			"labelSingular": "Kategorie",
+			"hierarchical": true,
+			"collections": [
+				"projekte"
+			],
+			"terms": [
+				{
+					"slug": "buehne-kostuem",
+					"label": "Bühne und Kostüm"
+				},
+				{
+					"slug": "alles-moegliche",
+					"label": "Alles Mögliche"
+				}
+			]
+		}
+	],
+	"content": {
+		"projekte": [
+			{
+				"id": "love-western-2026",
+				"slug": "love-western-2026",
+				"status": "published",
+				"data": {
+					"title": "Love Western",
+					"rolle": "Kostüm",
+					"jahr": "2026",
+					"ort": "Theater Freiburg",
+					"farbe": "Blau",
+					"position": 10,
+					"beschreibung": "»Wanted: Wilder Westen trifft queere Liebe!« In einer dystopischen Zukunft erzählt das Stück von einem queeren Paar, dessen geplante Hochzeit durch das Verbot der gleichgeschlechtlichen Ehe in Ohio verhindert wird. Eine rebellische Neuerzählung amerikanischer Geschichte als queerer Western.",
+					"credits": "Regie und Text: Onur Karaoglu\nBühne: Doruk Çiftçi\nKostüme: Carolin Pflüger\nPremiere: 16.05.2026",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/love-western-1.jpg",
+									"alt": "Love Western — Foto 1",
+									"filename": "love-western-1.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/love-western-2.jpg",
+									"alt": "Love Western — Foto 2",
+									"filename": "love-western-2.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/love-western-3.jpg",
+									"alt": "Love Western — Foto 3",
+									"filename": "love-western-3.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/love-western-4.jpg",
+									"alt": "Love Western — Foto 4",
+									"filename": "love-western-4.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/love-western-5.jpg",
+									"alt": "Love Western — Foto 5",
+									"filename": "love-western-5.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/love-western-6.jpg",
+									"alt": "Love Western — Foto 6",
+									"filename": "love-western-6.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "reden-2026",
+				"slug": "reden-2026",
+				"status": "published",
+				"data": {
+					"title": "Vielleicht können wir mal miteinander reden",
+					"rolle": "Kostüm und Bühne",
+					"jahr": "2026",
+					"ort": "Theater für Niedersachsen",
+					"farbe": "Blau",
+					"position": 20,
+					"beschreibung": "Eine Versuchsanordnung. Text, Schauspiel, Tanz, Ausstattung, Licht und Musik sind nicht aufeinander abgestimmt. Die Positionen gehen improvisiert und reagierend in ein Gespräch auf Augenhöhe — ein Gespräch, an dem auch das Publikum teilnimmt.",
+					"credits": "Konzept: Alexander Hanauer\nBühne und Kostüm: Carolin Pflüger\nPremiere: 07.05.2026",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-01.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 1",
+									"filename": "reden-2026-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-02.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 2",
+									"filename": "reden-2026-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-03.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 3",
+									"filename": "reden-2026-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-04.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 4",
+									"filename": "reden-2026-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-05.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 5",
+									"filename": "reden-2026-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-06.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 6",
+									"filename": "reden-2026-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-07.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 7",
+									"filename": "reden-2026-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-08.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 8",
+									"filename": "reden-2026-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-09.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 9",
+									"filename": "reden-2026-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-10.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 10",
+									"filename": "reden-2026-10.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-11.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 11",
+									"filename": "reden-2026-11.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-12.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 12",
+									"filename": "reden-2026-12.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-13.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 13",
+									"filename": "reden-2026-13.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-14.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 14",
+									"filename": "reden-2026-14.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-15.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 15",
+									"filename": "reden-2026-15.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-16.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 16",
+									"filename": "reden-2026-16.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-17.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 17",
+									"filename": "reden-2026-17.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-18.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 18",
+									"filename": "reden-2026-18.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-19.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 19",
+									"filename": "reden-2026-19.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/reden-2026/reden-2026-20.jpg",
+									"alt": "Vielleicht können wir mal miteinander reden — Foto 20",
+									"filename": "reden-2026-20.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "lost-2025",
+				"slug": "lost-2025",
+				"status": "published",
+				"data": {
+					"title": "LOST",
+					"rolle": "Bühne",
+					"jahr": "2025",
+					"ort": "Staatstheater Braunschweig",
+					"farbe": "Orange",
+					"position": 30,
+					"beschreibung": "In »LOST« forschen wir nach den körperlichen Reaktionen der allgegenwärtigen paralysierenden Überforderung. Zwischen Ekstase und Erschöpfung, Fluktuation, Stagnation und Stillstand glauben wir fest daran, uns gemeinsam aus der Erstarrung zu lösen. Tanzperformance beim tanzstark! Festival.",
+					"credits": "Konzept: Milena Kaltenbach, Wilma Schapp\nBühne: Carolin Pflüger\nKostüm und Sound: Iggi Bühler\nPremiere: 27.06.2025",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-01.jpg",
+									"alt": "LOST — Foto 1",
+									"filename": "lost-2025-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-02.jpg",
+									"alt": "LOST — Foto 2",
+									"filename": "lost-2025-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-03.jpg",
+									"alt": "LOST — Foto 3",
+									"filename": "lost-2025-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-04.jpg",
+									"alt": "LOST — Foto 4",
+									"filename": "lost-2025-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-05.jpg",
+									"alt": "LOST — Foto 5",
+									"filename": "lost-2025-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-06.jpg",
+									"alt": "LOST — Foto 6",
+									"filename": "lost-2025-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-07.jpg",
+									"alt": "LOST — Foto 7",
+									"filename": "lost-2025-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-08.jpg",
+									"alt": "LOST — Foto 8",
+									"filename": "lost-2025-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-09.jpg",
+									"alt": "LOST — Foto 9",
+									"filename": "lost-2025-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/lost-2025/lost-2025-10.jpg",
+									"alt": "LOST — Foto 10",
+									"filename": "lost-2025-10.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "ein-stueck-vom-mond-2025",
+				"slug": "ein-stueck-vom-mond-2025",
+				"status": "published",
+				"data": {
+					"title": "Ein Stück vom Mond",
+					"rolle": "Bühne und Kostüm",
+					"jahr": "2025",
+					"ort": "Das Weite Theater Berlin",
+					"farbe": "Blau",
+					"position": 40,
+					"beschreibung": "Kindertheater ab 4 Jahren. Bei dem Versuch, einen neuen Stern zu erschaffen, stellen die beiden Weltenbauer*innen so Einiges her, nur keinen strahlenden Himmelskörper. Von der Erkenntnis, dass Scheitern auch Schönheit hervorbringen kann. Mit Rauch, Licht und ein bisschen Magie.",
+					"credits": "Regie: Karoline Hoffmann\nBühne und Kostüme: Carolin Pflüger\nMusik: Niklas Kraft\nPremiere: 06.04.2025",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-01.jpg",
+									"alt": "Ein Stück vom Mond — Foto 1",
+									"filename": "ein-stueck-vom-mond-2025-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-02.jpg",
+									"alt": "Ein Stück vom Mond — Foto 2",
+									"filename": "ein-stueck-vom-mond-2025-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-03.jpg",
+									"alt": "Ein Stück vom Mond — Foto 3",
+									"filename": "ein-stueck-vom-mond-2025-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-04.jpg",
+									"alt": "Ein Stück vom Mond — Foto 4",
+									"filename": "ein-stueck-vom-mond-2025-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-05.jpg",
+									"alt": "Ein Stück vom Mond — Foto 5",
+									"filename": "ein-stueck-vom-mond-2025-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-06.jpg",
+									"alt": "Ein Stück vom Mond — Foto 6",
+									"filename": "ein-stueck-vom-mond-2025-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-07.jpg",
+									"alt": "Ein Stück vom Mond — Foto 7",
+									"filename": "ein-stueck-vom-mond-2025-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-08.jpg",
+									"alt": "Ein Stück vom Mond — Foto 8",
+									"filename": "ein-stueck-vom-mond-2025-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-09.jpg",
+									"alt": "Ein Stück vom Mond — Foto 9",
+									"filename": "ein-stueck-vom-mond-2025-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-10.jpg",
+									"alt": "Ein Stück vom Mond — Foto 10",
+									"filename": "ein-stueck-vom-mond-2025-10.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/ein-stueck-vom-mond-2025/ein-stueck-vom-mond-2025-11.jpg",
+									"alt": "Ein Stück vom Mond — Foto 11",
+									"filename": "ein-stueck-vom-mond-2025-11.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "draussen-feiern-2025",
+				"slug": "draussen-feiern-2025",
+				"status": "published",
+				"data": {
+					"title": "Draußen feiern die Leute",
+					"rolle": "Bühne und Kostüm",
+					"jahr": "2025",
+					"ort": "Theater Bremen",
+					"farbe": "Pink",
+					"position": 50,
+					"beschreibung": "Uraufführung nach dem Roman von Sven Pfizenmaier. In einem Dorf in Niedersachsen verschwinden junge Menschen. Die inneren Konflikte des Coming-of-Age, der Wunsch nach Zugehörigkeit sowie die Suche nach Glück werden in einer fantastisch-komischen Formsprache nach außen getragen.",
+					"credits": "Regie: Viktor Lamert\nBühne und Kostüme: Carolin Pflüger\nPremiere: 23.01.2025",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-01.jpg",
+									"alt": "Draußen feiern die Leute — Foto 1",
+									"filename": "draussen-feiern-2025-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-02.jpg",
+									"alt": "Draußen feiern die Leute — Foto 2",
+									"filename": "draussen-feiern-2025-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-03.jpg",
+									"alt": "Draußen feiern die Leute — Foto 3",
+									"filename": "draussen-feiern-2025-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-04.jpg",
+									"alt": "Draußen feiern die Leute — Foto 4",
+									"filename": "draussen-feiern-2025-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-05.jpg",
+									"alt": "Draußen feiern die Leute — Foto 5",
+									"filename": "draussen-feiern-2025-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-06.jpg",
+									"alt": "Draußen feiern die Leute — Foto 6",
+									"filename": "draussen-feiern-2025-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/draussen-feiern-2025/draussen-feiern-2025-07.jpg",
+									"alt": "Draußen feiern die Leute — Foto 7",
+									"filename": "draussen-feiern-2025-07.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "spuren-2024",
+				"slug": "spuren-2024",
+				"status": "published",
+				"data": {
+					"title": "Spuren",
+					"rolle": "Kostüm",
+					"jahr": "2024",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Orange",
+					"position": 60,
+					"beschreibung": "»If the past gets twisted all the time, what’s the base for research?« Leon Pfannenmüller und Maxim Mamochkin schlüpfen versuchsweise in die Figuren ihrer Großmütter. Sie streiten, tanzen und singen — was versperrt den Blick in die Vergangenheit?",
+					"credits": "Konzept und Regie: Leon Pfannenmüller\nKostüm: Carolin Pflüger\nPremiere: 04.05.2024",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-01.jpg",
+									"alt": "Spuren — Foto 1",
+									"filename": "spuren-2024-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-02.jpg",
+									"alt": "Spuren — Foto 2",
+									"filename": "spuren-2024-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-03.jpg",
+									"alt": "Spuren — Foto 3",
+									"filename": "spuren-2024-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-04.jpg",
+									"alt": "Spuren — Foto 4",
+									"filename": "spuren-2024-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-05.jpg",
+									"alt": "Spuren — Foto 5",
+									"filename": "spuren-2024-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-06.jpg",
+									"alt": "Spuren — Foto 6",
+									"filename": "spuren-2024-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/spuren-2024/spuren-2024-07.jpg",
+									"alt": "Spuren — Foto 7",
+									"filename": "spuren-2024-07.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "blut-2024",
+				"slug": "blut-2024",
+				"status": "published",
+				"data": {
+					"title": "Blut",
+					"rolle": "Kostüm",
+					"jahr": "2024",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Magenta",
+					"position": 65,
+					"credits": "Regie: Leon Pfannenmüller\nKostüm: Carolin Pflüger",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-01.jpg",
+									"alt": "Blut — Foto 1",
+									"filename": "blut-2024-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-02.jpg",
+									"alt": "Blut — Foto 2",
+									"filename": "blut-2024-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-03.jpg",
+									"alt": "Blut — Foto 3",
+									"filename": "blut-2024-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-04.jpg",
+									"alt": "Blut — Foto 4",
+									"filename": "blut-2024-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-05.jpg",
+									"alt": "Blut — Foto 5",
+									"filename": "blut-2024-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-06.jpg",
+									"alt": "Blut — Foto 6",
+									"filename": "blut-2024-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/blut-2024/blut-2024-07.jpg",
+									"alt": "Blut — Foto 7",
+									"filename": "blut-2024-07.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "amygdala-2024",
+				"slug": "amygdala-2024",
+				"status": "published",
+				"data": {
+					"title": "Die Entführung der Amygdala",
+					"rolle": "Bühne und Kostüm",
+					"jahr": "2024",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Orange",
+					"position": 70,
+					"beschreibung": "Eine Frau begeht einen Tabubruch: Nach einem Unfall und einer scheinbaren Amnesie entscheidet sie sich für eine neue Identität. Jenseits ihrer Rolle als Mutter und Ehefrau sucht sie nach einem neuen Platz — vielleicht in einem anderen Universum. Eingeladen zum Heidelberger Stückemarkt 2025.",
+					"credits": "Von und mit: Pina Bergemann\nBühne und Kostüm: Carolin Pflüger\nPremiere: 19.01.2024",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-01.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 1",
+									"filename": "amygdala-2024-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-02.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 2",
+									"filename": "amygdala-2024-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-03.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 3",
+									"filename": "amygdala-2024-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-04.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 4",
+									"filename": "amygdala-2024-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-05.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 5",
+									"filename": "amygdala-2024-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-06.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 6",
+									"filename": "amygdala-2024-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-07.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 7",
+									"filename": "amygdala-2024-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-08.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 8",
+									"filename": "amygdala-2024-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-09.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 9",
+									"filename": "amygdala-2024-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/amygdala-2024/amygdala-2024-10.jpg",
+									"alt": "Die Entführung der Amygdala — Foto 10",
+									"filename": "amygdala-2024-10.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "bitte-auto-komm-2024",
+				"slug": "bitte-auto-komm-2024",
+				"status": "published",
+				"data": {
+					"title": "Bitte! Auto! Komm!",
+					"rolle": "Bühne, Kostüm, Licht",
+					"jahr": "2024",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Magenta",
+					"position": 80,
+					"beschreibung": "Die vier Bewohner*innen einer WG in einem Haus in einer Straßenkurve haben die Wahrscheinlichkeit, dass ein Auto in ihr Zuhause fahren wird, gut berechnet. Also bleibt ihnen wohl nichts anderes übrig, als darauf zu warten. Warum kam ihnen nicht die Idee, nicht zu warten?",
+					"credits": "Regie: Nanine Maria Kok\nBühne, Kostüm, Licht: Carolin Pflüger\nPremiere: 05.04.2024",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-01.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 1",
+									"filename": "bitte-auto-komm-2024-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-02.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 2",
+									"filename": "bitte-auto-komm-2024-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-03.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 3",
+									"filename": "bitte-auto-komm-2024-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-04.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 4",
+									"filename": "bitte-auto-komm-2024-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-05.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 5",
+									"filename": "bitte-auto-komm-2024-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-06.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 6",
+									"filename": "bitte-auto-komm-2024-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-07.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 7",
+									"filename": "bitte-auto-komm-2024-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-08.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 8",
+									"filename": "bitte-auto-komm-2024-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-09.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 9",
+									"filename": "bitte-auto-komm-2024-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/bitte-auto-komm-2024/bitte-auto-komm-2024-10.jpg",
+									"alt": "Bitte! Auto! Komm! — Foto 10",
+									"filename": "bitte-auto-komm-2024-10.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "hundekot-attacke-2023",
+				"slug": "hundekot-attacke-2023",
+				"status": "published",
+				"data": {
+					"title": "Die Hundekot-Attacke",
+					"rolle": "Kostüm",
+					"jahr": "2023",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Magenta",
+					"position": 90,
+					"beschreibung": "Eine Vorstellung über Finsternis, Schönheit und Vergebung, basierend auf einer wahren Begebenheit. Eine Koproduktion mit Wunderbaum. Eingeladen zum Berliner Theatertreffen 2024 und zum Heidelberger Stückemarkt 2024.",
+					"credits": "Regie, Text: Walter Bart (Wunderbaum)\nKostüm: Carolin Pflüger\nPremiere: 28.10.2023",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-01.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 1",
+									"filename": "hundekot-attacke-2023-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-02.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 2",
+									"filename": "hundekot-attacke-2023-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-03.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 3",
+									"filename": "hundekot-attacke-2023-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-04.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 4",
+									"filename": "hundekot-attacke-2023-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-05.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 5",
+									"filename": "hundekot-attacke-2023-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-06.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 6",
+									"filename": "hundekot-attacke-2023-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-07.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 7",
+									"filename": "hundekot-attacke-2023-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-08.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 8",
+									"filename": "hundekot-attacke-2023-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-09.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 9",
+									"filename": "hundekot-attacke-2023-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/hundekot-attacke-2023/hundekot-attacke-2023-10.jpg",
+									"alt": "Die Hundekot-Attacke — Foto 10",
+									"filename": "hundekot-attacke-2023-10.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "vom-dorf-2023",
+				"slug": "vom-dorf-2023",
+				"status": "published",
+				"data": {
+					"title": "Vom Dorf",
+					"rolle": "Kostüm",
+					"jahr": "2023",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Orange",
+					"position": 95,
+					"credits": "Regie: Lizzy Timmers\nKostüm: Carolin Pflüger",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-01.jpg",
+									"alt": "Vom Dorf — Foto 1",
+									"filename": "vom-dorf-2023-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-02.jpg",
+									"alt": "Vom Dorf — Foto 2",
+									"filename": "vom-dorf-2023-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-03.jpg",
+									"alt": "Vom Dorf — Foto 3",
+									"filename": "vom-dorf-2023-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-04.jpg",
+									"alt": "Vom Dorf — Foto 4",
+									"filename": "vom-dorf-2023-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-05.jpg",
+									"alt": "Vom Dorf — Foto 5",
+									"filename": "vom-dorf-2023-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-06.jpg",
+									"alt": "Vom Dorf — Foto 6",
+									"filename": "vom-dorf-2023-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-07.jpg",
+									"alt": "Vom Dorf — Foto 7",
+									"filename": "vom-dorf-2023-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-08.jpg",
+									"alt": "Vom Dorf — Foto 8",
+									"filename": "vom-dorf-2023-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-09.jpg",
+									"alt": "Vom Dorf — Foto 9",
+									"filename": "vom-dorf-2023-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/vom-dorf-2023/vom-dorf-2023-10.jpg",
+									"alt": "Vom Dorf — Foto 10",
+									"filename": "vom-dorf-2023-10.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "on-repeat-2023",
+				"slug": "on-repeat-2023",
+				"status": "published",
+				"data": {
+					"title": "On Repeat",
+					"rolle": "Kostüm",
+					"jahr": "2023",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Blau",
+					"position": 100,
+					"beschreibung": "»Das hat mir gerade noch gefehlt… Immer, wenn ich einen Stein umdrehe, sehe ich mein eigenes Gesicht.« Stückentwicklung am Theaterhaus Jena, eine Koproduktion mit dem Theater Rotterdam.",
+					"credits": "Regie: Zarah Bracht\nKostüme: Carolin Pflüger\nPremiere: 22.04.2023",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-01.jpg",
+									"alt": "On Repeat — Foto 1",
+									"filename": "on-repeat-2023-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-02.jpg",
+									"alt": "On Repeat — Foto 2",
+									"filename": "on-repeat-2023-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-03.jpg",
+									"alt": "On Repeat — Foto 3",
+									"filename": "on-repeat-2023-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-04.jpg",
+									"alt": "On Repeat — Foto 4",
+									"filename": "on-repeat-2023-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-05.jpg",
+									"alt": "On Repeat — Foto 5",
+									"filename": "on-repeat-2023-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-06.jpg",
+									"alt": "On Repeat — Foto 6",
+									"filename": "on-repeat-2023-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-07.jpg",
+									"alt": "On Repeat — Foto 7",
+									"filename": "on-repeat-2023-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-08.jpg",
+									"alt": "On Repeat — Foto 8",
+									"filename": "on-repeat-2023-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-09.jpg",
+									"alt": "On Repeat — Foto 9",
+									"filename": "on-repeat-2023-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-10.jpg",
+									"alt": "On Repeat — Foto 10",
+									"filename": "on-repeat-2023-10.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-11.jpg",
+									"alt": "On Repeat — Foto 11",
+									"filename": "on-repeat-2023-11.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-12.jpg",
+									"alt": "On Repeat — Foto 12",
+									"filename": "on-repeat-2023-12.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-13.jpg",
+									"alt": "On Repeat — Foto 13",
+									"filename": "on-repeat-2023-13.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-14.jpg",
+									"alt": "On Repeat — Foto 14",
+									"filename": "on-repeat-2023-14.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-15.jpg",
+									"alt": "On Repeat — Foto 15",
+									"filename": "on-repeat-2023-15.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/on-repeat-2023/on-repeat-2023-16.jpg",
+									"alt": "On Repeat — Foto 16",
+									"filename": "on-repeat-2023-16.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "knast-2023",
+				"slug": "knast-2023",
+				"status": "published",
+				"data": {
+					"title": "Knast",
+					"rolle": "Kostüm",
+					"jahr": "2023",
+					"ort": "Theaterhaus Jena",
+					"farbe": "Blau",
+					"position": 110,
+					"beschreibung": "Für die Stückentwicklung »Knast« spielen die Spieler*innen des Theaterhaus Jena die Theatergruppe der JVA Hohenleuben unter dem Coaching der Theatergruppe JVA Hohenleuben.",
+					"credits": "Konzept und Regie: Leon Pfannenmüller\nKostüm: Carolin Pflüger\nPremiere: 03.03.2023",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-01.jpg",
+									"alt": "Knast — Foto 1",
+									"filename": "knast-2023-01.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-02.jpg",
+									"alt": "Knast — Foto 2",
+									"filename": "knast-2023-02.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-03.jpg",
+									"alt": "Knast — Foto 3",
+									"filename": "knast-2023-03.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-04.jpg",
+									"alt": "Knast — Foto 4",
+									"filename": "knast-2023-04.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-05.jpg",
+									"alt": "Knast — Foto 5",
+									"filename": "knast-2023-05.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-06.jpg",
+									"alt": "Knast — Foto 6",
+									"filename": "knast-2023-06.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-07.jpg",
+									"alt": "Knast — Foto 7",
+									"filename": "knast-2023-07.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-08.jpg",
+									"alt": "Knast — Foto 8",
+									"filename": "knast-2023-08.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-09.jpg",
+									"alt": "Knast — Foto 9",
+									"filename": "knast-2023-09.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/d2ad8d2663f233ef669afb50306498d6917ae850/seed/fotos/knast-2023/knast-2023-10.jpg",
+									"alt": "Knast — Foto 10",
+									"filename": "knast-2023-10.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"buehne-kostuem"
+					]
+				}
+			},
+			{
+				"id": "um-ordnen-2021",
+				"slug": "um-ordnen-2021",
+				"status": "published",
+				"data": {
+					"title": "UM/ORDNEN",
+					"rolle": "Intervention",
+					"jahr": "seit 2021",
+					"ort": "urbaner Raum, Berlin",
+					"farbe": "Orange",
+					"position": 120,
+					"beschreibung": "Berlin ist voll mit Dingen. Oder ist es voll mit Müll? Was einmal wertvoll war, wird plötzlich zum Abfall — weggeworfen, vergessen, liegen gelassen. Wir steigen ein, mitten in den Verfall. Dokumentieren. Sortieren. Spielen. Wir ordnen die Unordnung. Oder wir ordnen die Unordnung um.",
+					"credits": "strolling_____ (Lara Scheuermann und Carolin Pflüger)",
+					"links": [
+						{
+							"label": "strolling.de",
+							"url": "https://strolling.de/um-ordnung/"
+						},
+						{
+							"label": "instagram",
+							"url": "https://www.instagram.com/strolling_____"
+						}
+					],
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/um-ordnen-1.jpg",
+									"alt": "UM/ORDNEN — Foto 1",
+									"filename": "um-ordnen-1.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/um-ordnen-2.jpg",
+									"alt": "UM/ORDNEN — Foto 2",
+									"filename": "um-ordnen-2.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/um-ordnen-3.jpg",
+									"alt": "UM/ORDNEN — Foto 3",
+									"filename": "um-ordnen-3.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/um-ordnen-4.jpg",
+									"alt": "UM/ORDNEN — Foto 4",
+									"filename": "um-ordnen-4.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"alles-moegliche"
+					]
+				}
+			},
+			{
+				"id": "heavy-matters-2026",
+				"slug": "heavy-matters-2026",
+				"status": "published",
+				"data": {
+					"title": "Heavy Matters",
+					"rolle": "walk in progress",
+					"jahr": "2026",
+					"ort": "performativer Müllwalk",
+					"farbe": "Magenta",
+					"position": 130,
+					"beschreibung": "Ein performativer Walk im öffentlichen Raum, der sich mit Müll, körperlicher Arbeit und geschlechtlich codierten Zuschreibungen von Gewicht, Wert und Sichtbarkeit auseinandersetzt. Wer trägt was — und unter welchen Bedingungen? Der Weg zur Entsorgungsstelle wird zur Choreografie.",
+					"credits": "Konzept und Performance: Carolin Pflüger",
+					"links": [
+						{
+							"label": "Video",
+							"url": "https://vimeo.com/1190920248"
+						}
+					],
+					"video": "https://player.vimeo.com/video/1190920248",
+					"video_datei": "/videos/heavy-matters.mp4",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/heavy-matters-1.jpg",
+									"alt": "Heavy Matters — Foto 1",
+									"filename": "heavy-matters-1.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/heavy-matters-2.jpg",
+									"alt": "Heavy Matters — Foto 2",
+									"filename": "heavy-matters-2.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/heavy-matters-3.jpg",
+									"alt": "Heavy Matters — Foto 3",
+									"filename": "heavy-matters-3.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"alles-moegliche"
+					]
+				}
+			},
+			{
+				"id": "parachutes-2021",
+				"slug": "parachutes-2021",
+				"status": "published",
+				"data": {
+					"title": "parachute(s)",
+					"rolle": "Installation",
+					"jahr": "2021",
+					"ort": "48 Stunden Neukölln",
+					"farbe": "Pink",
+					"position": 140,
+					"beschreibung": "Eine multimediale, interdisziplinäre und digitale Ausstellung zum Thema Luft, deren Werke mit Hilfe von Fallschirmen im Stadtraum sichtbar und aufrufbar gemacht werden. QUO möchte eine Brücke zwischen Luft und Erde, Vergangenheit und Zukunft, Digital- und Stadtraum schaffen.",
+					"credits": "Künstlerinnenkollektiv QUO\npartizipative Installation",
+					"bilder": [
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/parachutes-1.jpg",
+									"alt": "parachute(s) — Foto 1",
+									"filename": "parachutes-1.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/parachutes-2.jpg",
+									"alt": "parachute(s) — Foto 2",
+									"filename": "parachutes-2.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/parachutes-3.jpg",
+									"alt": "parachute(s) — Foto 3",
+									"filename": "parachutes-3.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/parachutes-4.jpg",
+									"alt": "parachute(s) — Foto 4",
+									"filename": "parachutes-4.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/parachutes-5.jpg",
+									"alt": "parachute(s) — Foto 5",
+									"filename": "parachutes-5.jpg"
+								}
+							}
+						},
+						{
+							"bild": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/niklasp/caro-portfolio/c0ccba2f2de4e4fd75981860de28ee7af23d3c8f/public/images/parachutes-6.jpg",
+									"alt": "parachute(s) — Foto 6",
+									"filename": "parachutes-6.jpg"
+								}
+							}
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"alles-moegliche"
+					]
+				}
+			}
+		],
+		"seiten": [
+			{
+				"id": "about",
+				"slug": "about",
+				"status": "published",
+				"data": {
+					"title": "About",
+					"content": [],
+					"lebenslauf": [
+						{
+							"_type": "block",
+							"_key": "ll0",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll1",
+									"text": "Freischaffende Bühnen- und Kostümbildnerin, Kunstvermittlerin.\nMitbegründerin des Künstlerinnenkollektivs QUO, Teil des Bühnenbildduos strolling_____",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "lln",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "llo",
+									"text": "Ausbildung",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "table",
+							"_key": "llm",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "ll3",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5",
+													"text": "2014",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2",
+													"text": "Bachelor of Arts Kunst und Sonderpädagogik/Inklusion (Uni Leipzig)",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll8",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll9",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "lla",
+													"text": "2014",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "llb",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll7",
+													"text": "Auslandsstipendium an der Accademia di Belle Arti di Roma (Rom, Italien)",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "lld",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "lle",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llf",
+													"text": "2017",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "llg",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llc",
+													"text": "Master of Education, Bildende Kunst (UdK Berlin), Sonderpädagogik (HU Berlin)",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "lli",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "llj",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llk",
+													"text": "2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "lll",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llh",
+													"text": "Master of Arts Bühnenbild/Szenischer Raum (TU Berlin)",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll1u",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll1v",
+									"text": "Beruflicher Werdegang",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "table",
+							"_key": "ll1t",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "llq",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "llr",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "lls",
+													"text": "seit 2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "llt",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llp",
+													"text": "freischaffende Bühnenbild- und Kostümbildnerin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "llv",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "llw",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llx",
+													"text": "2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "lly",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llu",
+													"text": "Ausstattungsassistentin am Theater Bremen, Theaterhaus Jena",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll10",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll11",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll12",
+													"text": "2017–2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll13",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llz",
+													"text": "Kunstlehrerin an der Carl-von-Linné Schule Berlin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll15",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll16",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll17",
+													"text": "2018",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll18",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll14",
+													"text": "Kunstvermittlerin „APPScouts“, Berlin Biennale",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll1a",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll1b",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1c",
+													"text": "seit 2018",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll1d",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll19",
+													"text": "freischaffende Künstlerin und Kunstvermittlerin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll1f",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll1g",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1h",
+													"text": "2016–2017",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll1i",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1e",
+													"text": "Lernbegleiterin an der Revik-Veseli Schule Berlin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll1k",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll1l",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1m",
+													"text": "2017",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll1n",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1j",
+													"text": "Mitgründerin des Künstlerinnenkollektivs QUO",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll1p",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll1q",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1r",
+													"text": "2016",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll1s",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1o",
+													"text": "Erwachsenenbildung, Deutsch für Geflüchtete bei A&QUA",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll1w",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll1x",
+									"text": "Software Skills",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll1y",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll1z",
+									"text": "Adobe Creative Suite, Vectorworks, AutoCAD, Blender, 3-D Druck",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll20",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll21",
+									"text": "Sprachliche Skills",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll22",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll23",
+									"text": "Englisch, Italienisch, Spanisch",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll24",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll25",
+									"text": "Sonstige Skills",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll26",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll27",
+									"text": "Führerschein Klasse B, Genie-/Hebebühnenführerschein, Fortbildung in „graphic recording“ an der Akademie für Illustration und Design Berlin, Teilnahme an Workshopreihen des Szenografiebundes zum Thema Nachhaltigkeit",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll28",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll29",
+									"text": "künstlerische Arbeiten",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll55",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll56",
+									"text": "Bühne und Kostüm",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "table",
+							"_key": "ll54",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "ll2d",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll2e",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2f",
+													"text": "2026",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll2g",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2b",
+													"text": "Love Western.",
+													"marks": [
+														"strong",
+														"em",
+														"ll2a"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll2c",
+													"text": " Theater Freiburg. Kostüm. Regie: Onur Karaoglu",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll2a",
+													"href": "/drehbuehne/love-western-2026"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll2j",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll2k",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2l",
+													"text": "2026",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll2m",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2h",
+													"text": "Coming Out.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll2i",
+													"text": " Theater für Niedersachsen. Bühne und Kostüm. Regie: Alexander Hanauer",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll2p",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll2q",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2r",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll2s",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2n",
+													"text": "Zeitstillstand.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll2o",
+													"text": " Theater am Kirchplatz Liechtenstein. künstlerische Mitarbeit Bühnen- und Kostümbild. Regie: Katrin Hilbe",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll2w",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll2x",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2y",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll2z",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2u",
+													"text": "LOST.",
+													"marks": [
+														"strong",
+														"em",
+														"ll2t"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll2v",
+													"text": " Bühne. Tanzperformance beim tanzstark! Festival Staatstheater Braunschweig. Regie/Choreografie: Milena Kaltenbach, Wilma Schapp",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll2t",
+													"href": "/drehbuehne/lost-2025"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll33",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll34",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll35",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll36",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll31",
+													"text": "Ein Stück vom Mond.",
+													"marks": [
+														"strong",
+														"em",
+														"ll30"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll32",
+													"text": " Das Weite Theater für Puppen und Menschen Berlin. Bühne und Kostüm. Regie: Karoline Hoffmann",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll30",
+													"href": "/drehbuehne/ein-stueck-vom-mond-2025"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll3a",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll3b",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3c",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll3d",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll38",
+													"text": "Draußen feiern die Leute.",
+													"marks": [
+														"strong",
+														"em",
+														"ll37"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll39",
+													"text": " Theater Bremen. Bühne und Kostüm. Regie: Viktor Lamert",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll37",
+													"href": "/drehbuehne/draussen-feiern-2025"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll3h",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll3i",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3j",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll3k",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3f",
+													"text": "Spuren.",
+													"marks": [
+														"strong",
+														"em",
+														"ll3e"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll3g",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll3e",
+													"href": "/drehbuehne/spuren-2024"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll3o",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll3p",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3q",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll3r",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3m",
+													"text": "Blut.",
+													"marks": [
+														"strong",
+														"em",
+														"ll3l"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll3n",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll3l",
+													"href": "/drehbuehne/blut-2024"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll3v",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll3w",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3x",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll3y",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3t",
+													"text": "Bitte! Auto! Komm!.",
+													"marks": [
+														"strong",
+														"em",
+														"ll3s"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll3u",
+													"text": " Theaterhaus Jena. Bühne, Kostüm, Licht. Regie: Nanine Maria Kok",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll3s",
+													"href": "/drehbuehne/bitte-auto-komm-2024"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll42",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll43",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll44",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll45",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll40",
+													"text": "Die Entführung der Amygdala.",
+													"marks": [
+														"strong",
+														"em",
+														"ll3z"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll41",
+													"text": " Theaterhaus Jena. Bühne und Kostüm. Regie: Babett Grube/Pina Bergemann",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll3z",
+													"href": "/drehbuehne/amygdala-2024"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll49",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4a",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4b",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll4c",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll47",
+													"text": "Die Hundekot-Attacke.",
+													"marks": [
+														"strong",
+														"em",
+														"ll46"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll48",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Walter Bart (Wunderbaum). Eingeladen zum Berliner Theatertreffen 2024 und zum Heidelberger Stückemarkt 2024",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll46",
+													"href": "/drehbuehne/hundekot-attacke-2023"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll4g",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4h",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4i",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll4j",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4e",
+													"text": "Vom Dorf.",
+													"marks": [
+														"strong",
+														"em",
+														"ll4d"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll4f",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Lizzy Timmers",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll4d",
+													"href": "/drehbuehne/vom-dorf-2023"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll4n",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4o",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4p",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll4q",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4l",
+													"text": "On Repeat.",
+													"marks": [
+														"strong",
+														"em",
+														"ll4k"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll4m",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Zarah Bracht",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll4k",
+													"href": "/drehbuehne/on-repeat-2023"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll4u",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4v",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4w",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll4x",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4s",
+													"text": "Knast.",
+													"marks": [
+														"strong",
+														"em",
+														"ll4r"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll4t",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll4r",
+													"href": "/drehbuehne/knast-2023"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll50",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll51",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll52",
+													"text": "2021",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll53",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4y",
+													"text": "Alcin*a.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll4z",
+													"text": " Ensemble Utopera, Berlin. Bühne. Regie: Teresa Reiber",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll6f",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll6g",
+									"text": "Ausstellungen",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "table",
+							"_key": "ll6e",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "ll59",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5a",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5b",
+													"text": "2026",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll5c",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll57",
+													"text": "Metamorphosen des Abfalls.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll58",
+													"text": " Boss Bitch Baby — Projektraum Galerie M, Berlin. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll5f",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5g",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5h",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll5i",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5d",
+													"text": "All About that Waste.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll5e",
+													"text": " 48 Stunden Neukölln. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll5l",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5m",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5n",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll5o",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5j",
+													"text": "ein Traumspiel.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll5k",
+													"text": " Localize Potsdam / TU Berlin, fix-o-tec. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll5s",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5t",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5u",
+													"text": "2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll5v",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5q",
+													"text": "parachute(s).",
+													"marks": [
+														"strong",
+														"em",
+														"ll5p"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll5r",
+													"text": " signals 48 Stunden Neukölln, Berlin. partizipative Installation",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll5p",
+													"href": "/drehbuehne/parachutes-2021"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll5y",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5z",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll60",
+													"text": "2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll61",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5w",
+													"text": "Experimente. Weil wir* euch** feiern***.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll5x",
+													"text": " Galerie Grolman, Berlin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll64",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll65",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll66",
+													"text": "2021",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll67",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll62",
+													"text": "QUO-Gallery II.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll63",
+													"text": " Rundgang UdK, Berlin. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll6a",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6b",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6c",
+													"text": "2019",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6d",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll68",
+													"text": "QUO-Gallery / QUO II.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll69",
+													"text": " 48h Neukölln / Plattenvereinigung Tempelhofer Feld. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ll77",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll78",
+									"text": "Auszeichnungen",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "table",
+							"_key": "ll76",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "ll6i",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6j",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6k",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6l",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6h",
+													"text": "Arbeits- und Recherchestipendium des Berliner Senats, Arbeitstitel „Transforming trash“",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll6n",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6o",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6p",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6q",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6m",
+													"text": "Einladung zum Heidelberger Stückemarkt mit „Die Entführung der Amygdala“",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll6s",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6t",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6u",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6v",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6r",
+													"text": "Einladung zum Berliner Theatertreffen mit „Die Hundekot-Attacke“",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll6x",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6y",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6z",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll70",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6w",
+													"text": "Theaterpreis des Bundes in der Kategorie Stadt- und Landestheater für das Theaterhaus Jena",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll72",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll73",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll74",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll75",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll71",
+													"text": "Einladung zum „Heidelberger Stückemarkt“ mit „Die Hundekot-Attacke“",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"buehne": [
+			{
+				"id": "drehbuehne",
+				"slug": "drehbuehne",
+				"status": "published",
+				"data": {
+					"title": "Drehbühne",
+					"ansicht": "Große Bilder untereinander, Text haftet seitlich",
+					"leinwand": "Bodenprojektion",
+					"leinwand_motiv": "Matratze im Grün",
+					"leinwand_passung": "Ausschnitt, fest",
+					"leinwand_reihen": 1,
+					"leinwand_hell": 1,
+					"grund_art": "Farbe",
+					"grund": "#6266bf",
+					"grund2": "#000000",
+					"grund_richtung": "Von oben nach unten",
+					"text": "#ffffff",
+					"scheibe": "#4a4a4a",
+					"licht": "Verfolger (Maus)",
+					"licht_staerke": 1,
+					"schatten": true,
+					"obj_aufstellung": "Frei gestellt",
+					"obj_anzahl": 3,
+					"obj_groesse": 1,
+					"obj_dicke": 0.5,
+					"obj_radius": 11.2,
+					"obj_streuung": 1,
+					"obj_verdrehung": 1,
+					"obj_neigung": 0,
+					"obj_schweben": 0,
+					"obj_atmen": 0,
+					"obj_zur_kamera": 0,
+					"obj_schwung": 0,
+					"obj_stapel": 0,
+					"obj_rueckseite": false,
+					"laufschrift": true,
+					"lauf_schrift": "Punktschrift 5×7",
+					"lauf_farbe": "#ff1c0d",
+					"lauf_tempo": 16,
+					"lauf_zeilen": 16,
+					"wende_tempo": 3.4,
+					"zoom_dauer": 0.95
+				}
+			}
+		]
+	}
+}

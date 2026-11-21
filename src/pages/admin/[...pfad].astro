@@ -1,0 +1,6 @@
+---
+// Kurze Adresse für den Admin: /admin führt nach /_emdash/admin.
+// EmDash selbst legt den Admin fest unter /_emdash/admin ab; das lässt sich nicht umstellen.
+const { pfad } = Astro.params;
+return Astro.redirect(`/_emdash/admin${pfad ? `/${pfad}` : ""}`, 302);
+---
