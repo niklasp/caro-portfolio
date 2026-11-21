@@ -101,7 +101,7 @@ const weich = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2)
 // ---------- Auftakt: Ladeschirm ----------
 // Der Name der Künstlerin füllt sich von links in der Farbe des vordersten Projekts,
 // während die Fotos laden. Erst wenn alles da ist — und der Auftakt kurz zu sehen war —
-// hebt sich der Vorhang. Einmal pro Sitzung; wer vom Lebenslauf zurückkommt, wartet nicht.
+// hebt sich der Vorhang. Einmal pro Sitzung; wer von About zurückkommt, wartet nicht.
 let auftaktGezeigt = false
 const AUFTAKT_MIN = 1.7 // Sekunden, die der Auftakt mindestens steht
 const AUFTAKT_MAX = 9 // danach geht es auch ohne letztes Bild weiter
@@ -172,7 +172,8 @@ const sichtfeld = (aspekt: number, abstand = RASTER_D) => {
   return { b: h * aspekt, h }
 }
 // Schmales Layout: die Seite scrollt, das Bildraster im Kameraraum rollt mit (Pixel).
-const rollen = { px: 0 }
+// textUnten: dort endet am Telefon der Text der Projektansicht (Pixel ab Seitenanfang) — darunter beginnen die Fotos.
+const rollen = { px: 0, textUnten: 0 }
 const rollWelt = (aspekt: number, hoehePx: number) => (rollen.px / hoehePx) * sichtfeld(aspekt).h
 
 // Zeilen im Blocksatz: jede Zeile füllt die Breite, die Bilder behalten ihr Format.
@@ -182,6 +183,11 @@ const rasterCache = new Map<string, Zelle[]>()
 
 // Scrollt die Projektansicht? Schmal immer; breit je nach Stellwerk (Ordner „Projektansicht").
 const rollt = (breite: number, hoehe: number) => istSchmal(breite, hoehe) || cfg.ansicht !== 'raster'
+
+// Schmal, in Pixeln: Seitenrand wie beim Text (styles.css), Abstand vom Text zum ersten Foto, Lücke zwischen den Fotos.
+const SCHMAL_RAND = 24
+const SCHMAL_ABSTAND = 36
+const SCHMAL_LUECKE = 10
 
 // Stapel und Spalte, in Pixeln: links die Bildspalte, rechts daneben der Text. Die Bildspalte
 // wächst nicht über SPALTE_MAX hinaus — auf sehr breiten Schirmen rückt das Ganze in die Mitte.
@@ -200,8 +206,8 @@ function spaltenMasse(breite: number) {
 
 function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
   const schmal = istSchmal(breite, hoehe)
-  const ansicht = schmal ? 'breit' : cfg.ansicht
-  const schluessel = `${ansicht}|${Math.round(breite)}x${Math.round(hoehe)}|${ars.join()}`
+  const ansicht = schmal ? 'schmal' : cfg.ansicht
+  const schluessel = `${ansicht}|${Math.round(breite)}x${Math.round(hoehe)}|${schmal ? Math.round(rollen.textUnten) : ''}|${ars.join()}`
   const fertig = rasterCache.get(schluessel)
   if (fertig) return fertig
   if (rasterCache.size > 400) rasterCache.clear() // beim Ziehen am Fenster sammelt sich sonst jede Größe an
@@ -210,6 +216,23 @@ function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
   const links = -0.44 * sicht.b
   const oben = 0.36 * sicht.h
   const zellen: Zelle[] = []
+
+  // Schmal (Telefon): oben stehen Titel und Text im Seitenfluss, darunter jedes Foto in voller
+  // Breite, eins unter dem anderen. Gerechnet in Pixeln ab Seitenanfang, dann in den Kameraraum.
+  if (ansicht === 'schmal') {
+    const px = sicht.h / hoehe
+    const B = (breite - 2 * SCHMAL_RAND) * px
+    // Querformat-Telefon, quadratisches Fenster: kein Foto höher als der Schirm.
+    const hMax = 0.86 * sicht.h
+    let y = sicht.h / 2 - (rollen.textUnten + SCHMAL_ABSTAND) * px
+    ars.forEach((ar, i) => {
+      const h = Math.min(hMax, B / ar)
+      zellen[i] = { x: (SCHMAL_RAND - breite / 2) * px + (h * ar) / 2, y: y - h / 2, b: h * ar, h }
+      y -= h + SCHMAL_LUECKE * px
+    })
+    rasterCache.set(schluessel, zellen)
+    return zellen
+  }
 
   // Stapel und Spalte: jedes Foto füllt die Spalte links, eins unter dem anderen — die Seite
   // scrollt, die Beschreibung haftet rechts (Breite in Pixeln, siehe .ansicht-stapel .db-beschreibung).
@@ -241,9 +264,9 @@ function bildraster(ars: number[], breite: number, hoehe: number): Zelle[] {
   // .db-beschreibung). Breit: das Raster nimmt die ganze Breite, der Text steht darunter.
   const textspalte = Math.min(290, 0.3 * breite) * 1.23 + 76
   const B = (ansicht === 'breit' ? 0.88 : Math.min(0.64, 0.94 - textspalte / breite)) * sicht.b
-  // Raster: endet über dem großen Titel. Breit scrollt die Seite — am Telefon knapp, im
-  // breiten Fenster darf das Raster fast den ganzen Schirm füllen.
-  const H = (ansicht === 'breit' ? (schmal ? 0.5 : 1.2) : 0.55) * sicht.h
+  // Raster: endet über dem großen Titel. Breit scrollt die Seite — das Raster darf fast den
+  // ganzen Schirm füllen.
+  const H = (ansicht === 'breit' ? 1.2 : 0.55) * sicht.h
   let beste: { zeilen: number[][]; hoehen: number[]; wert: number } | null = null
 
   const pruefe = (zeilen: number[][]) => {
@@ -605,11 +628,13 @@ function Scheinwerfer({
 
 function Beleuchtung({ art, staerke: s, schatten }: { art: Licht; staerke: number; schatten: boolean }) {
   switch (art) {
-    // 1 — der Verfolger: ein echtes Licht, von der Maus geführt
+    // 1 — der Verfolger: ein echtes Licht, von der Maus geführt. Dazu steht das Hauptprojekt vorn
+    //     immer in einem festen Licht (ohne eigenen Schatten — den wirft schon der Verfolger).
     case 'verfolger':
       return (
         <>
           <ambientLight intensity={0.42} color="#f2ecff" />
+          <Scheinwerfer von={[0, 15, 23]} auf={[0, 1, RADIUS + 0.4]} angle={0.2} penumbra={0.85} intensity={3.2 * s} color="#fff6ea" schatten={false} />
           <Scheinwerfer
             von={[0, 13, 21]}
             auf={[0, 0.8, RADIUS]}
@@ -1420,6 +1445,7 @@ export default function Drehbuehne() {
   useProjektUrlSync('/drehbuehne', p, detail ? DETAIL_HASH : '')
 
   // Scrollende Ansichten: die Seite reicht bis unter das letzte Foto — dessen Unterkante in Pixeln.
+  const [textUnten, setTextUnten] = useState(0)
   const rasterUnten = useMemo(() => {
     const zellen = bildraster(
       p.bilder.map((b) => b.ar),
@@ -1428,12 +1454,29 @@ export default function Drehbuehne() {
     )
     const unten = Math.min(...zellen.map((z) => z.y - z.h / 2))
     return (0.5 - unten / sichtfeld(fenster.b / fenster.h).h) * fenster.h
-  }, [p, fenster, config.ansicht])
+  }, [p, fenster, config.ansicht, textUnten])
   const scrollt = detail && rollt(fenster.b, fenster.h)
   const spalte = spaltenMasse(fenster.b)
 
   const wrap = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
+  const titelblock = useRef<HTMLDivElement>(null)
+  // Schmal: Titel und Text stehen über den Fotos. Wo der Text endet, wird gemessen — auch wenn er
+  // später umbricht (Fenster gedreht, Titel im Bearbeitungsmodus geändert).
+  useLayoutEffect(() => {
+    const el = panel.current
+    if (!el || !detail || !istSchmal(fenster.b, fenster.h)) return
+    const miss = () => {
+      const unten = Math.round(el.getBoundingClientRect().bottom + window.scrollY)
+      rollen.textUnten = unten
+      setTextUnten(unten)
+    }
+    miss()
+    const waechter = new ResizeObserver(miss)
+    waechter.observe(el)
+    if (titelblock.current) waechter.observe(titelblock.current)
+    return () => waechter.disconnect()
+  }, [detail, p, fenster])
   const zeiger = useRef<{ x: number; y: number; roh: number; achse: 'x' | 'y' | null; richtung: number } | null>(null)
   const radAcc = useRef({ acc: 0, t: 0 })
 
@@ -1521,7 +1564,8 @@ export default function Drehbuehne() {
     if (!stand.current.detail) {
       hierGeoeffnet.current = true
       navigate({ hash: DETAIL_HASH })
-    } else setGross((g) => (g === bildIndex ? null : bildIndex))
+    } else if (!istSchmal(window.innerWidth, window.innerHeight)) setGross((g) => (g === bildIndex ? null : bildIndex))
+    // Am Telefon stehen die Fotos schon in voller Breite untereinander: Antippen vergrößert nichts.
   }
   // Steht ein Foto groß vor der Kamera, blättern Pfeile und Scrollen durch die Bilder
   // des Projekts — sonst durch die Projekte.
@@ -1725,12 +1769,12 @@ export default function Drehbuehne() {
       <button className="db-zurueck" onClick={schliesse}>
         ← zurück zur Bühne
       </button>
-      <div className="sb-titel">
-        <h2 {...feld(p.ref, 'title')}>{p.titel}</h2>
-        <div className="sb-meta db-zaehler">
-          {KATEGORIEN[kat].name} · {String(aktiv + 1).padStart(2, '0')} / {String(projekte.length).padStart(2, '0')}
-        </div>
-        {/* Die Pfeile stehen unter dem Titel — auf der Bühne ganz unten links (styles.css). */}
+      <div className="sb-titel" ref={titelblock}>
+        {/* --zeichen: lange Titel werden kleiner, damit sie in einer Zeile Platz haben (styles.css). */}
+        <h2 {...feld(p.ref, 'title')} style={{ '--zeichen': Math.max(p.titel.length, 1) } as React.CSSProperties}>
+          {p.titel}
+        </h2>
+        {/* Auf der Bühne: die Pfeile ganz unten links. In der Projektansicht stehen sie unten rechts (.db-ecke). */}
         <div className="db-pfeile">
           <button onClick={() => dreheUm(-1)} aria-label="Vorheriges Projekt">
             ←
@@ -1747,18 +1791,6 @@ export default function Drehbuehne() {
       {/* Beschreibung unten rechts — über dunklem Boden, ohne Fläche. In der
           Detailansicht rückt sie neben das Bildraster und wird zur Lesegröße. */}
       <div className="db-beschreibung" ref={panel} key={p.slug}>
-        {/* Stapel-Ansicht: der große Titel unten links tritt ab — Blättern und Zähler ziehen hierher. */}
-        <div className="db-blaettern ov-anim-2">
-          <button onClick={() => dreheUm(-1)} aria-label="Vorheriges Projekt">
-            ←
-          </button>
-          <button onClick={() => dreheUm(1)} aria-label="Nächstes Projekt">
-            →
-          </button>
-          <span>
-            {KATEGORIEN[kat].name} · {String(aktiv + 1).padStart(2, '0')} / {String(projekte.length).padStart(2, '0')}
-          </span>
-        </div>
         {/* Jedes Feld in einem eigenen Element: der Bearbeitungsmodus speichert dessen ganzen Text. */}
         <h3 className="db-titel ov-anim-2" {...feld(p.ref, 'title')}>
           {p.titel}
@@ -1785,13 +1817,16 @@ export default function Drehbuehne() {
         )}
       </div>
 
-      <div className="hinweis hell">
-        {detail
-          ? `${scrollt ? 'Pfeiltasten' : 'scrollen oder Pfeiltasten'}: nächstes Projekt · Foto anklicken: groß · Esc: zurück zur Bühne`
-          : 'ziehen ↔ oder scrollen: drehen · ziehen ↕: Bühne wenden · Maus führt das Licht · Foto anklicken: hinein ins Projekt'}
+      {/* In der Projektansicht steht rechts unten statt Titel und Ort das Blättern. */}
+      <Fuss hell projekt={detail ? p : undefined} rechts={detail ? '' : undefined} fallback={['', '', `${KATEGORIEN[kat].name}, 2021–2026`]} />
+      <div className="db-pfeile db-ecke" aria-hidden={!detail}>
+        <button onClick={() => dreheUm(-1)} aria-label="Vorheriges Projekt" tabIndex={detail ? 0 : -1}>
+          ←
+        </button>
+        <button onClick={() => dreheUm(1)} aria-label="Nächstes Projekt" tabIndex={detail ? 0 : -1}>
+          →
+        </button>
       </div>
-
-      <Fuss hell projekt={detail ? p : undefined} fallback={['', '', `${KATEGORIEN[kat].name}, 2021–2026`]} />
     </div>
   )
 }

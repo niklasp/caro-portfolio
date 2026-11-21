@@ -142,7 +142,7 @@
 			"slug": "seiten",
 			"label": "Seiten",
 			"labelSingular": "Seite",
-			"description": "Texte für About und weitere Seiten.",
+			"description": "About: Porträt, Kurzvorstellung und Lebenslauf.",
 			"sortOrder": 2,
 			"supports": [
 				"drafts",
@@ -160,191 +160,28 @@
 				},
 				{
 					"slug": "bild",
-					"label": "Bild",
+					"label": "Porträt (links neben der Kurzvorstellung)",
 					"type": "image"
 				},
 				{
 					"slug": "content",
-					"label": "Text",
+					"label": "Kurzvorstellung (rechts neben dem Porträt)",
 					"type": "portableText",
 					"searchable": true
-				}
-			]
-		},
-		{
-			"slug": "lebenslauf",
-			"label": "Lebenslauf",
-			"labelSingular": "Lebenslauf",
-			"description": "Die Seite „Lebenslauf\". Es zählt der Eintrag „Lebenslauf\". Die Reihenfolge der Zeilen ist die Reihenfolge auf der Seite — Zeilen lassen sich am Griff verschieben.",
-			"sortOrder": 3,
-			"supports": [
-				"drafts",
-				"revisions"
-			],
-			"urlPattern": "/{slug}",
-			"fields": [
-				{
-					"slug": "title",
-					"label": "Titel",
-					"type": "string",
-					"required": true
 				},
 				{
-					"slug": "einleitung",
-					"label": "Einleitung (eine Zeile pro Zeile auf der Seite)",
-					"type": "text"
+					"slug": "lebenslauf",
+					"label": "Lebenslauf (Tabellen: links das Jahr, rechts der Text; Tab in der letzten Zelle fügt eine Zeile an)",
+					"type": "portableText",
+					"searchable": true
 				},
 				{
-					"slug": "pdf",
+					"slug": "lebenslauf_pdf",
 					"label": "Lebenslauf als PDF zum Herunterladen",
 					"type": "file",
 					"validation": {
 						"allowedMimeTypes": [
 							"application/pdf"
-						]
-					}
-				},
-				{
-					"slug": "ausbildung",
-					"label": "Ausbildung",
-					"type": "repeater",
-					"validation": {
-						"maxItems": 40,
-						"subFields": [
-							{
-								"slug": "jahr",
-								"label": "Jahr (z. B. 2025 oder seit 2023)",
-								"type": "string",
-								"required": true
-							},
-							{
-								"slug": "text",
-								"label": "Text",
-								"type": "text",
-								"required": true
-							}
-						]
-					}
-				},
-				{
-					"slug": "werdegang",
-					"label": "Beruflicher Werdegang",
-					"type": "repeater",
-					"validation": {
-						"maxItems": 60,
-						"subFields": [
-							{
-								"slug": "jahr",
-								"label": "Jahr (z. B. 2025 oder seit 2023)",
-								"type": "string",
-								"required": true
-							},
-							{
-								"slug": "text",
-								"label": "Text",
-								"type": "text",
-								"required": true
-							}
-						]
-					}
-				},
-				{
-					"slug": "skills",
-					"label": "Skills",
-					"type": "repeater",
-					"validation": {
-						"maxItems": 12,
-						"subFields": [
-							{
-								"slug": "titel",
-								"label": "Überschrift (z. B. Software Skills)",
-								"type": "string",
-								"required": true
-							},
-							{
-								"slug": "text",
-								"label": "Text",
-								"type": "text",
-								"required": true
-							}
-						]
-					}
-				},
-				{
-					"slug": "arbeiten",
-					"label": "Künstlerische Arbeiten: Bühne und Kostüm",
-					"type": "repeater",
-					"validation": {
-						"maxItems": 100,
-						"subFields": [
-							{
-								"slug": "jahr",
-								"label": "Jahr (z. B. 2025 oder seit 2023)",
-								"type": "string",
-								"required": true
-							},
-							{
-								"slug": "titel",
-								"label": "Titel",
-								"type": "string",
-								"required": true
-							},
-							{
-								"slug": "text",
-								"label": "Text",
-								"type": "text",
-								"required": false
-							}
-						]
-					}
-				},
-				{
-					"slug": "ausstellungen",
-					"label": "Künstlerische Arbeiten: Ausstellungen",
-					"type": "repeater",
-					"validation": {
-						"maxItems": 100,
-						"subFields": [
-							{
-								"slug": "jahr",
-								"label": "Jahr (z. B. 2025 oder seit 2023)",
-								"type": "string",
-								"required": true
-							},
-							{
-								"slug": "titel",
-								"label": "Titel",
-								"type": "string",
-								"required": true
-							},
-							{
-								"slug": "text",
-								"label": "Text",
-								"type": "text",
-								"required": false
-							}
-						]
-					}
-				},
-				{
-					"slug": "auszeichnungen",
-					"label": "Auszeichnungen",
-					"type": "repeater",
-					"validation": {
-						"maxItems": 60,
-						"subFields": [
-							{
-								"slug": "jahr",
-								"label": "Jahr (z. B. 2025 oder seit 2023)",
-								"type": "string",
-								"required": true
-							},
-							{
-								"slug": "text",
-								"label": "Text",
-								"type": "text",
-								"required": true
-							}
 						]
 					}
 				}
@@ -2476,218 +2313,1691 @@
 				"status": "published",
 				"data": {
 					"title": "About",
-					"content": []
-				}
-			}
-		],
-		"lebenslauf": [
-			{
-				"id": "lebenslauf",
-				"slug": "lebenslauf",
-				"status": "published",
-				"data": {
-					"title": "Lebenslauf",
-					"einleitung": "Freischaffende Bühnen- und Kostümbildnerin, Kunstvermittlerin.\nMitbegründerin des Künstlerinnenkollektivs QUO, Teil des Bühnenbildduos strolling_____",
-					"ausbildung": [
+					"content": [],
+					"lebenslauf": [
 						{
-							"jahr": "2014",
-							"text": "Bachelor of Arts Kunst und Sonderpädagogik/Inklusion (Uni Leipzig)"
+							"_type": "block",
+							"_key": "ll0",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll1",
+									"text": "Freischaffende Bühnen- und Kostümbildnerin, Kunstvermittlerin.\nMitbegründerin des Künstlerinnenkollektivs QUO, Teil des Bühnenbildduos strolling_____",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2014",
-							"text": "Auslandsstipendium an der Accademia di Belle Arti di Roma (Rom, Italien)"
+							"_type": "block",
+							"_key": "lln",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "llo",
+									"text": "Ausbildung",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2017",
-							"text": "Master of Education, Bildende Kunst (UdK Berlin), Sonderpädagogik (HU Berlin)"
+							"_type": "table",
+							"_key": "llm",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "ll3",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5",
+													"text": "2014",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2",
+													"text": "Bachelor of Arts Kunst und Sonderpädagogik/Inklusion (Uni Leipzig)",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll8",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll9",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "lla",
+													"text": "2014",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "llb",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll7",
+													"text": "Auslandsstipendium an der Accademia di Belle Arti di Roma (Rom, Italien)",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "lld",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "lle",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llf",
+													"text": "2017",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "llg",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llc",
+													"text": "Master of Education, Bildende Kunst (UdK Berlin), Sonderpädagogik (HU Berlin)",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "lli",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "llj",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llk",
+													"text": "2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "lll",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llh",
+													"text": "Master of Arts Bühnenbild/Szenischer Raum (TU Berlin)",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
 						},
 						{
-							"jahr": "2022",
-							"text": "Master of Arts Bühnenbild/Szenischer Raum (TU Berlin)"
-						}
-					],
-					"werdegang": [
-						{
-							"jahr": "seit 2023",
-							"text": "freischaffende Bühnenbild- und Kostümbildnerin"
+							"_type": "block",
+							"_key": "ll1u",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll1v",
+									"text": "Beruflicher Werdegang",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2022",
-							"text": "Ausstattungsassistentin am Theater Bremen, Theaterhaus Jena"
+							"_type": "table",
+							"_key": "ll1t",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "llq",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "llr",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "lls",
+													"text": "seit 2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "llt",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llp",
+													"text": "freischaffende Bühnenbild- und Kostümbildnerin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "llv",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "llw",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llx",
+													"text": "2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "lly",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llu",
+													"text": "Ausstattungsassistentin am Theater Bremen, Theaterhaus Jena",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll10",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll11",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll12",
+													"text": "2017–2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll13",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "llz",
+													"text": "Kunstlehrerin an der Carl-von-Linné Schule Berlin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll15",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll16",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll17",
+													"text": "2018",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll18",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll14",
+													"text": "Kunstvermittlerin „APPScouts“, Berlin Biennale",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll1a",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll1b",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1c",
+													"text": "seit 2018",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll1d",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll19",
+													"text": "freischaffende Künstlerin und Kunstvermittlerin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll1f",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll1g",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1h",
+													"text": "2016–2017",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll1i",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1e",
+													"text": "Lernbegleiterin an der Revik-Veseli Schule Berlin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll1k",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll1l",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1m",
+													"text": "2017",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll1n",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1j",
+													"text": "Mitgründerin des Künstlerinnenkollektivs QUO",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll1p",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll1q",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1r",
+													"text": "2016",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll1s",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll1o",
+													"text": "Erwachsenenbildung, Deutsch für Geflüchtete bei A&QUA",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
 						},
 						{
-							"jahr": "2017–2022",
-							"text": "Kunstlehrerin an der Carl-von-Linné Schule Berlin"
+							"_type": "block",
+							"_key": "ll1w",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll1x",
+									"text": "Software Skills",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2018",
-							"text": "Kunstvermittlerin „APPScouts“, Berlin Biennale"
+							"_type": "block",
+							"_key": "ll1y",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll1z",
+									"text": "Adobe Creative Suite, Vectorworks, AutoCAD, Blender, 3-D Druck",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "seit 2018",
-							"text": "freischaffende Künstlerin und Kunstvermittlerin"
+							"_type": "block",
+							"_key": "ll20",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll21",
+									"text": "Sprachliche Skills",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2016–2017",
-							"text": "Lernbegleiterin an der Revik-Veseli Schule Berlin"
+							"_type": "block",
+							"_key": "ll22",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll23",
+									"text": "Englisch, Italienisch, Spanisch",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2017",
-							"text": "Mitgründerin des Künstlerinnenkollektivs QUO"
+							"_type": "block",
+							"_key": "ll24",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll25",
+									"text": "Sonstige Skills",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2016",
-							"text": "Erwachsenenbildung, Deutsch für Geflüchtete bei A&QUA"
-						}
-					],
-					"skills": [
-						{
-							"titel": "Software Skills",
-							"text": "Adobe Creative Suite, Vectorworks, AutoCAD, Blender, 3-D Druck"
+							"_type": "block",
+							"_key": "ll26",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll27",
+									"text": "Führerschein Klasse B, Genie-/Hebebühnenführerschein, Fortbildung in „graphic recording“ an der Akademie für Illustration und Design Berlin, Teilnahme an Workshopreihen des Szenografiebundes zum Thema Nachhaltigkeit",
+									"marks": []
+								}
+							]
 						},
 						{
-							"titel": "Sprachliche Skills",
-							"text": "Englisch, Italienisch, Spanisch"
+							"_type": "block",
+							"_key": "ll28",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll29",
+									"text": "künstlerische Arbeiten",
+									"marks": []
+								}
+							]
 						},
 						{
-							"titel": "Sonstige Skills",
-							"text": "Führerschein Klasse B, Genie-/Hebebühnenführerschein, Fortbildung in „graphic recording“ an der Akademie für Illustration und Design Berlin, Teilnahme an Workshopreihen des Szenografiebundes zum Thema Nachhaltigkeit"
-						}
-					],
-					"arbeiten": [
-						{
-							"jahr": "2026",
-							"titel": "Love Western",
-							"text": "Theater Freiburg. Kostüm. Regie: Onur Karaoglu"
+							"_type": "block",
+							"_key": "ll55",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll56",
+									"text": "Bühne und Kostüm",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2026",
-							"titel": "Coming Out",
-							"text": "Theater für Niedersachsen. Bühne und Kostüm. Regie: Alexander Hanauer"
+							"_type": "table",
+							"_key": "ll54",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "ll2d",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll2e",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2f",
+													"text": "2026",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll2g",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2b",
+													"text": "Love Western.",
+													"marks": [
+														"strong",
+														"em",
+														"ll2a"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll2c",
+													"text": " Theater Freiburg. Kostüm. Regie: Onur Karaoglu",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll2a",
+													"href": "/drehbuehne/love-western-2026"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll2j",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll2k",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2l",
+													"text": "2026",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll2m",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2h",
+													"text": "Coming Out.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll2i",
+													"text": " Theater für Niedersachsen. Bühne und Kostüm. Regie: Alexander Hanauer",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll2p",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll2q",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2r",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll2s",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2n",
+													"text": "Zeitstillstand.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll2o",
+													"text": " Theater am Kirchplatz Liechtenstein. künstlerische Mitarbeit Bühnen- und Kostümbild. Regie: Katrin Hilbe",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll2w",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll2x",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2y",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll2z",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll2u",
+													"text": "LOST.",
+													"marks": [
+														"strong",
+														"em",
+														"ll2t"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll2v",
+													"text": " Bühne. Tanzperformance beim tanzstark! Festival Staatstheater Braunschweig. Regie/Choreografie: Milena Kaltenbach, Wilma Schapp",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll2t",
+													"href": "/drehbuehne/lost-2025"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll33",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll34",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll35",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll36",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll31",
+													"text": "Ein Stück vom Mond.",
+													"marks": [
+														"strong",
+														"em",
+														"ll30"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll32",
+													"text": " Das Weite Theater für Puppen und Menschen Berlin. Bühne und Kostüm. Regie: Karoline Hoffmann",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll30",
+													"href": "/drehbuehne/ein-stueck-vom-mond-2025"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll3a",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll3b",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3c",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll3d",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll38",
+													"text": "Draußen feiern die Leute.",
+													"marks": [
+														"strong",
+														"em",
+														"ll37"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll39",
+													"text": " Theater Bremen. Bühne und Kostüm. Regie: Viktor Lamert",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll37",
+													"href": "/drehbuehne/draussen-feiern-2025"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll3h",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll3i",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3j",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll3k",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3f",
+													"text": "Spuren.",
+													"marks": [
+														"strong",
+														"em",
+														"ll3e"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll3g",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll3e",
+													"href": "/drehbuehne/spuren-2024"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll3o",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll3p",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3q",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll3r",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3m",
+													"text": "Blut.",
+													"marks": [
+														"strong",
+														"em",
+														"ll3l"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll3n",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll3l",
+													"href": "/drehbuehne/blut-2024"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll3v",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll3w",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3x",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll3y",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll3t",
+													"text": "Bitte! Auto! Komm!.",
+													"marks": [
+														"strong",
+														"em",
+														"ll3s"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll3u",
+													"text": " Theaterhaus Jena. Bühne, Kostüm, Licht. Regie: Nanine Maria Kok",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll3s",
+													"href": "/drehbuehne/bitte-auto-komm-2024"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll42",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll43",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll44",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll45",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll40",
+													"text": "Die Entführung der Amygdala.",
+													"marks": [
+														"strong",
+														"em",
+														"ll3z"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll41",
+													"text": " Theaterhaus Jena. Bühne und Kostüm. Regie: Babett Grube/Pina Bergemann",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll3z",
+													"href": "/drehbuehne/amygdala-2024"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll49",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4a",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4b",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll4c",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll47",
+													"text": "Die Hundekot-Attacke.",
+													"marks": [
+														"strong",
+														"em",
+														"ll46"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll48",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Walter Bart (Wunderbaum). Eingeladen zum Berliner Theatertreffen 2024 und zum Heidelberger Stückemarkt 2024",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll46",
+													"href": "/drehbuehne/hundekot-attacke-2023"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll4g",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4h",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4i",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll4j",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4e",
+													"text": "Vom Dorf.",
+													"marks": [
+														"strong",
+														"em",
+														"ll4d"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll4f",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Lizzy Timmers",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll4d",
+													"href": "/drehbuehne/vom-dorf-2023"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll4n",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4o",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4p",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll4q",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4l",
+													"text": "On Repeat.",
+													"marks": [
+														"strong",
+														"em",
+														"ll4k"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll4m",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Zarah Bracht",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll4k",
+													"href": "/drehbuehne/on-repeat-2023"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll4u",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll4v",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4w",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll4x",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4s",
+													"text": "Knast.",
+													"marks": [
+														"strong",
+														"em",
+														"ll4r"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll4t",
+													"text": " Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll4r",
+													"href": "/drehbuehne/knast-2023"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll50",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll51",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll52",
+													"text": "2021",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll53",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll4y",
+													"text": "Alcin*a.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll4z",
+													"text": " Ensemble Utopera, Berlin. Bühne. Regie: Teresa Reiber",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
 						},
 						{
-							"jahr": "2025",
-							"titel": "Zeitstillstand",
-							"text": "Theater am Kirchplatz Liechtenstein. künstlerische Mitarbeit Bühnen- und Kostümbild. Regie: Katrin Hilbe"
+							"_type": "block",
+							"_key": "ll6f",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll6g",
+									"text": "Ausstellungen",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2025",
-							"titel": "LOST",
-							"text": "Bühne. Tanzperformance beim tanzstark! Festival Staatstheater Braunschweig. Regie/Choreografie: Milena Kaltenbach, Wilma Schapp"
+							"_type": "table",
+							"_key": "ll6e",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "ll59",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5a",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5b",
+													"text": "2026",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll5c",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll57",
+													"text": "Metamorphosen des Abfalls.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll58",
+													"text": " Boss Bitch Baby — Projektraum Galerie M, Berlin. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll5f",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5g",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5h",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll5i",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5d",
+													"text": "All About that Waste.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll5e",
+													"text": " 48 Stunden Neukölln. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll5l",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5m",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5n",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll5o",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5j",
+													"text": "ein Traumspiel.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll5k",
+													"text": " Localize Potsdam / TU Berlin, fix-o-tec. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll5s",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5t",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5u",
+													"text": "2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll5v",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5q",
+													"text": "parachute(s).",
+													"marks": [
+														"strong",
+														"em",
+														"ll5p"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll5r",
+													"text": " signals 48 Stunden Neukölln, Berlin. partizipative Installation",
+													"marks": []
+												}
+											],
+											"markDefs": [
+												{
+													"_type": "link",
+													"_key": "ll5p",
+													"href": "/drehbuehne/parachutes-2021"
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll5y",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll5z",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll60",
+													"text": "2022",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll61",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll5w",
+													"text": "Experimente. Weil wir* euch** feiern***.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll5x",
+													"text": " Galerie Grolman, Berlin",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll64",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll65",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll66",
+													"text": "2021",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll67",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll62",
+													"text": "QUO-Gallery II.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll63",
+													"text": " Rundgang UdK, Berlin. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll6a",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6b",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6c",
+													"text": "2019",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6d",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll68",
+													"text": "QUO-Gallery / QUO II.",
+													"marks": [
+														"strong",
+														"em"
+													]
+												},
+												{
+													"_type": "span",
+													"_key": "ll69",
+													"text": " 48h Neukölln / Plattenvereinigung Tempelhofer Feld. Installation",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
 						},
 						{
-							"jahr": "2025",
-							"titel": "Ein Stück vom Mond",
-							"text": "Das Weite Theater für Puppen und Menschen Berlin. Bühne und Kostüm. Regie: Karoline Hoffmann"
+							"_type": "block",
+							"_key": "ll77",
+							"style": "h3",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ll78",
+									"text": "Auszeichnungen",
+									"marks": []
+								}
+							]
 						},
 						{
-							"jahr": "2025",
-							"titel": "Draußen feiern die Leute",
-							"text": "Theater Bremen. Bühne und Kostüm. Regie: Viktor Lamert"
-						},
-						{
-							"jahr": "2024",
-							"titel": "Spuren",
-							"text": "Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller"
-						},
-						{
-							"jahr": "2024",
-							"titel": "Blut",
-							"text": "Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller"
-						},
-						{
-							"jahr": "2024",
-							"titel": "Bitte! Auto! Komm!",
-							"text": "Theaterhaus Jena. Bühne, Kostüm, Licht. Regie: Nanine Maria Kok"
-						},
-						{
-							"jahr": "2024",
-							"titel": "Die Entführung der Amygdala",
-							"text": "Theaterhaus Jena. Bühne und Kostüm. Regie: Babett Grube/Pina Bergemann"
-						},
-						{
-							"jahr": "2023",
-							"titel": "Die Hundekot-Attacke",
-							"text": "Theaterhaus Jena. Kostüm. Regie: Walter Bart (Wunderbaum). Eingeladen zum Berliner Theatertreffen 2024 und zum Heidelberger Stückemarkt 2024"
-						},
-						{
-							"jahr": "2023",
-							"titel": "Vom Dorf",
-							"text": "Theaterhaus Jena. Kostüm. Regie: Lizzy Timmers"
-						},
-						{
-							"jahr": "2023",
-							"titel": "On Repeat",
-							"text": "Theaterhaus Jena. Kostüm. Regie: Zarah Bracht"
-						},
-						{
-							"jahr": "2023",
-							"titel": "Knast",
-							"text": "Theaterhaus Jena. Kostüm. Regie: Leon Pfannenmüller"
-						},
-						{
-							"jahr": "2021",
-							"titel": "Alcin*a",
-							"text": "Ensemble Utopera, Berlin. Bühne. Regie: Teresa Reiber"
-						}
-					],
-					"ausstellungen": [
-						{
-							"jahr": "2026",
-							"titel": "Metamorphosen des Abfalls",
-							"text": "Boss Bitch Baby — Projektraum Galerie M, Berlin. Installation"
-						},
-						{
-							"jahr": "2025",
-							"titel": "All About that Waste",
-							"text": "48 Stunden Neukölln. Installation"
-						},
-						{
-							"jahr": "2023",
-							"titel": "ein Traumspiel",
-							"text": "Localize Potsdam / TU Berlin, fix-o-tec. Installation"
-						},
-						{
-							"jahr": "2022",
-							"titel": "parachute(s)",
-							"text": "signals 48 Stunden Neukölln, Berlin. partizipative Installation"
-						},
-						{
-							"jahr": "2022",
-							"titel": "Experimente. Weil wir* euch** feiern***",
-							"text": "Galerie Grolman, Berlin"
-						},
-						{
-							"jahr": "2021",
-							"titel": "QUO-Gallery II",
-							"text": "Rundgang UdK, Berlin. Installation"
-						},
-						{
-							"jahr": "2019",
-							"titel": "QUO-Gallery / QUO II",
-							"text": "48h Neukölln / Plattenvereinigung Tempelhofer Feld. Installation"
-						}
-					],
-					"auszeichnungen": [
-						{
-							"jahr": "2025",
-							"text": "Arbeits- und Recherchestipendium des Berliner Senats, Arbeitstitel „Transforming trash“"
-						},
-						{
-							"jahr": "2025",
-							"text": "Einladung zum Heidelberger Stückemarkt mit „Die Entführung der Amygdala“"
-						},
-						{
-							"jahr": "2024",
-							"text": "Einladung zum Berliner Theatertreffen mit „Die Hundekot-Attacke“"
-						},
-						{
-							"jahr": "2023",
-							"text": "Theaterpreis des Bundes in der Kategorie Stadt- und Landestheater für das Theaterhaus Jena"
-						},
-						{
-							"jahr": "2023",
-							"text": "Einladung zum „Heidelberger Stückemarkt“ mit „Die Hundekot-Attacke“"
+							"_type": "table",
+							"_key": "ll76",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "ll6i",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6j",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6k",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6l",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6h",
+													"text": "Arbeits- und Recherchestipendium des Berliner Senats, Arbeitstitel „Transforming trash“",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll6n",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6o",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6p",
+													"text": "2025",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6q",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6m",
+													"text": "Einladung zum Heidelberger Stückemarkt mit „Die Entführung der Amygdala“",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll6s",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6t",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6u",
+													"text": "2024",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll6v",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6r",
+													"text": "Einladung zum Berliner Theatertreffen mit „Die Hundekot-Attacke“",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll6x",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll6y",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6z",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll70",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll6w",
+													"text": "Theaterpreis des Bundes in der Kategorie Stadt- und Landestheater für das Theaterhaus Jena",
+													"marks": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "ll72",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "ll73",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll74",
+													"text": "2023",
+													"marks": []
+												}
+											]
+										},
+										{
+											"_type": "tableCell",
+											"_key": "ll75",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ll71",
+													"text": "Einladung zum „Heidelberger Stückemarkt“ mit „Die Hundekot-Attacke“",
+													"marks": []
+												}
+											]
+										}
+									]
+								}
+							]
 						}
 					]
 				}

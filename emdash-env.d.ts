@@ -36,27 +36,8 @@ export interface Seiten {
   title: string;
   bild?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   content?: PortableTextBlock[];
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  byline?: BylineSummary | null;
-  bylines?: ContentBylineCredit[];
-  terms?: Record<string, TaxonomyTerm[]>;
-}
-
-export interface Lebenslauf {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  einleitung?: string;
-  pdf?: { id: string; url?: string; src?: string; filename?: string; mimeType?: string; size?: number; provider?: string; meta?: Record<string, unknown> };
-  ausbildung?: { "jahr": string; "text": string }[];
-  werdegang?: { "jahr": string; "text": string }[];
-  skills?: { "titel": string; "text": string }[];
-  arbeiten?: { "jahr": string; "titel": string; "text"?: string | null }[];
-  ausstellungen?: { "jahr": string; "titel": string; "text"?: string | null }[];
-  auszeichnungen?: { "jahr": string; "text": string }[];
+  lebenslauf?: PortableTextBlock[];
+  lebenslauf_pdf?: { id: string; url?: string; src?: string; filename?: string; mimeType?: string; size?: number; provider?: string; meta?: Record<string, unknown> };
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -122,7 +103,6 @@ declare module "emdash" {
   interface EmDashCollections {
     projekte: Projekte;
     seiten: Seiten;
-    lebenslauf: Lebenslauf;
     buehne: Buehne;
   }
 }

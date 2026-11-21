@@ -12,16 +12,13 @@ export function Kopf({ hell = false }: { hell?: boolean }) {
         {KONTAKT.name}
       </Link>
       <nav>
-        {(pathname === '/lebenslauf' || pathname === '/about') && (
+        {pathname === '/about' && (
           <button onClick={zurueck} aria-label="Zurück" style={{ fontSize: 15, lineHeight: 1 }}>
             ←
           </button>
         )}
         <NavLink to="/about" className={({ isActive }) => (isActive ? 'aktiv' : '')}>
           About
-        </NavLink>
-        <NavLink to="/lebenslauf" className={({ isActive }) => (isActive ? 'aktiv' : '')}>
-          Lebenslauf
         </NavLink>
         <a href={KONTAKT.instagram} target="_blank" rel="noreferrer">
           insta <span aria-hidden="true">↗</span>
@@ -36,16 +33,19 @@ export function Fuss({
   projekt,
   hell = false,
   fallback,
+  rechts,
 }: {
   projekt?: Projekt | null
   hell?: boolean
   fallback?: [string, string, string]
+  // ersetzt den rechten Teil (Titel und Ort) — die Drehbühne stellt dort in der Projektansicht ihr Blättern hin
+  rechts?: string
 }) {
   return (
     <footer className={hell ? 'fuss hell' : 'fuss'}>
       <span>{projekt ? projekt.rolle : (fallback?.[0] ?? '')}</span>
       <span>{projekt ? projekt.jahr : (fallback?.[1] ?? '')}</span>
-      <span>{projekt ? `${projekt.titel}, ${projekt.ort}` : (fallback?.[2] ?? '')}</span>
+      <span>{rechts ?? (projekt ? `${projekt.titel}, ${projekt.ort}` : (fallback?.[2] ?? ''))}</span>
     </footer>
   )
 }

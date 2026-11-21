@@ -1,10 +1,12 @@
 ---
 import Seite from "../layouts/Seite.astro";
 import type { Daten, Projekt } from "../data/projects";
+import { kuerze, vorschauVon } from "../cms/vorschau";
+import { basisAdresse, PERSON_ID } from "../cms/adresse";
 
 // Die Drehbühne, mit oder ohne Projekt in der Adresse. Die Seite (src/pages/…)
-// sucht das Projekt heraus; hier entstehen Titel und Vorschau dazu — die
-// Darstellung selbst übernimmt die React-Insel.
+// sucht das Projekt heraus; hier entstehen Titel, Vorschau und der schlichte
+// Text für Suchmaschinen — die Darstellung selbst übernimmt die React-Insel.
 interface Props {
 	daten: Daten;
 	projekt?: Projekt;
@@ -12,23 +14,90 @@ interface Props {
 
 const { daten, projekt } = Astro.props;
 
-const kuerze = (text: string, max = 158) =>
-	text.length <= max ? text : `${text.slice(0, max - 1).replace(/\s+\S*$/, "")}…`;
-
 const wer = daten.kontakt.name;
 const untertitel = daten.kontakt.untertitel;
 const titel = projekt ? `${projekt.titel} (${projekt.jahr}) — ${wer}` : `${wer} — Bühne und Kostüm`;
+const angaben = (p: Projekt) => [p.rolle, p.jahr, p.ort].filter(Boolean).join(" · ");
 const beschreibung = projekt
-	? kuerze([[projekt.rolle, projekt.jahr, projekt.ort].filter(Boolean).join(" · "), projekt.blurb].filter(Boolean).join(". "))
+	? kuerze([angaben(projekt), projekt.blurb].filter(Boolean).join(". "))
 	: `${wer}${untertitel ? `, ${untertitel}` : ""}, Berlin. Räumliches Portfolio auf einer Drehbühne: ${daten.kategorien.map((k) => k.name).join(", ")}.`;
+
+// Projekt: sein Hauptfoto. Bühne: das Vorschaubild der Website (Seite.astro).
+const vorschau = projekt?.bilder[0] && vorschauVon(projekt.bilder[0], `${projekt.titel}, ${angaben(projekt)}`);
+
+const basis = await basisAdresse(Astro.url);
+
+// Ein Projekt als Werk (schema.org) mit Carolin als Mitwirkender.
+const werk = projekt && {
+	"@type": "CreativeWork",
+	name: projekt.titel,
+	description: projekt.blurb || undefined,
+	dateCreated: projekt.jahrNum ? String(projekt.jahrNum) : undefined,
+	locationCreated: projekt.ort ? { "@type": "Place", name: projekt.ort } : undefined,
+	contributor: { "@id": PERSON_ID(basis) },
+	image: projekt.bilder.slice(0, 5).map((b) => new URL(vorschauVon(b, "").src, `${basis}/`).href),
+};
+
+// Projekte je Kategorie für die Liste ohne JavaScript, in der Reihenfolge der Bühne.
+const gruppen = daten.kategorien
+	.map((k) => ({ name: k.name, projekte: daten.projekte.filter((p) => p.kategorie === k.id) }))
+	.filter((g) => g.projekte.length > 0);
 ---
 
 <Seite
 	daten={daten}
 	titel={titel}
 	beschreibung={beschreibung}
-	bild={projekt?.bilder[0]?.src}
-	art={projekt ? "article" : "website"}
+	vorschau={vorschau || undefined}
+	pfad={projekt ? undefined : "/"}
+	strukturiert={werk ? [werk] : []}
 	brauchtProjekte
 	eintragRef={projekt?.ref}
-/>
+>
+	{
+		projekt ? (
+			<article>
+				<h1>{projekt.titel}</h1>
+				<p>{angaben(projekt)}</p>
+				{projekt.blurb && <p>{projekt.blurb}</p>}
+				{projekt.credits.length > 0 && (
+					<ul>
+						{projekt.credits.map((c) => (
+							<li>{c}</li>
+						))}
+					</ul>
+				)}
+				{projekt.bilder.slice(0, 1).map((b) => (
+					<img src={b.src} width={b.w} height={b.h} alt={`${projekt.titel}, ${angaben(projekt)}`} loading="lazy" />
+				))}
+				<p>
+					<a href="/">{wer} — alle Arbeiten</a>
+				</p>
+			</article>
+		) : (
+			<>
+				<h1>{wer}</h1>
+				<p>{beschreibung}</p>
+			</>
+		)
+	}
+	<nav>
+		{
+			gruppen.map((g) => (
+				<section>
+					<h2>{g.name}</h2>
+					<ul>
+						{g.projekte.map((p) => (
+							<li>
+								<a href={`/drehbuehne/${p.slug}`}>{p.titel}</a> — {angaben(p)}
+							</li>
+						))}
+					</ul>
+				</section>
+			))
+		}
+		<p>
+			<a href="/about">About und Lebenslauf</a> · <a href={daten.kontakt.instagram}>Instagram</a>
+		</p>
+	</nav>
+</Seite>

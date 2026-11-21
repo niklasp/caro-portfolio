@@ -159,48 +159,27 @@
         },
         {
           "slug": "bild",
-          "label": "Bild",
+          "label": "Porträt (links neben der Kurzvorstellung)",
           "type": "image",
           "required": false,
           "unique": false
         },
         {
           "slug": "content",
-          "label": "Text",
+          "label": "Kurzvorstellung (rechts neben dem Porträt)",
           "type": "portableText",
           "required": false,
           "unique": false
-        }
-      ]
-    },
-    {
-      "slug": "lebenslauf",
-      "label": "Lebenslauf",
-      "labelSingular": "Lebenslauf",
-      "description": "Die Seite „Lebenslauf\". Es zählt der Eintrag „Lebenslauf\". Die Reihenfolge der Zeilen ist die Reihenfolge auf der Seite — Zeilen lassen sich am Griff verschieben.",
-      "supports": [
-        "drafts",
-        "revisions"
-      ],
-      "hidden": false,
-      "sortOrder": 3,
-      "fields": [
-        {
-          "slug": "title",
-          "label": "Titel",
-          "type": "string",
-          "required": true,
-          "unique": false
         },
         {
-          "slug": "einleitung",
-          "label": "Einleitung (eine Zeile pro Zeile auf der Seite)",
-          "type": "text",
+          "slug": "lebenslauf",
+          "label": "Lebenslauf (Tabellen: links das Jahr, rechts der Text; Tab in der letzten Zelle fügt eine Zeile an)",
+          "type": "portableText",
           "required": false,
           "unique": false
         },
         {
-          "slug": "pdf",
+          "slug": "lebenslauf_pdf",
           "label": "Lebenslauf als PDF zum Herunterladen",
           "type": "file",
           "required": false,
@@ -209,162 +188,6 @@
             "allowedMimeTypes": [
               "application/pdf"
             ]
-          }
-        },
-        {
-          "slug": "ausbildung",
-          "label": "Ausbildung",
-          "type": "repeater",
-          "required": false,
-          "unique": false,
-          "validation": {
-            "subFields": [
-              {
-                "slug": "jahr",
-                "type": "string",
-                "label": "Jahr (z. B. 2025 oder seit 2023)",
-                "required": true
-              },
-              {
-                "slug": "text",
-                "type": "text",
-                "label": "Text",
-                "required": true
-              }
-            ],
-            "maxItems": 40
-          }
-        },
-        {
-          "slug": "werdegang",
-          "label": "Beruflicher Werdegang",
-          "type": "repeater",
-          "required": false,
-          "unique": false,
-          "validation": {
-            "subFields": [
-              {
-                "slug": "jahr",
-                "type": "string",
-                "label": "Jahr (z. B. 2025 oder seit 2023)",
-                "required": true
-              },
-              {
-                "slug": "text",
-                "type": "text",
-                "label": "Text",
-                "required": true
-              }
-            ],
-            "maxItems": 60
-          }
-        },
-        {
-          "slug": "skills",
-          "label": "Skills",
-          "type": "repeater",
-          "required": false,
-          "unique": false,
-          "validation": {
-            "subFields": [
-              {
-                "slug": "titel",
-                "type": "string",
-                "label": "Überschrift (z. B. Software Skills)",
-                "required": true
-              },
-              {
-                "slug": "text",
-                "type": "text",
-                "label": "Text",
-                "required": true
-              }
-            ],
-            "maxItems": 12
-          }
-        },
-        {
-          "slug": "arbeiten",
-          "label": "Künstlerische Arbeiten: Bühne und Kostüm",
-          "type": "repeater",
-          "required": false,
-          "unique": false,
-          "validation": {
-            "subFields": [
-              {
-                "slug": "jahr",
-                "type": "string",
-                "label": "Jahr (z. B. 2025 oder seit 2023)",
-                "required": true
-              },
-              {
-                "slug": "titel",
-                "type": "string",
-                "label": "Titel",
-                "required": true
-              },
-              {
-                "slug": "text",
-                "type": "text",
-                "label": "Text",
-                "required": false
-              }
-            ],
-            "maxItems": 100
-          }
-        },
-        {
-          "slug": "ausstellungen",
-          "label": "Künstlerische Arbeiten: Ausstellungen",
-          "type": "repeater",
-          "required": false,
-          "unique": false,
-          "validation": {
-            "subFields": [
-              {
-                "slug": "jahr",
-                "type": "string",
-                "label": "Jahr (z. B. 2025 oder seit 2023)",
-                "required": true
-              },
-              {
-                "slug": "titel",
-                "type": "string",
-                "label": "Titel",
-                "required": true
-              },
-              {
-                "slug": "text",
-                "type": "text",
-                "label": "Text",
-                "required": false
-              }
-            ],
-            "maxItems": 100
-          }
-        },
-        {
-          "slug": "auszeichnungen",
-          "label": "Auszeichnungen",
-          "type": "repeater",
-          "required": false,
-          "unique": false,
-          "validation": {
-            "subFields": [
-              {
-                "slug": "jahr",
-                "type": "string",
-                "label": "Jahr (z. B. 2025 oder seit 2023)",
-                "required": true
-              },
-              {
-                "slug": "text",
-                "type": "text",
-                "label": "Text",
-                "required": true
-              }
-            ],
-            "maxItems": 60
           }
         }
       ]
@@ -855,5 +678,5 @@
       ]
     }
   ],
-  "version": "04244c74f3bdff6d"
+  "version": "425667149bf6d230"
 }

@@ -1,7 +1,7 @@
 import { getEmDashCollection, getEmDashEntry, getSiteSettings, getTaxonomyTerms } from 'emdash'
 import type { MediaValue, PortableTextBlock } from 'emdash'
-import type { Absatz, Bild, Daten, KategorieEintrag, LebenslaufDaten, LlZeile, Projekt, SeitenText, TextTeil } from '../data/projects'
-import type { Lebenslauf } from '../../emdash-env'
+import type { Absatz, Bild, Daten, KategorieEintrag, Projekt, TextTeil } from '../data/projects'
+import { lebenslaufAlsText, type AlterLebenslauf } from './lebenslaufText'
 import { KONTAKT_FEST } from '../data/kontakt'
 import {
   ANSICHTEN,
@@ -122,80 +122,86 @@ const MARKEN: Record<string, keyof TextTeil> = { strong: 'fett', em: 'kursiv', u
 // Nur Adressen, die ein Link sein dürfen: Web, Mail, Telefon, Seiten dieser Website.
 const LINK_ERLAUBT = /^(https?:\/\/|mailto:|tel:|\/(?!\/)|#)/i
 
-type Block = {
-  style?: string
-  listItem?: string
-  children?: { text?: string; marks?: string[] }[]
-  markDefs?: { _key?: string; _type?: string; href?: string; blank?: boolean }[]
+type Span = { text?: string; marks?: string[] }
+type MarkDef = { _key?: string; _type?: string; href?: string; blank?: boolean }
+type Block = { style?: string; listItem?: string; children?: Span[]; markDefs?: MarkDef[] }
+type Tabelle = { rows?: { cells?: { content?: Span[]; markDefs?: MarkDef[] }[] }[]; markDefs?: MarkDef[] }
+
+// Textstücke mit ihren Auszeichnungen. Links nur zu erlaubten Adressen; die Definitionen
+// stehen am Block — bei Tabellen an der Zelle oder an der ganzen Tabelle.
+function alsTeile(stuecke: Span[] | undefined, defs: MarkDef[]): TextTeil[] {
+  const links = new Map(defs.filter((m) => m._type === 'link' && m._key).map((m) => [m._key as string, m]))
+  const teile: TextTeil[] = []
+  for (const kind of stuecke ?? []) {
+    if (!kind.text) continue
+    const teil: TextTeil = { text: kind.text }
+    for (const marke of kind.marks ?? []) {
+      const schalter = MARKEN[marke]
+      if (schalter) (teil as unknown as Record<string, unknown>)[schalter] = true
+      const link = links.get(marke)
+      const adresse = link?.href?.trim() ?? ''
+      if (LINK_ERLAUBT.test(adresse)) {
+        teil.link = adresse
+        if (link?.blank || /^https?:/i.test(adresse)) teil.neuesFenster = true
+      }
+    }
+    teile.push(teil)
+  }
+  return teile
 }
 
-// Der Fließtext einer Seite: Überschriften, Absätze, Zitate und Listen, mit fett, kursiv und Links.
+// Rich Text aus dem Editor: Überschriften, Absätze, Zitate, Listen und Tabellen, mit fett, kursiv und Links.
 // Andere Blöcke des Editors (Bilder, Einbettungen) zeigt die Seite nicht.
-function alsSeite(titel: string, bloecke: PortableTextBlock[] | undefined, bild: unknown): SeitenText {
+function alsText(bloecke: PortableTextBlock[] | undefined): Absatz[] {
   const absaetze: Absatz[] = []
   for (const roh of bloecke ?? []) {
+    if (roh._type === 'table') {
+      const tabelle = roh as unknown as Tabelle
+      const zeilen = (tabelle.rows ?? [])
+        .map((r) => (r.cells ?? []).map((c) => alsTeile(c.content, [...(c.markDefs ?? []), ...(tabelle.markDefs ?? [])])))
+        .filter((zellen) => zellen.some((teile) => teile.some((t) => t.text.trim())))
+      if (zeilen.length) absaetze.push({ art: 'tabelle', text: '', teile: [], zeilen })
+      continue
+    }
     if (roh._type !== 'block') continue
     const block = roh as Block
-    const links = new Map((block.markDefs ?? []).filter((m) => m._type === 'link' && m._key).map((m) => [m._key as string, m]))
-    const teile: TextTeil[] = []
-    for (const kind of block.children ?? []) {
-      if (!kind.text) continue
-      const teil: TextTeil = { text: kind.text }
-      for (const marke of kind.marks ?? []) {
-        const schalter = MARKEN[marke]
-        if (schalter) (teil as unknown as Record<string, unknown>)[schalter] = true
-        const link = links.get(marke)
-        const adresse = link?.href?.trim() ?? ''
-        if (LINK_ERLAUBT.test(adresse)) {
-          teil.link = adresse
-          if (link?.blank || /^https?:/i.test(adresse)) teil.neuesFenster = true
-        }
-      }
-      teile.push(teil)
-    }
+    const teile = alsTeile(block.children, block.markDefs ?? [])
     const inhalt = teile.map((t) => t.text).join('').trim()
     if (!inhalt) continue
     const stil = String(block.style ?? 'normal')
-    const art: Absatz['art'] =
-      block.listItem === 'number' ? 'nummer' : block.listItem ? 'punkt' : /^h[1-6]$/.test(stil) ? 'h' : stil === 'blockquote' ? 'zitat' : 'p'
-    absaetze.push({ art, text: inhalt, teile })
+    const ueberschrift = /^h([1-6])$/.exec(stil)
+    if (block.listItem) absaetze.push({ art: block.listItem === 'number' ? 'nummer' : 'punkt', text: inhalt, teile })
+    else if (ueberschrift) absaetze.push({ art: 'h', stufe: Number(ueberschrift[1]) <= 2 ? 2 : 3, text: inhalt, teile })
+    else absaetze.push({ art: stil === 'blockquote' ? 'zitat' : 'p', text: inhalt, teile })
   }
-  return { titel, bild: alsBild(bild), absaetze }
+  return absaetze
 }
 
 // Die PDF, die schon vor dem CMS da war — sie gilt, solange im Admin keine hochgeladen ist.
 const PDF_FEST = '/lebenslauf-carolin-pflueger.pdf'
+const pdfAdresse = (datei: { url?: string } | null | undefined) =>
+  (datei && (datei.url || bildAdresse(datei as MediaValue))) || PDF_FEST
 
-const llZeilen = (liste: { jahr?: string | null; titel?: string | null; text?: string | null }[] | undefined): LlZeile[] =>
-  (liste ?? [])
-    .map((z) => ({ jahr: text(z?.jahr), ...(text(z?.titel) ? { titel: text(z?.titel) } : {}), text: text(z?.text) }))
-    .filter((z) => z.jahr || z.titel || z.text)
-
-function alsLebenslauf(d: Lebenslauf): LebenslaufDaten {
-  return {
-    titel: text(d.title) || 'Lebenslauf',
-    einleitung: text(d.einleitung)
-      .split('\n')
-      .map((z) => z.trim())
-      .filter(Boolean),
-    pdf: (d.pdf && (d.pdf.url || bildAdresse(d.pdf))) || PDF_FEST,
-    ausbildung: llZeilen(d.ausbildung),
-    werdegang: llZeilen(d.werdegang),
-    skills: (d.skills ?? []).map((z) => ({ titel: text(z?.titel), text: text(z?.text) })).filter((z) => z.titel || z.text),
-    arbeiten: llZeilen(d.arbeiten),
-    ausstellungen: llZeilen(d.ausstellungen),
-    auszeichnungen: llZeilen(d.auszeichnungen),
+// Übergang: Bis der Lebenslauf live ins Feld `lebenslauf` von About umgezogen ist
+// (~/code/caro-sicherung/lebenslauf-umziehen.mjs), kommt er aus der alten Sammlung „Lebenslauf".
+// Gibt es die Sammlung nicht mehr, bleibt es beim leeren Feld.
+async function alterLebenslauf(): Promise<{ daten: AlterLebenslauf; pdf?: { url?: string } } | null> {
+  try {
+    const { entry } = await getEmDashEntry('lebenslauf' as never, 'lebenslauf')
+    const daten = (entry as { data?: AlterLebenslauf & { pdf?: { url?: string } } } | null)?.data
+    return daten ? { daten, pdf: daten.pdf } : null
+  } catch {
+    return null
   }
 }
 
 export async function ladeDaten(angemeldet: boolean): Promise<Daten> {
-  const [projekte, begriffe, einstellungen, buehne, about, lebenslauf] = await Promise.all([
+  const [projekte, begriffe, einstellungen, buehne, about] = await Promise.all([
     getEmDashCollection('projekte', { limit: 500 }),
     getTaxonomyTerms('category'),
     getSiteSettings(),
     getEmDashEntry('buehne', 'drehbuehne'),
     getEmDashEntry('seiten', 'about'),
-    getEmDashEntry('lebenslauf', 'lebenslauf'),
   ])
 
   const alleKategorien: KategorieEintrag[] = begriffe.map((b) => ({ id: b.slug, name: b.label }))
@@ -255,7 +261,17 @@ export async function ladeDaten(angemeldet: boolean): Promise<Daten> {
   // Nur Kategorien mit Projekten bekommen eine Seite der Bühne.
   const kategorien = alleKategorien.filter((k) => liste.some((p) => p.kategorie === k.id))
 
+  // About: Porträt und Kurzvorstellung, darunter der Lebenslauf (beides Rich Text im selben Eintrag).
   const aboutDaten = about.entry?.data
+  let lebenslauf = alsText(aboutDaten?.lebenslauf)
+  let pdf = pdfAdresse(aboutDaten?.lebenslauf_pdf)
+  if (lebenslauf.length === 0) {
+    const alt = await alterLebenslauf()
+    if (alt) {
+      lebenslauf = alsText(lebenslaufAlsText(alt.daten, liste.map((p) => ({ titel: p.titel, slug: p.slug }))) as PortableTextBlock[])
+      if (!aboutDaten?.lebenslauf_pdf) pdf = pdfAdresse(alt.pdf)
+    }
+  }
 
   return {
     kategorien,
@@ -267,9 +283,13 @@ export async function ladeDaten(angemeldet: boolean): Promise<Daten> {
     },
     buehne: alsBuehne(buehne.entry?.data),
     angemeldet,
-    about: aboutDaten
-      ? { ...alsSeite(aboutDaten.title?.trim() || 'About', aboutDaten.content, aboutDaten.bild), ...marke(about.entry) }
-      : null,
-    lebenslauf: lebenslauf.entry ? { ...alsLebenslauf(lebenslauf.entry.data), ...marke(lebenslauf.entry) } : null,
+    about: {
+      titel: aboutDaten?.title?.trim() || 'About',
+      bild: alsBild(aboutDaten?.bild),
+      absaetze: alsText(aboutDaten?.content),
+      lebenslauf,
+      pdf,
+      ...marke(about.entry),
+    },
   }
 }

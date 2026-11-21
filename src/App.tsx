@@ -1,5 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
-import Lebenslauf from './ansichten/Lebenslauf'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import About from './ansichten/About'
 import Drehbuehne from './ideas/Drehbuehne'
 
@@ -10,7 +9,8 @@ export default function App() {
     <div className="app">
       <Routes>
         <Route path="/drehbuehne?/:projekt?" element={<Drehbuehne />} />
-        <Route path="/lebenslauf" element={<Lebenslauf />} />
+        {/* Der Lebenslauf steht jetzt auf About. */}
+        <Route path="/lebenslauf" element={<Navigate to={{ pathname: '/about', hash: '#lebenslauf' }} replace />} />
         <Route path="/about" element={<About />} />
       </Routes>
     </div>

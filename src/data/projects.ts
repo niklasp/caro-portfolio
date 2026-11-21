@@ -64,39 +64,25 @@ export interface TextTeil {
   neuesFenster?: true
 }
 
-// Ein Absatz der Seite: Überschrift, Absatz, Zitat oder Listenpunkt. `text` ist der Inhalt ohne Auszeichnung.
+// Ein Absatz aus dem Rich Text: Überschrift, Absatz, Zitat, Listenpunkt oder Tabelle.
+// `text` ist der Inhalt ohne Auszeichnung (leer bei Tabellen).
 export interface Absatz {
-  art: 'h' | 'p' | 'zitat' | 'punkt' | 'nummer'
+  art: 'h' | 'p' | 'zitat' | 'punkt' | 'nummer' | 'tabelle'
+  // Überschrift: 2 = Abschnitt mit Linie darunter (H1, H2 im Editor), 3 = klein und kursiv (H3 bis H6)
+  stufe?: 2 | 3
   text: string
   teile: TextTeil[]
+  // Tabelle: Zeilen → Zellen → Textstücke
+  zeilen?: TextTeil[][][]
 }
 
-export interface SeitenText {
+// Die Seite About (Seiten → about): Porträt und Kurzvorstellung, darunter der Lebenslauf.
+export interface AboutSeite {
   titel: string
   bild?: Bild
   absaetze: Absatz[]
-  ref?: string
-}
-
-// Eine Zeile im Lebenslauf: Jahr und Text, bei künstlerischen Arbeiten mit Titel.
-export interface LlZeile {
-  jahr: string
-  titel?: string
-  text: string
-}
-
-// Der Lebenslauf aus dem CMS (Sammlung „Lebenslauf", Eintrag `lebenslauf`).
-// Die Reihenfolge der Zeilen ist die im Admin.
-export interface LebenslaufDaten {
-  titel: string
-  einleitung: string[]
+  lebenslauf: Absatz[]
   pdf: string
-  ausbildung: LlZeile[]
-  werdegang: LlZeile[]
-  skills: { titel: string; text: string }[]
-  arbeiten: LlZeile[]
-  ausstellungen: LlZeile[]
-  auszeichnungen: LlZeile[]
   ref?: string
 }
 
@@ -107,8 +93,7 @@ export interface Daten {
   projekte: Projekt[]
   kontakt: Kontakt
   buehne: Partial<DrehConfig>
-  about: SeitenText | null
-  lebenslauf: LebenslaufDaten | null
+  about: AboutSeite
   // Im Admin angemeldet: nur dann erscheint das Stellwerk auf der Bühne.
   angemeldet: boolean
 }
@@ -123,8 +108,7 @@ export const KATEGORIEN: KategorieEintrag[] = DATEN.kategorien
 export const PROJEKTE: Projekt[] = DATEN.projekte
 export const KONTAKT: Kontakt = DATEN.kontakt
 export const BUEHNE: Partial<DrehConfig> = DATEN.buehne
-export const LEBENSLAUF: LebenslaufDaten | null = DATEN.lebenslauf
-export const ABOUT: SeitenText | null = DATEN.about
+export const ABOUT: AboutSeite = DATEN.about
 export const ANGEMELDET: boolean = DATEN.angemeldet
 
 export const permalink = (p: Projekt): string => p.slug

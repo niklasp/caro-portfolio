@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { ABOUT, LEBENSLAUF, PROJEKTE } from './projects'
+import { ABOUT, PROJEKTE } from './projects'
 
 // EmDashs Bearbeitungsmodus: der Schalter in der Leiste unten, die Angemeldete auf der Seite
 // sehen. Die Leiste macht anklickbar, was das Attribut `data-emdash-ref` trägt — einzeilige
@@ -48,7 +48,7 @@ export function zeigtAuf(ref: string | undefined) {
   link.style.display = ''
 }
 
-const AN = Boolean(ABOUT?.ref || LEBENSLAUF?.ref || PROJEKTE.some((p) => p.ref))
+const AN = Boolean(ABOUT.ref || PROJEKTE.some((p) => p.ref))
 
 // Wird gerade in einem Feld getippt? Dann gehören Pfeiltasten und Esc dem Feld, nicht der
 // Bühne. Die Leiste beendet das Bearbeiten bei Esc selbst, bevor die Taste bei den Seiten
@@ -61,7 +61,6 @@ export const tipptImFeld = (): boolean => imFeld
 const TEXTE: Record<string, Record<string, string>> = {
   projekte: { title: 'titel', rolle: 'rolle', jahr: 'jahr', ort: 'ort', beschreibung: 'blurb' },
   seiten: { title: 'titel' },
-  lebenslauf: { title: 'titel' },
 }
 
 let stand = 0
@@ -82,7 +81,7 @@ if (AN) {
     const r = lies(el?.getAttribute?.('data-emdash-ref') ?? '')
     const schluessel = r?.field && TEXTE[r.collection]?.[r.field]
     if (!el || !r || !schluessel) return
-    const eintrag = [...PROJEKTE, ABOUT, LEBENSLAUF].find((e) => e?.ref && lies(e.ref)?.id === r.id) as
+    const eintrag = [...PROJEKTE, ABOUT].find((e) => e?.ref && lies(e.ref)?.id === r.id) as
       | Record<string, unknown>
       | undefined
     const neu = el.innerText.trim()

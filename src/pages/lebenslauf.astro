@@ -1,13 +1,4 @@
 ---
-import Seite from "../layouts/Seite.astro";
-import { ladeDaten } from "../cms/daten";
-
-const daten = await ladeDaten(Boolean(Astro.locals.user));
+// Der Lebenslauf steht jetzt auf der Seite About. Alte Links und Lesezeichen landen dort.
+return Astro.redirect("/about#lebenslauf", 301);
 ---
-
-<Seite
-	daten={daten}
-	titel={`Lebenslauf — ${daten.kontakt.name}`}
-	beschreibung={`Lebenslauf von ${daten.kontakt.name}: Bühnen- und Kostümbildnerin, Kunstvermittlerin. Ausbildung, Werdegang, künstlerische Arbeiten, Auszeichnungen.`}
-	eintragRef={daten.lebenslauf?.ref}
-/>

@@ -1,15 +1,45 @@
 ---
 import Seite from "../layouts/Seite.astro";
 import { ladeDaten } from "../cms/daten";
+import { kuerze, vorschauVon } from "../cms/vorschau";
+import { basisAdresse, PERSON_ID } from "../cms/adresse";
+import type { Absatz } from "../data/projects";
 
 const daten = await ladeDaten(Boolean(Astro.locals.user));
-const erster = daten.about?.absaetze.find((a) => a.art === "p")?.text;
+const { about, kontakt } = daten;
+// Die Kurzvorstellung als Beschreibung — alle Absätze, denn der erste ist oft nur eine Zeile („Carolin Pflüger (sie/ihr)").
+const intro = about.absaetze.filter((a) => a.art === "p").map((a) => a.text).join(" ");
+const basis = await basisAdresse(Astro.url);
+
+// Rich Text als schlichter Text für Suchmaschinen; Tabellenzeilen als „Jahr  Text".
+const zeilenText = (a: Absatz) => (a.zeilen ?? []).map((zellen) => zellen.map((teile) => teile.map((t) => t.text).join("")).join("  "));
 ---
 
 <Seite
 	daten={daten}
-	titel={`${daten.about?.titel ?? "About"} — ${daten.kontakt.name}`}
-	beschreibung={erster ?? `Über ${daten.kontakt.name}: Bühnen- und Kostümbildnerin, Kunstvermittlerin in Berlin.`}
-	bild={daten.about?.bild?.src}
-	eintragRef={daten.about?.ref}
-/>
+	titel={`${about.titel} — ${kontakt.name}`}
+	beschreibung={intro.trim() ? kuerze(intro) : `Über ${kontakt.name}: Bühnen- und Kostümbildnerin, Kunstvermittlerin in Berlin. Lebenslauf, Ausbildung, künstlerische Arbeiten.`}
+	vorschau={about.bild && vorschauVon(about.bild, kontakt.name)}
+	strukturiert={[{ "@type": "ProfilePage", url: `${basis}/about`, mainEntity: { "@id": PERSON_ID(basis) } }]}
+	eintragRef={about.ref}
+>
+	<h1>{about.titel}</h1>
+	{
+		[...about.absaetze, ...about.lebenslauf].map((a) =>
+			a.art === "tabelle" ? (
+				<ul>
+					{zeilenText(a).map((z) => (
+						<li>{z}</li>
+					))}
+				</ul>
+			) : a.art === "h" ? (
+				<h2>{a.text}</h2>
+			) : (
+				<p>{a.text}</p>
+			),
+		)
+	}
+	<p>
+		<a href="/">{kontakt.name} — alle Arbeiten</a> · <a href={about.pdf}>Lebenslauf als PDF</a>
+	</p>
+</Seite>
