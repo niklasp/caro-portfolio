@@ -599,8 +599,16 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
   display: flex;
   gap: 16px;
   font-size: 20px;
-  margin-bottom: 10px;
+  margin-top: 10px;
   pointer-events: auto;
+}
+/* Auf der Bühne stehen die Pfeile unten links in der Ecke — so weit vom unteren Rand wie der Name
+   oben links vom oberen. In der Projektansicht bleiben sie direkt unter dem Titel: dort steht unten die Fußzeile. */
+.db:not(.detail) .sb-titel .db-pfeile {
+  position: fixed;
+  left: 24px;
+  bottom: 13px; /* gemessen: Unterkante der Pfeile 22 px vom Rand, wie die Oberkante des Namens */
+  margin: 0;
 }
 .db-pfeile button:hover { transform: translateY(-1px); }
 .db-beschreibung .db-titel {
@@ -650,7 +658,7 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 /* Kategorien — die drei Seiten der Münze */
 .db-kategorien {
   position: fixed;
-  top: 18px;
+  top: 19px; /* 12 px Schrift neben 13 px in der Kopfzeile: 1 px tiefer, dann stehen alle auf einer Grundlinie */
   left: 50%;
   transform: translateX(-50%);
   z-index: 35;
@@ -671,7 +679,7 @@ body.boden-dunkel .licht-wahl { color: rgba(255, 255, 255, 0.7); }
 .db-zurueck {
   position: fixed;
   left: 50%;
-  top: 18px;
+  top: 19px; /* wie .db-kategorien: auf der Grundlinie von Name und Navigation */
   transform: translateX(-50%);
   white-space: nowrap;
   z-index: 35;

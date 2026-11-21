@@ -1726,6 +1726,11 @@ export default function Drehbuehne() {
         ← zurück zur Bühne
       </button>
       <div className="sb-titel">
+        <h2 {...feld(p.ref, 'title')}>{p.titel}</h2>
+        <div className="sb-meta db-zaehler">
+          {KATEGORIEN[kat].name} · {String(aktiv + 1).padStart(2, '0')} / {String(projekte.length).padStart(2, '0')}
+        </div>
+        {/* Die Pfeile stehen unter dem Titel — auf der Bühne ganz unten links (styles.css). */}
         <div className="db-pfeile">
           <button onClick={() => dreheUm(-1)} aria-label="Vorheriges Projekt">
             ←
@@ -1736,10 +1741,6 @@ export default function Drehbuehne() {
           <button className="db-wenden" onClick={() => wendeZu(seite + 1)} aria-label="Bühne wenden" title="Bühne wenden">
             ↻
           </button>
-        </div>
-        <h2 {...feld(p.ref, 'title')}>{p.titel}</h2>
-        <div className="sb-meta db-zaehler">
-          {KATEGORIEN[kat].name} · {String(aktiv + 1).padStart(2, '0')} / {String(projekte.length).padStart(2, '0')}
         </div>
       </div>
 

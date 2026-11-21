@@ -1,0 +1,859 @@
+{
+  "collections": [
+    {
+      "slug": "projekte",
+      "label": "Projekte",
+      "labelSingular": "Projekt",
+      "description": "Jedes Projekt steht mit seinen Fotos auf der Drehbühne. Die Kategorie (rechts im Editor) bestimmt die Seite der Bühne, „Reihenfolge\" den Platz darauf.",
+      "icon": "briefcase",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "hidden": false,
+      "sortOrder": 1,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Titel",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "rolle",
+          "label": "Rolle (z. B. Bühne und Kostüm)",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "jahr",
+          "label": "Jahr (z. B. 2025 oder seit 2021)",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "ort",
+          "label": "Ort / Haus",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "farbe",
+          "label": "Farbe",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "defaultValue": "Blau",
+          "validation": {
+            "options": [
+              "Blau",
+              "Orange",
+              "Magenta",
+              "Pink"
+            ]
+          }
+        },
+        {
+          "slug": "position",
+          "label": "Reihenfolge auf der Bühne (kleine Zahl = weiter vorn, leer = ganz vorn)",
+          "type": "integer",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "beschreibung",
+          "label": "Beschreibung",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "credits",
+          "label": "Credits (eine Zeile pro Eintrag)",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "bilder",
+          "label": "Fotos",
+          "type": "repeater",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "maxItems": 40,
+            "subFields": [
+              {
+                "slug": "bild",
+                "label": "Foto",
+                "type": "image",
+                "required": true
+              }
+            ]
+          }
+        },
+        {
+          "slug": "links",
+          "label": "Links",
+          "type": "repeater",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "maxItems": 8,
+            "subFields": [
+              {
+                "slug": "label",
+                "label": "Beschriftung",
+                "type": "string",
+                "required": true
+              },
+              {
+                "slug": "url",
+                "label": "Adresse",
+                "type": "url",
+                "required": true
+              }
+            ]
+          }
+        },
+        {
+          "slug": "video",
+          "label": "Video (Vimeo-Player-Adresse)",
+          "type": "url",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "video_datei",
+          "label": "Video-Datei für die Leinwand (Pfad oder Adresse einer mp4)",
+          "type": "string",
+          "required": false,
+          "unique": false
+        }
+      ]
+    },
+    {
+      "slug": "seiten",
+      "label": "Seiten",
+      "labelSingular": "Seite",
+      "description": "Texte für About und weitere Seiten.",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "hidden": false,
+      "sortOrder": 2,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Titel",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "bild",
+          "label": "Bild",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "content",
+          "label": "Text",
+          "type": "portableText",
+          "required": false,
+          "unique": false
+        }
+      ]
+    },
+    {
+      "slug": "lebenslauf",
+      "label": "Lebenslauf",
+      "labelSingular": "Lebenslauf",
+      "description": "Die Seite „Lebenslauf\". Es zählt der Eintrag „Lebenslauf\". Die Reihenfolge der Zeilen ist die Reihenfolge auf der Seite — Zeilen lassen sich am Griff verschieben.",
+      "supports": [
+        "drafts",
+        "revisions"
+      ],
+      "hidden": false,
+      "sortOrder": 3,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Titel",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "einleitung",
+          "label": "Einleitung (eine Zeile pro Zeile auf der Seite)",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "pdf",
+          "label": "Lebenslauf als PDF zum Herunterladen",
+          "type": "file",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "allowedMimeTypes": [
+              "application/pdf"
+            ]
+          }
+        },
+        {
+          "slug": "ausbildung",
+          "label": "Ausbildung",
+          "type": "repeater",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "subFields": [
+              {
+                "slug": "jahr",
+                "type": "string",
+                "label": "Jahr (z. B. 2025 oder seit 2023)",
+                "required": true
+              },
+              {
+                "slug": "text",
+                "type": "text",
+                "label": "Text",
+                "required": true
+              }
+            ],
+            "maxItems": 40
+          }
+        },
+        {
+          "slug": "werdegang",
+          "label": "Beruflicher Werdegang",
+          "type": "repeater",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "subFields": [
+              {
+                "slug": "jahr",
+                "type": "string",
+                "label": "Jahr (z. B. 2025 oder seit 2023)",
+                "required": true
+              },
+              {
+                "slug": "text",
+                "type": "text",
+                "label": "Text",
+                "required": true
+              }
+            ],
+            "maxItems": 60
+          }
+        },
+        {
+          "slug": "skills",
+          "label": "Skills",
+          "type": "repeater",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "subFields": [
+              {
+                "slug": "titel",
+                "type": "string",
+                "label": "Überschrift (z. B. Software Skills)",
+                "required": true
+              },
+              {
+                "slug": "text",
+                "type": "text",
+                "label": "Text",
+                "required": true
+              }
+            ],
+            "maxItems": 12
+          }
+        },
+        {
+          "slug": "arbeiten",
+          "label": "Künstlerische Arbeiten: Bühne und Kostüm",
+          "type": "repeater",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "subFields": [
+              {
+                "slug": "jahr",
+                "type": "string",
+                "label": "Jahr (z. B. 2025 oder seit 2023)",
+                "required": true
+              },
+              {
+                "slug": "titel",
+                "type": "string",
+                "label": "Titel",
+                "required": true
+              },
+              {
+                "slug": "text",
+                "type": "text",
+                "label": "Text",
+                "required": false
+              }
+            ],
+            "maxItems": 100
+          }
+        },
+        {
+          "slug": "ausstellungen",
+          "label": "Künstlerische Arbeiten: Ausstellungen",
+          "type": "repeater",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "subFields": [
+              {
+                "slug": "jahr",
+                "type": "string",
+                "label": "Jahr (z. B. 2025 oder seit 2023)",
+                "required": true
+              },
+              {
+                "slug": "titel",
+                "type": "string",
+                "label": "Titel",
+                "required": true
+              },
+              {
+                "slug": "text",
+                "type": "text",
+                "label": "Text",
+                "required": false
+              }
+            ],
+            "maxItems": 100
+          }
+        },
+        {
+          "slug": "auszeichnungen",
+          "label": "Auszeichnungen",
+          "type": "repeater",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "subFields": [
+              {
+                "slug": "jahr",
+                "type": "string",
+                "label": "Jahr (z. B. 2025 oder seit 2023)",
+                "required": true
+              },
+              {
+                "slug": "text",
+                "type": "text",
+                "label": "Text",
+                "required": true
+              }
+            ],
+            "maxItems": 60
+          }
+        }
+      ]
+    },
+    {
+      "slug": "buehne",
+      "label": "Bühne",
+      "labelSingular": "Bühne",
+      "description": "Das Stellwerk für alle: Farben, Leinwand, Licht, Kulissen und Laufschrift der Drehbühne. Es zählt der Eintrag „Drehbühne\".",
+      "supports": [],
+      "hidden": false,
+      "sortOrder": 4,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Name",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "ansicht",
+          "label": "Projektansicht: Aufbau",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "options": [
+              "Große Bilder untereinander, Text haftet seitlich",
+              "Jedes Bild in voller Spaltenbreite, Text haftet seitlich",
+              "Bildraster neben dem Text (ohne Scrollen)",
+              "Bildraster in voller Breite, Text darunter"
+            ]
+          }
+        },
+        {
+          "slug": "leinwand",
+          "label": "Leinwand: Art",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "options": [
+              "Rundhorizont",
+              "Vollbild (ganze Seite)",
+              "Oberer Bildschirmteil",
+              "Rundum-Panorama",
+              "Bodenprojektion",
+              "Schwebende Leinwand",
+              "Keine Leinwand"
+            ]
+          }
+        },
+        {
+          "slug": "leinwand_motiv",
+          "label": "Leinwand: Bild",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "options": [
+              "Projektmotiv (wechselt)",
+              "Matratze im Grün",
+              "Containerhof mit Kränen",
+              "Container in Reihe"
+            ]
+          }
+        },
+        {
+          "slug": "leinwand_bild",
+          "label": "Leinwand: eigenes Bild (überstimmt die Auswahl darüber)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "leinwand_kategorien",
+          "label": "Leinwand: eigenes Bild je Kategorie (überstimmt beides darüber)",
+          "type": "repeater",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "subFields": [
+              {
+                "slug": "kategorie",
+                "type": "string",
+                "label": "Kategorie (Name wie unter „Kategorien“)",
+                "required": true
+              },
+              {
+                "slug": "bild",
+                "type": "image",
+                "label": "Bild",
+                "required": true
+              }
+            ],
+            "maxItems": 12
+          }
+        },
+        {
+          "slug": "leinwand_passung",
+          "label": "Leinwand: Motiv",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "options": [
+              "Ausschnitt, Maus führt",
+              "Ausschnitt, fest",
+              "Ganzes Bild",
+              "Ganzes Bild, Rand gefüllt",
+              "Gekachelt, gespiegelt",
+              "Gekachelt, gerade"
+            ]
+          }
+        },
+        {
+          "slug": "leinwand_reihen",
+          "label": "Leinwand: Kachel-Reihen",
+          "type": "integer",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 1,
+            "max": 4
+          }
+        },
+        {
+          "slug": "leinwand_hell",
+          "label": "Leinwand: Helligkeit",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0.2,
+            "max": 3
+          }
+        },
+        {
+          "slug": "grund_art",
+          "label": "Hintergrund: Art",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "options": [
+              "Farbe",
+              "Farbverlauf",
+              "Bild"
+            ]
+          }
+        },
+        {
+          "slug": "grund",
+          "label": "Hintergrund: Farbe (#rrggbb)",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          }
+        },
+        {
+          "slug": "grund2",
+          "label": "Hintergrund: zweite Farbe für den Farbverlauf (#rrggbb)",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          }
+        },
+        {
+          "slug": "grund_richtung",
+          "label": "Hintergrund: Richtung des Farbverlaufs",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "options": [
+              "Von oben nach unten",
+              "Von links nach rechts",
+              "Diagonal",
+              "Aus der Mitte"
+            ]
+          }
+        },
+        {
+          "slug": "grund_bild",
+          "label": "Hintergrund: Bild (für die Art „Bild“)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "text",
+          "label": "Farbe: Text (#rrggbb)",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          }
+        },
+        {
+          "slug": "scheibe",
+          "label": "Farbe: Scheibe (#rrggbb)",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          }
+        },
+        {
+          "slug": "licht",
+          "label": "Licht: Stimmung",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "options": [
+              "Verfolger (Maus)",
+              "Fokus aufs Hauptprojekt",
+              "Arbeitslicht",
+              "Gegenlicht",
+              "Farbwechsler (drei Farben)",
+              "Suchscheinwerfer"
+            ]
+          }
+        },
+        {
+          "slug": "licht_staerke",
+          "label": "Licht: Stärke",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0.2,
+            "max": 2.5
+          }
+        },
+        {
+          "slug": "schatten",
+          "label": "Licht: Schatten",
+          "type": "boolean",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "obj_aufstellung",
+          "label": "Kulissen: Aufstellung",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "options": [
+              "Frei gestellt",
+              "Hauptbild hinten, zwei kleine davor",
+              "Nebeneinander",
+              "Fächer",
+              "Treppe nach vorn"
+            ]
+          }
+        },
+        {
+          "slug": "obj_anzahl",
+          "label": "Kulissen: Fotos pro Projekt auf der Scheibe",
+          "type": "integer",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        {
+          "slug": "obj_groesse",
+          "label": "Kulissen: Größe",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0.4,
+            "max": 2.2
+          }
+        },
+        {
+          "slug": "obj_dicke",
+          "label": "Kulissen: Dicke der Blöcke",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0.02,
+            "max": 3
+          }
+        },
+        {
+          "slug": "obj_radius",
+          "label": "Kulissen: Abstand zur Mitte",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 4,
+            "max": 12.6
+          }
+        },
+        {
+          "slug": "obj_streuung",
+          "label": "Kulissen: Streuung",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0,
+            "max": 3
+          }
+        },
+        {
+          "slug": "obj_verdrehung",
+          "label": "Kulissen: Verdrehung",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0,
+            "max": 8
+          }
+        },
+        {
+          "slug": "obj_neigung",
+          "label": "Kulissen: Neigung nach hinten",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": -0.6,
+            "max": 0.6
+          }
+        },
+        {
+          "slug": "obj_schweben",
+          "label": "Kulissen: Schweben",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0,
+            "max": 5
+          }
+        },
+        {
+          "slug": "obj_atmen",
+          "label": "Kulissen: Atmen (auf und ab)",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "slug": "obj_zur_kamera",
+          "label": "Kulissen: Blick zum Publikum",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "slug": "obj_schwung",
+          "label": "Kulissen: Schwung beim Drehen",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0,
+            "max": 1.5
+          }
+        },
+        {
+          "slug": "obj_stapel",
+          "label": "Kulissen: Stapeln zum Turm",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "slug": "obj_rueckseite",
+          "label": "Kulissen: Rückseiten in Projektfarbe",
+          "type": "boolean",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "laufschrift",
+          "label": "Laufschrift: an",
+          "type": "boolean",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "lauf_schrift",
+          "label": "Laufschrift: Schrift",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "options": [
+              "Punktschrift 5×7",
+              "Kursiv",
+              "Gesperrt",
+              "Breit (jede zweite Diode)"
+            ]
+          }
+        },
+        {
+          "slug": "lauf_farbe",
+          "label": "Laufschrift: Farbe (#rrggbb)",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          }
+        },
+        {
+          "slug": "lauf_text",
+          "label": "Laufschrift: Text (leer = Name der Kategorie)",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "lauf_tempo",
+          "label": "Laufschrift: Tempo",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0,
+            "max": 60
+          }
+        },
+        {
+          "slug": "lauf_zeilen",
+          "label": "Laufschrift: Dioden-Zeilen",
+          "type": "integer",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 7,
+            "max": 21
+          }
+        },
+        {
+          "slug": "wende_tempo",
+          "label": "Bewegung: Wenden",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 1,
+            "max": 8
+          }
+        },
+        {
+          "slug": "zoom_dauer",
+          "label": "Bewegung: ins Projekt (Sekunden)",
+          "type": "number",
+          "required": false,
+          "unique": false,
+          "validation": {
+            "min": 0.3,
+            "max": 2.5
+          }
+        }
+      ]
+    }
+  ],
+  "version": "04244c74f3bdff6d"
+}
